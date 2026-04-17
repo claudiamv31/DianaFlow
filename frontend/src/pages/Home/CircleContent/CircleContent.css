@@ -1,0 +1,34 @@
+.progressbar-container {
+  width: 280px;
+  margin: 2rem auto;
+}
+
+.inner-circle-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* Esto asegura que el texto no toque los bordes del círculo */
+  padding: 20px;
+}
+
+.phase-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #a5a5a5;
+  letter-spacing: 1px;
+}
+
+.main-status {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 8px 0;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.day-counter {
+  font-size: 0.9rem;
+  color: #666;
+}

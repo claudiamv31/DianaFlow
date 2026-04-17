@@ -1,0 +1,52 @@
+.custom-input-wrapper label {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.custom-input-wrapper {
+  width: 100%;
+}
+
+.custom-input-wrapper .input-group {
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  display: flex !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-input-wrapper .input-group:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.2rem rgba(186, 160, 229, 0.4);
+}
+
+.custom-input-wrapper .form-control {
+  border: none;
+  border-radius: 0;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  display: block;
+}
+
+.custom-input-wrapper .input-group-text {
+  background: var(--background-color);
+  border: none;
+  border-right: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.custom-input-wrapper .btn {
+  border-radius: 0 12px 12px 0;
+  border: none;
+}
+
+.custom-input-wrapper .form-control:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.form-control {
+  font-size: 15px !important;
+}

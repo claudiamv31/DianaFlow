@@ -1,0 +1,315 @@
+.log-flow-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.log-flow-overlay .log-flow-container {
+  width: min(100%, 760px);
+  max-width: 760px;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-main-content);
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.17);
+}
+
+.log-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--bg-main-content);
+  border-bottom: 1px solid #ececec;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: #333;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.log-scroll-content {
+  padding: 1.5rem 1.25rem;
+  overflow-y: auto;
+}
+
+.log-scroll-content h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.log-scroll-content h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+}
+
+.log-scroll-content h3 {
+  margin: 0 0 1.25rem;
+  font-size: 0.9rem;
+  color: var(--label-color);
+}
+
+.calendar-section,
+.input-group {
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.options-grid{
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.calendar-instructions {
+  margin: 0 0 0.75rem;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.period-summary {
+  margin: 0 0 1rem;
+  font-weight: 600;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.option-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.option-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.symptoms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.symptom-card {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.symptom-card.active {
+  background: #fde2e6;
+  border-color: #f5c4cb;
+}
+
+.period-tile {
+  background: #fde2e6;
+  color: #811f41;
+  border-radius: 10px;
+}
+
+.period-edge {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+}
+
+.log-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem 1.25rem;
+  background: var(--bg-main-content);
+  border-top: 1px solid #ececec;
+}
+
+.btn-cancel {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  padding: 0.85rem 1.2rem;
+  cursor: pointer;
+}
+
+.react-calendar {
+  width: 100%;
+  border: none;
+  border-radius: 1.25rem;
+  background: var(--accent-color);
+  box-shadow: 0 20px 50px rgba(117, 63, 96, 0.08);
+  padding: 1rem;
+}
+
+.react-calendar__navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  background: transparent;
+  padding: 0;
+}
+
+.react-calendar__navigation button {
+  border: none;
+  font-weight: 600;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.react-calendar__navigation button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.react-calendar__navigation__label {
+  font-weight: 700;
+  background-color: transparent;
+  font-size: 1rem;
+  color: #3d2740;
+}
+
+.react-calendar__navigation__arrow {
+  background-color: transparent;
+}
+
+.react-calendar__month-view__weekdays {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: #9c88a1;
+  font-weight: 700;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+
+.react-calendar__tile {
+  border-radius: 0.85rem;
+  border: none;
+  background: transparent;
+  height: 52px;
+  line-height: 52px;
+  font-weight: 600;
+  color: #4d3b4d;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background: var(--tercendary-color);
+  transform: none;
+}
+
+.react-calendar__tile--active {
+  background: transparent;
+}
+
+.react-calendar__tile.period-middle {
+  background: var(--tercendary-color) !important;
+  color: #7d4562 !important;
+}
+
+.react-calendar__tile.period-edge {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  ) !important;
+  color: white !important;
+}
+
+.react-calendar__tile.period-middle:hover,
+.react-calendar__tile.period-middle:focus,
+.react-calendar__tile.period-edge:hover,
+.react-calendar__tile.period-edge:focus {
+  transform: none;
+}
+
+.period-start,
+.period-end {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.react-calendar__tile.period-tile:hover,
+.react-calendar__tile.period-tile:focus,
+.react-calendar__tile.period-edge:hover,
+.react-calendar__tile.period-edge:focus {
+  transform: none;
+}
+
+.react-calendar__month-view__days__day {
+  background: transparent;
+}
+
+.react-calendar__tile--now {
+  background: rgba(237, 197, 208, 0.25);
+  color: #5f3f52;
+}
+
+@media (max-width: 640px) {
+  .log-flow-overlay {
+    padding: 0.75rem;
+  }
+
+  .log-flow-overlay .log-flow-container {
+    width: 100%;
+    border-radius: 22px;
+  }
+
+  .options-grid,
+  .symptoms-grid {
+    grid-template-columns: 1fr;
+  }
+}

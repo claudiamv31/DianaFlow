@@ -1,0 +1,58 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 1rem 1rem;
+  justify-content: space-between;
+  background-color: var(--tags-content);
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header li,
+.header a {
+  text-decoration: none;
+  color: var(--text-color);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  color: var(--primary-color);
+}
+
+.header-logo h1 {
+  margin: 0 0 0 5px;
+  font-size: 1.6rem;
+  color: var(--primary-color);
+}
+
+.moon-icon {
+  font-size: 1.4rem;
+  transform: rotate(340deg);
+  color: var(--primary-color);
+}
+
+.user-icon {
+  cursor: pointer;
+  margin-right: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 1px solid var(--label-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--label-color);
+}
+
+.profile {
+  margin-top: auto;
+  border-top: 1px solid rgb(105 102 102 / 14%);
+  padding-top: 0.8rem;
+}

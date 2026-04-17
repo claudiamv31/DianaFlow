@@ -1,0 +1,10 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: diana_flow_db
+    environment:
+      POSTGRES_USER: diana_flow_user
+      POSTGRES_PASSWORD: diana_flow_password
+      POSTGRES_DB: diana_flow_db
+    ports:
+      - "5432:5432"

@@ -1,0 +1,52 @@
+.login-screen {
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  place-items: center;
+}
+
+.login-screen form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1vh;
+}
+
+.login-logo {
+  display: flex;
+  color: var(--primary-color);
+  align-items: baseline;
+  gap: 5px;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.login-logo h1 {
+  font-size: 4.8vh;
+  margin: 0;
+  line-height: 1;
+}
+
+.login-logo .moon-icon {
+  font-size: 3.8vh;
+  transform: rotate(340deg);
+  line-height: 1;
+}
+
+.login-logo h1,
+.login-logo .moon-icon {
+  vertical-align: middle;
+}
+
+.login-screen button {
+  width: 100%;
+}
+
+.login-screen input {
+  width: 100%;
+}
+
+.signup-text {
+  font-size: 2vh;
+}

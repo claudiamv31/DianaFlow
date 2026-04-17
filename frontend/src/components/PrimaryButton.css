@@ -1,0 +1,27 @@
+.main-btn {
+  background: linear-gradient(
+    to left,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+  border-color: transparent;
+  width: 50%;
+}
+
+.main-btn:hover {
+  background: linear-gradient(
+    to left,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+  border-color: transparent;
+}
+
+.main-btn:active {
+  background: linear-gradient(
+    to left,
+    var(--secondary-color),
+    var(--primary-color)
+  ) !important;
+  border-color: transparent !important;
+}
