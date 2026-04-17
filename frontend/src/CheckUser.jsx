@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { auth } from './firebase/firebase';
 import './App.css';
 import { NavLink } from 'react-router-dom';
 

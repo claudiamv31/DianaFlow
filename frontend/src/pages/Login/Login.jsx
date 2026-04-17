@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../../firebase/authService';
+import { login } from '../../database/authService';
 import { FaMoon, FaUser, FaLock } from 'react-icons/fa';
 import PrimaryButton from '../../components/PrimaryButton';
 import Input from '../../components/Input';

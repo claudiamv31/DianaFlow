@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { register } from '../../firebase/authService';
 import { Link, useNavigate } from 'react-router-dom';
 import './SignUp.css';
 import image from '../../assets/register-img.png';
@@ -16,26 +15,18 @@ const SignUp = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      // 1. Autenticación con Supabase
-      const signData = await register(email, password);
-
-      // 2. Obtener el token de la sesión
-      const idToken = signData.session.access_token;
-      console.log('🔑 Token:', idToken);
-
-      // 3. Hacer request al backend protegido
       const res = await fetch(
-        'http://localhost:5079/api/profiles/save-profile',
+        'http://localhost:5039/api/users/sign-up',
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${idToken}`,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
             Name: name,
             LastName: lastName,
-            Email: email
+            Email: email,
+            Password: password
           })
         }
       );
@@ -45,7 +36,7 @@ const SignUp = () => {
         throw new Error(errorText || 'There was an error saving the profile');
       }
 
-      navigate('/first-questions');
+      navigate('/first-questions'); // O /login
     } catch (error) {
       console.error('Error in sign in:', error.message);
     }

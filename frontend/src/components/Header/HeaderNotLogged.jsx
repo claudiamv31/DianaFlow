@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { logout } from '../../firebase/authService';
+import { logout } from '../../database/authService';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { FaMoon } from 'react-icons/fa';
@@ -23,15 +23,6 @@ const HeaderNotLogged = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (err) {
-      setError(true);
-    }
-  };
 
   if (error) return <ErrorScreen />;
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { checkUser } from '../../firebase/authService';
+import { checkUser } from '../../database/authService';
 import apiClient from '../../api/apiClient';
 import './Home.css';
 import toast from 'react-hot-toast';

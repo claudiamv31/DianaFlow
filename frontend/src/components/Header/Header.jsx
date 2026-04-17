@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { logout } from '../../firebase/authService';
+import { logout } from '../../database/authService';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { FaUser, FaMoon } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

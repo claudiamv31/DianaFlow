@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { supabase } from '../supabaseClient';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5079/api/',
+  baseURL: 'http://localhost:5039/api/',
   timeout: 30000
 });
 
@@ -21,9 +20,8 @@ apiClient.interceptors.response.use(
   }
 );
 
-apiClient.interceptors.request.use(async (config) => {
-  const { data } = await supabase.auth.getSession();
-  const token = data?.session?.access_token;
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('jwtToken');
   console.log("Axios Interceptor Token:", token ? "Exists" : "EMPTY");
 
   if (token) {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { checkUser } from '../../firebase/authService';
+import { checkUser } from '../../database/authService';
 import apiClient from '../../api/apiClient';
 import { useQuery } from '@tanstack/react-query';
 import LoadingSpinner from '../../components/LoadingSpinner';

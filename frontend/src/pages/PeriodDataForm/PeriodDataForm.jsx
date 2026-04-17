@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { checkUser } from '../../firebase/authService';
+import { checkUser } from '../../database/authService';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
 
