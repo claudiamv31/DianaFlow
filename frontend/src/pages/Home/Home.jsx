@@ -151,8 +151,7 @@ function Home() {
             </form>
           </div>
           <div className="homepage-info">
-            <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
-            <YourPeriodCard />
+            {safeStatus.previousCycle && <><CycleInsightsCard previousCycle={safeStatus.previousCycle} /><YourPeriodCard /></>}
           </div>
         </div>
       )}

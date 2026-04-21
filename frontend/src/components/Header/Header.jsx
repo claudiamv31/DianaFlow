@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { logout } from '../../database/authService';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { FaUser, FaMoon } from 'react-icons/fa';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -32,14 +31,14 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (err) {
-      setError(true);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await logout();
+  //     navigate('/login');
+  //   } catch (err) {
+  //     setError(true);
+  //   }
+  // };
 
   if (error) return <ErrorScreen />;
 

@@ -32,7 +32,7 @@ const CycleInsightsCard = ({ previousCycle }) => {
                   icon={faCalendarDays}
                   className="nav-icon duration"
                 />
-                <p className="title">{previousCycle.duration} Days</p>
+                <p className="title">{previousCycle.days} Days</p>
                 <p>Period Duration</p>
               </div>
               <div className="info-card">

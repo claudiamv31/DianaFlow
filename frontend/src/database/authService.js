@@ -21,7 +21,6 @@ export const register = async (email, password, name, lastName) => {
 };
 
 export function checkUser(callback) {
-  // Ya no dependemos de Supabase. Checamos directamente si hay un Token.
   const token = localStorage.getItem('jwtToken');
   
   if (token) {
@@ -32,7 +31,6 @@ export function checkUser(callback) {
     callback(null);
   }
 
-  // Regresamos una función vacía para que no se rompan los useEffects que esperan un Unsubscribe
   return () => {};
 }
 
