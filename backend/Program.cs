@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using backend.Modulos.Periods.Services;
+using backend.Modulos.Cycles.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +39,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+// Register Module Services
+builder.Services.AddScoped<PeriodService>();
+builder.Services.AddScoped<CycleService>();
+builder.Services.AddScoped<CalendarService>();
 
 var app = builder.Build();
 

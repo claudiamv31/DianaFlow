@@ -1,0 +1,17 @@
+using System.Collections.Generic;
+
+namespace backend.Modulos.Cycles.DTOs
+{
+    public class CalendarDayDto
+    {
+        public string? PeriodId { get; set; }    
+        public DateOnly Date { get; set; }
+        public int CycleDay { get; set; }
+        public bool IsPeriod { get; set; }
+        public bool IsFertile { get; set; }
+        public bool IsOvulation {get; set; }
+        public string? Notes { get; set; }
+        public string? FertilityLevel { get; set; } 
+        public List<SymptomsDto> Symptoms { get; set; } = new();
+    }
+}
