@@ -31,4 +31,27 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+apiClient.checkUser = async () => {
+  const token = localStorage.getItem('jwtToken');
+  if (!token) {
+    return null;
+  }
+  const response = await apiClient.get('/users/me');
+  return response.data;
+};
+
+apiClient.logout = async () => {
+  localStorage.removeItem('jwtToken');
+};  
+
+apiClient.login = async (email, password) => {
+  const response = await apiClient.post('/users/login', { email, password });
+  if (response.status === 200) {
+    localStorage.setItem('jwtToken', response.data.token);
+  }else{
+    throw new Error('❌ Error al iniciar sesión');
+  }
+  return response.data;
+};
+
 export default apiClient;

@@ -1,3 +1,5 @@
+namespace backend.Modulos.Users.Models;
+
 public class UserProfile
 {
     public int Id { get; set; }

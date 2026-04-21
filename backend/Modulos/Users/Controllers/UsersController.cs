@@ -1,5 +1,6 @@
 using backend.Data;
 using backend.Modulos.Users.DTOs;
+using backend.Modulos.Users.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -49,7 +50,6 @@ namespace backend.Modulos.Users.Controllers
         {
             var user = _context.UserProfiles.FirstOrDefault(u => u.Email == dto.Email);
             
-            // Validate user exists and password hash matches
             if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
             {
                 return Unauthorized(new { message = "Credenciales inválidas" });

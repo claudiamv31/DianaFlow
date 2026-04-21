@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../../database/authService';
+import { useMutation } from '@tanstack/react-query';
 import { FaMoon, FaUser, FaLock } from 'react-icons/fa';
 import PrimaryButton from '../../components/PrimaryButton';
+import apiClient from '../../api/apiClient';
 import Input from '../../components/Input';
 import './Login.css';
 
@@ -18,11 +19,13 @@ function Login() {
         alert('Por favor ingresa correo y contraseña');
         return;
       }
+      
+      apiClient.login(email, password);
 
-      const userCredential = await login(email, password);
-      const user = userCredential.user;
+      if  (apiClient.checkUser()) {
+        navigate('/');
+      }
 
-      navigate('/');
     } catch (error) {
       console.error('❌ Error al iniciar sesión:', error);
       alert('Error al iniciar sesión');

@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-
-// Asegúrate de que el namespace de UserProfile coincida o agrégalo en los usings si no es global
-// using backend.Modulos.Users.Models;
+using backend.Modulos.Users.Models; 
+using backend.Modulos.Periods.Models;
 
 namespace backend.Data
 {
@@ -13,6 +12,7 @@ namespace backend.Data
 
         // Aquí agregas las tablas de tus módulos, por ejemplo UserProfile
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Periods> Periods { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
