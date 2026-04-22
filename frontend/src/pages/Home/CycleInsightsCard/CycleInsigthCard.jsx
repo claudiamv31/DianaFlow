@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faClover } from '@fortawesome/free-solid-svg-icons';
 import './CycleInsightsCard.css';
 
-const CycleInsightsCard = ({ previousCycle }) => {
+const CycleInsightsCard = ({ previousCycle}) => {
   return (
     <div className="cycle-insights">
       <div>

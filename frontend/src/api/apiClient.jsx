@@ -36,8 +36,13 @@ apiClient.checkUser = async () => {
   if (!token) {
     return null;
   }
-  const response = await apiClient.get('/users/me');
-  return response.data;
+  try {
+    const response = await apiClient.get('/users/me');
+    return response.data;
+  } catch (error) {
+    localStorage.removeItem('jwtToken');
+    return null;
+  }
 };
 
 apiClient.logout = async () => {
