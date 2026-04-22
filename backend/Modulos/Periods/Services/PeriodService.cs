@@ -96,12 +96,15 @@ namespace backend.Modulos.Periods.Services
 
             var cycleStatus = _cycleService.BuildCycleStatus(latest, cycleLength, periodLength);
 
+            var currentPhase = _cycleService.GetCyclePhase(latest.StartDate, cycleLength, DateOnly.FromDateTime(DateTime.Now));
+
             return new PeriodHomeDto
             {
                 StartDate = latest.StartDate,
                 EndDate = latest.EndDate,
                 DurationDays = periodLength,
                 IsActive = cycleStatus.Status == "active_period",
+                CurrentPhase = currentPhase,
                 PreviousCycle = previousCycleStatus,
                 CycleStatus = cycleStatus
             };

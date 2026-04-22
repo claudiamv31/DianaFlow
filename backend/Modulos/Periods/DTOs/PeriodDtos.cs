@@ -1,5 +1,7 @@
 using System;
 using backend.Modulos.Periods.Models;
+using backend.Modulos.Cycles.DTOs;
+using System.Text.Json.Serialization;
 
 namespace backend.Modulos.Periods.DTOs
 {
@@ -17,6 +19,11 @@ namespace backend.Modulos.Periods.DTOs
         public DateOnly EndDate { get; set; }
         public int DurationDays { get; set; }
         public bool IsActive { get; set; }
+        public int CycleDay { get; set; }
+        
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ECyclePhase CurrentPhase {get; set;}
+
         public PeriodStatus? PreviousCycle { get; set; }
         public PeriodStatus CycleStatus { get; set; } = new();
     }

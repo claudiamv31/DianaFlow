@@ -89,5 +89,31 @@ namespace backend.Modulos.Cycles.Services
                 FertilityLevel = fertilityLevel
             };
         }
+
+        public ECyclePhase GetCyclePhase(DateOnly periodStartDate, int cycleLength, DateOnly date)
+        {
+            var cycleDay = date.DayNumber - periodStartDate.DayNumber + 1;
+            var avgCycleLength = cycleLength > 0 ? cycleLength : 28;
+
+            if (cycleDay >= 1 && cycleDay <= 5) 
+            {
+                return ECyclePhase.Menstruation;
+            }
+
+            var ovulationDay = avgCycleLength - 14;
+
+            if (cycleDay >= ovulationDay - 1 && cycleDay <= ovulationDay + 1)
+            {
+                return ECyclePhase.Ovulation;
+            }
+
+            if (cycleDay < ovulationDay)
+            {
+                return ECyclePhase.Follicular;
+            }
+
+            return ECyclePhase.Luteal;
+        }
+
     }
 }

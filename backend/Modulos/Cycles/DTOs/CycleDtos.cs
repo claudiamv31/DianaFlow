@@ -1,3 +1,5 @@
+using backend.Modulos.Periods.Models;
+
 namespace backend.Modulos.Cycles.DTOs
 {
     public class SymptomsDto
@@ -13,5 +15,21 @@ namespace backend.Modulos.Cycles.DTOs
         public bool IsFertile { get; set; }
         public bool IsOvulation { get; set; }
         public string FertilityLevel { get; set; } = "low";
+    }
+
+    public enum ECyclePhase
+    {
+        Menstruation,
+        Follicular,
+        Ovulation,
+        Luteal
+    }
+
+    public class UpsertPeriodDto
+    {
+        public string? PeriodId { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        public PeriodFlow PeriodFlow { get; set; }
     }
 }
