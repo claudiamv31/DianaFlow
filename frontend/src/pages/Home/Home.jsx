@@ -135,11 +135,11 @@ function Home() {
           <div className="status">
             <form id="update-period" onSubmit={(e) => e.preventDefault()}>
               <div className="home-status">
-                <p className="text-phase bg-white/60">CICLE FHASE</p>
+                <p className="text-phase bg-white/60">{safeStatus.currentPhase.toLowerCase().toUpperCase()} PHASE</p>
                 <p className="text-status">
                   {getCycleMessage(safeStatus.cycleStatus)}
                 </p>
-                <p className="text-cycle">Cycle Day 23</p>
+                <p className="text-cycle">Cycle Day {safeStatus.cycleStatus.days}</p>
 
                 <PrimaryButton
                   type="button"

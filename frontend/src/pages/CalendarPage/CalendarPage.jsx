@@ -45,6 +45,8 @@ const CalendarPage = () => {
     enabled: !!user
   });
 
+  console.log("Calendar Days: ", calendarDays); 
+
   // 🔹 Periods (solo para pintar / seleccionar)
   const { data: periods } = useQuery({
     queryKey: ['periods', user?.uid, visibleMonth.year, visibleMonth.month],

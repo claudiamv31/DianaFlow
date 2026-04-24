@@ -1,4 +1,5 @@
 using backend.Data;
+using Microsoft.AspNetCore.Authorization;
 using backend.Modulos.Users.DTOs;
 using backend.Modulos.Users.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -89,5 +90,24 @@ namespace backend.Modulos.Users.Controllers
             var user = _context.UserProfiles.FirstOrDefault(u => u.Email == jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)!.Value);
             return Ok(user);
         }
+
+        [HttpGet("me")]
+        [Authorize] 
+        public IActionResult GetCurrentUser()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            var user = _context.UserProfiles.FirstOrDefault(u => u.Id.ToString() == userId);
+            
+            if (user == null) return NotFound();
+
+            return Ok(new {
+                id = user.Id,
+                email = user.Email,
+                name = user.Name,
+                lastName = user.LastName
+            });
+        }
+
     }
 }
