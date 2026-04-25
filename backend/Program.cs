@@ -5,11 +5,18 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using backend.Modulos.Periods.Services;
 using backend.Modulos.Cycles.Services;
+using backend.Modulos.Users.Services;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -44,15 +51,7 @@ builder.Services.AddAuthorization();
 // Register Module Services
 builder.Services.AddScoped<PeriodService>();
 builder.Services.AddScoped<CycleService>();
-builder.Services.AddScoped<CalendarService>();
-
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-    });
+builder.Services.AddScoped<UsersService>();
 
 var app = builder.Build();
 

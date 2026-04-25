@@ -25,22 +25,16 @@ namespace backend.Modulos.Periods.Controllers
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
-                if (dto.StartDate == default || dto.EndDate == default)
-                    return BadRequest("Fechas inválidas");
+                if (dto.StartDate == default)
+                    return BadRequest("La fecha de inicio es requerida.");
                             
-                if (dto.EndDate < dto.StartDate)
-                    return BadRequest("EndDate no puede ser menor a StartDate");
+                if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
+                    return BadRequest("La fecha de fin no puede ser menor a la de inicio.");
 
-                await _periodService.AddPeriodAsync(
-                    userId,
-                    dto.StartDate,
-                    dto.EndDate,
-                    dto.PeriodFlow
-                );
+                await _periodService.AddPeriodAsync(userId,dto);
 
                 return Created("", new { message = "Periodo guardado correctamente" });
             }
@@ -58,9 +52,8 @@ namespace backend.Modulos.Periods.Controllers
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
                 object? result = null;
                 
@@ -93,9 +86,8 @@ namespace backend.Modulos.Periods.Controllers
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
                 var period = await _periodService.GetLatestPeriodAsync(userId);
                 if (period == null)
@@ -116,12 +108,11 @@ namespace backend.Modulos.Periods.Controllers
             var claims = HttpContext.User.Claims.Select(c => c.Type + "=" + c.Value);
             Console.WriteLine("ALL CLAIMS: " + string.Join(", ", claims));
 
-            var userId = HttpContext.User.FindFirst("sub")?.Value 
+            var userIdString = HttpContext.User.FindFirst("sub")?.Value 
                          ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             
-            Console.WriteLine("UserId in GetHome: " + (userId ?? "NULL"));  
-            if (userId == null)
-                return Unauthorized();
+            Console.WriteLine("UserId in GetHome: " + (userIdString ?? "NULL"));  
+            if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
             var result = await _periodService.GetLatestForHomeAsync(userId);
             
@@ -136,22 +127,20 @@ namespace backend.Modulos.Periods.Controllers
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
-                if (dto.StartDate == default || dto.EndDate == default)
-                    return BadRequest("Fechas inválidas");
+                if (dto.StartDate == default)
+                    return BadRequest("La fecha de inicio es requerida.");
+                            
+                if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
+                    return BadRequest("La fecha de fin no puede ser menor a la de inicio.");
 
-                if (dto.EndDate < dto.StartDate)
-                    return BadRequest("EndDate no puede ser menor a StartDate");
-
-                var updated = await _periodService.UpdatePeriodAsync(
+                var updated = await _periodService.UpdatePeriod(
                     userId,
                     id,
                     dto.StartDate,
-                    dto.EndDate,
-                    dto.PeriodFlow
+                    dto.EndDate
                 );
 
                 if (!updated)
@@ -173,9 +162,8 @@ namespace backend.Modulos.Periods.Controllers
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
                 var deleted = await _periodService.DeletePeriodAsync(userId, id);
 

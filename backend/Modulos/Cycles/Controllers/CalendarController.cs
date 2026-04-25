@@ -22,9 +22,8 @@ namespace backend.Modulos.Cycles.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCalendar([FromQuery] int year, [FromQuery] int month)
         {
-            var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-                return Unauthorized();
+            var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
             var result = await _calendarService.GetCalendarAsync(userId, year, month);
 
@@ -35,9 +34,8 @@ namespace backend.Modulos.Cycles.Controllers
         [HttpGet("day")]
         public async Task<IActionResult> GetCalendar([FromQuery] DateOnly date)
         {
-            var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-                return Unauthorized();
+            var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
 
             var result = await _calendarService.GetCalendarDayAsync(userId, date);
 
@@ -49,7 +47,6 @@ namespace backend.Modulos.Cycles.Controllers
         {
             var startDate = dto.StartDate;
             var endDate = dto.EndDate;
-            var flow  = dto.PeriodFlow;
             var periodId = dto.PeriodId;
 
             if (endDate < startDate)
@@ -59,11 +56,10 @@ namespace backend.Modulos.Cycles.Controllers
 
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
                     
-                var result = await _calendarService.UpdateCalendar(userId, periodId, startDate, endDate, flow);
+                var result = await _calendarService.UpdateCalendar(userId, periodId, startDate, endDate);
 
                 return result == "created" 
                     ? StatusCode(201, new { message = "Período creado", status = "created" })

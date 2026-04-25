@@ -13,6 +13,7 @@ namespace backend.Data
         // Aquí agregas las tablas de tus módulos, por ejemplo UserProfile
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Periods> Periods { get; set; }
+        public DbSet<PeriodDays> PeriodDays { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

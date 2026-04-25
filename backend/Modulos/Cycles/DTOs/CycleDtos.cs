@@ -25,11 +25,20 @@ namespace backend.Modulos.Cycles.DTOs
         Luteal
     }
 
+    public class CycleStatus
+    {
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
+        public int CycleLength { get; set; }
+        public string Status { get; set; } = "unknown";
+        public int CycleDay { get; set; }
+        public int Days { get; set; }
+    }
+
     public class UpsertPeriodDto
     {
         public string? PeriodId { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly EndDate { get; set; }
-        public PeriodFlow PeriodFlow { get; set; }
     }
 }

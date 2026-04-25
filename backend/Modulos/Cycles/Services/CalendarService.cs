@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using backend.Modulos.Periods.Services;
 using backend.Modulos.Cycles.DTOs;
 using backend.Modulos.Periods.Models;
+using backend.Modulos.Periods.DTOs;
 
 namespace backend.Modulos.Cycles.Services
 {
@@ -19,9 +20,9 @@ namespace backend.Modulos.Cycles.Services
             _periodService = periodService;
         }
 
-        public async Task<List<CalendarDayDto>> GetCalendarAsync(string userId, int year, int month)
+        public async Task<List<CalendarDayDto>> GetCalendarAsync(int userId, int year, int month)
         {
-            var periods = await _periodService.GetPeriodsAsync(userId);
+            var periods = await _periodService.GetLast5PeriodsByUser(userId);
 
             var startMonth = new DateOnly(year, month, 1);
             var endMonth = startMonth.AddMonths(1).AddDays(-1);
@@ -58,9 +59,9 @@ namespace backend.Modulos.Cycles.Services
             return calendar;
         }
 
-        public async Task<CalendarDayDto> GetCalendarDayAsync(string userId, DateOnly date)
+        public async Task<CalendarDayDto> GetCalendarDayAsync(int userId, DateOnly date)
         {
-            var periods = await _periodService.GetPeriodsAsync(userId);
+            var periods = await _periodService.GetLast5PeriodsByUser(userId);
 
             var latestPeriod = periods
                 .Where(p => p.StartDate <= date)
@@ -87,25 +88,26 @@ namespace backend.Modulos.Cycles.Services
             };
         }
 
-        public async Task<string> UpdateCalendar(string userId, string? periodId, DateOnly start, DateOnly end, PeriodFlow flow)
+        public async Task<string> UpdateCalendar(int userId, string? periodId, DateOnly start, DateOnly end)
         {
-            var periods = await _periodService.GetPeriodsAsync(userId);
+            var periods = await _periodService.GetLast5PeriodsByUser(userId);
             
-            if (periodId != null)
+            if (periodId != null && int.TryParse(periodId, out int id))
             {
-                bool hasOverlap = periods.Any(p => p.Id != periodId && start <= p.EndDate && end >= p.StartDate);
+                bool hasOverlap = periods.Any(p => p.Id != periodId && start <= (p.EndDate ?? DateOnly.MaxValue) && end >= p.StartDate);
                 if (hasOverlap)
                     throw new InvalidOperationException("Periodo se solapa con otro");
                 
-                await _periodService.UpdatePeriodAsync(userId, periodId, start, end, flow);
+                await _periodService.UpdatePeriod(userId, periodId, start, end);
                 return "updated";
             }
             
-            bool hasOverlapCreate = periods.Any(p => start <= p.EndDate && end >= p.StartDate);
+            bool hasOverlapCreate = periods.Any(p => start <= (p.EndDate ?? DateOnly.MaxValue) && end >= p.StartDate);
             if (hasOverlapCreate)
                 throw new InvalidOperationException("Periodo se solapa con otro");
                 
-            await _periodService.AddPeriodAsync(userId, start, end, flow);
+            var periodDto = new PeriodDto { StartDate = start, EndDate = end };
+            await _periodService.AddPeriodAsync(userId, periodDto);
             return "created";
         }
     }
