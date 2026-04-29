@@ -19,7 +19,15 @@ namespace backend.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            // Configuraciones especiales de tus tablas irían aquí
+           modelBuilder.Entity<UserProfile>()
+                .Property(u => u.Id)
+                .HasValueGenerator<Microsoft.EntityFrameworkCore.ValueGeneration.SequentialGuidValueGenerator>();
+
+            modelBuilder.Entity<PeriodDays>()
+                .HasOne(pd => pd.Periods)    
+                .WithMany()
+                .HasForeignKey(pd => pd.PeriodId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

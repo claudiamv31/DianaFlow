@@ -24,7 +24,7 @@ namespace backend.Modulos.Periods.Services
             _usersService = usersService;
         }
 
-        public async Task<List<PeriodDto>> GetLast5PeriodsByUser(int userId)
+        public async Task<List<PeriodDto>> GetLast5PeriodsByUser(Guid userId)
         {
             var periods = await _context.Periods
                 .Where(p => p.UserId == userId)
@@ -35,7 +35,7 @@ namespace backend.Modulos.Periods.Services
             return periods.Select(MapToDto).ToList();
         }
 
-        public async Task<List<PeriodDto>> GetPeriodsByYearAsync(int userId, int year)
+        public async Task<List<PeriodDto>> GetPeriodsByYearAsync(Guid userId, int year)
         {
             var startYear = new DateOnly(year, 1, 1);
             var endYear = new DateOnly(year, 12, 31);
@@ -48,7 +48,7 @@ namespace backend.Modulos.Periods.Services
             return periods.Select(MapToDto).ToList();
         }
 
-        public async Task<List<PeriodDto>> GetPeriodsByMonthAsync(int userId, int year, int month)
+        public async Task<List<PeriodDto>> GetPeriodsByMonthAsync(Guid userId, int year, int month)
         {
             var startMonth = new DateOnly(year, month, 1);
             var endMonth = startMonth.AddMonths(1).AddDays(-1);
@@ -61,7 +61,7 @@ namespace backend.Modulos.Periods.Services
             return periods.Select(MapToDto).ToList();
         }
 
-        public async Task<List<PeriodDto>> GetPeriodsPagination(int userId, int page, int pageSize)
+        public async Task<List<PeriodDto>> GetPeriodsPagination(Guid userId, int page, int pageSize)
         {
             var periods = await _context.Periods
                 .Where(p => p.UserId == userId)
@@ -73,7 +73,7 @@ namespace backend.Modulos.Periods.Services
             return periods.Select(MapToDto).ToList();
         }
 
-        public async Task<PeriodDto?> GetLatestPeriodAsync(int userId)
+        public async Task<PeriodDto?> GetLatestPeriodAsync(Guid userId)
         {
             var period = await _context.Periods
                 .Where(p => p.UserId == userId)
@@ -83,7 +83,7 @@ namespace backend.Modulos.Periods.Services
             return period != null ? MapToDto(period) : null;
         }
 
-        public async Task<PeriodHomeDto?> GetLatestForHomeAsync(int userId)
+        public async Task<PeriodHomeDto?> GetLatestForHomeAsync(Guid userId)
         {
 
             var userTimeZoneId = _usersService.GetUserTimeZone(userId) ?? "UTC";
@@ -136,7 +136,7 @@ namespace backend.Modulos.Periods.Services
             };
         }
 
-        public async Task AddPeriodAsync(int userId, PeriodDto request)
+        public async Task AddPeriodAsync(Guid userId, PeriodDto request)
         {
             var timeZoneId = _usersService.GetUserTimeZone(userId);
             var today = _usersService.GetUserToday(timeZoneId);
@@ -155,7 +155,7 @@ namespace backend.Modulos.Periods.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task AddPeriodDays(int userId, int periodId, DateOnly startDate, DateOnly? endDate)
+        private async Task AddPeriodDays(Guid userId, int periodId, DateOnly startDate, DateOnly? endDate)
         {
             var startDateOnly = startDate.ToDateTime(TimeOnly.MinValue);
             var endDateOnly = endDate?.ToDateTime(TimeOnly.MaxValue);
@@ -170,35 +170,56 @@ namespace backend.Modulos.Periods.Services
                 });
             }
             _context.PeriodDays.AddRange(daysToAdd);
-        }
-
-        public async Task<bool> UpdatePeriod(int userId, string periodId, DateOnly startDate, DateOnly? endDate)
-        {
-            if (!int.TryParse(periodId, out int id)) return false;
-
-            var period = await _context.Periods.FirstOrDefaultAsync(p => p.Id == id && p.UserId == userId);
-            if (period == null) return false;
-
-            period.StartDate = startDate;
-            period.EndDate = endDate;
-            period.EndDate = endDate;
-            period.UpdatedAt = _usersService.GetUserToday(_usersService.GetUserTimeZone(userId));
-
-            var startDateTime = startDate.ToDateTime(TimeOnly.MinValue);
-            var endDateTime = endDate?.ToDateTime(TimeOnly.MaxValue);
-
-            var queryLimpieza = _context.PeriodDays
-                    .Where(r => r.PeriodId == id && 
-                   (r.Date < startDateTime || 
-                   (endDateTime.HasValue && r.Date > endDateTime.Value)));
-
-            await queryLimpieza.ExecuteDeleteAsync();
             await _context.SaveChangesAsync();
-
-            return true;
         }
 
-        public async Task<bool> DeletePeriodAsync(int userId, string periodId)
+        public async Task<bool> UpdatePeriod(Guid userId, int periodId, UpdatePeriodDto dto)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var timeZoneId = _usersService.GetUserTimeZone(userId);
+                var today = _usersService.GetUserToday(timeZoneId);
+
+                var period = await _context.Periods.FirstOrDefaultAsync(p => p.Id == periodId && p.UserId == userId);
+                if (period == null) return false;
+                
+                if(dto.SelectedDays == null || !dto.SelectedDays.Any()){
+                    _context.Periods.Remove(period);
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return true;
+                } 
+
+                await _context.PeriodDays.Where(pd => pd.PeriodId == periodId).ExecuteDeleteAsync();
+                
+                var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
+                period.StartDate = sortedDays.First().Date;
+                period.EndDate = sortedDays.Last().Date;
+                period.UpdatedAt = today;
+
+                var newPeriodDays = sortedDays.Select(d => new backend.Modulos.Periods.Models.PeriodDays
+                {
+                    PeriodId = periodId,
+                    Date = d.Date.ToDateTime(TimeOnly.MinValue),
+                    Flow = d.Flow
+                    
+                });
+
+                _context.PeriodDays.AddRange(newPeriodDays);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        public async Task<bool> DeletePeriodAsync(Guid userId, string periodId)
         {
             if (!int.TryParse(periodId, out int id)) return false;
 

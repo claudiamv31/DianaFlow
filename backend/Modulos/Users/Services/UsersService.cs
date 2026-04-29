@@ -12,7 +12,7 @@ namespace backend.Modulos.Users.Services
             _context = context;
         }
 
-        public string GetUserTimeZone(int userId)
+        public string GetUserTimeZone(Guid  userId)
         {
             var user = _context.UserProfiles.Find(userId);
             if (!string.IsNullOrEmpty(user?.TimeZone))

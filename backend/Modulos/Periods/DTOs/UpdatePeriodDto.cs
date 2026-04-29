@@ -1,8 +1,12 @@
-namespace backend.Modulos.Periods.Models;
+namespace backend.Modulos.Periods.DTOs;
 
 public class UpdatePeriodDto
 {
-    public DateOnly StartDate { get; set; }
-    public DateOnly? EndDate { get; set; }
-    public DateOnly UpdatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);   
+    public List<DailyRecordInput> SelectedDays { get; set; } = new();
+}
+
+public class DailyRecordInput
+{
+    public DateOnly Date { get; set; }
+    public int Flow { get; set; }
 }

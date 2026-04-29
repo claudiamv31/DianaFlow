@@ -20,7 +20,7 @@ namespace backend.Modulos.Cycles.Services
             _periodService = periodService;
         }
 
-        public async Task<List<CalendarDayDto>> GetCalendarAsync(int userId, int year, int month)
+        public async Task<List<CalendarDayDto>> GetCalendarAsync(Guid userId, int year, int month)
         {
             var periods = await _periodService.GetLast5PeriodsByUser(userId);
 
@@ -59,7 +59,7 @@ namespace backend.Modulos.Cycles.Services
             return calendar;
         }
 
-        public async Task<CalendarDayDto> GetCalendarDayAsync(int userId, DateOnly date)
+        public async Task<CalendarDayDto> GetCalendarDayAsync(Guid userId, DateOnly date)
         {
             var periods = await _periodService.GetLast5PeriodsByUser(userId);
 
@@ -88,27 +88,42 @@ namespace backend.Modulos.Cycles.Services
             };
         }
 
-        public async Task<string> UpdateCalendar(int userId, string? periodId, DateOnly start, DateOnly end)
+        public async Task<string> UpdateCalendar(Guid userId, int periodId, UpdatePeriodDto dto)
         {
             var periods = await _periodService.GetLast5PeriodsByUser(userId);
             
-            if (periodId != null && int.TryParse(periodId, out int id))
+            if (periodId > 0)
             {
-                bool hasOverlap = periods.Any(p => p.Id != periodId && start <= (p.EndDate ?? DateOnly.MaxValue) && end >= p.StartDate);
-                if (hasOverlap)
-                    throw new InvalidOperationException("Periodo se solapa con otro");
+                if (dto.SelectedDays != null && dto.SelectedDays.Any())
+                {
+                    var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
+                    var start = sortedDays.First().Date;
+                    var end = sortedDays.Last().Date;
+                    bool hasOverlap = periods.Any(p => p.Id != periodId.ToString() && start <= (p.EndDate ?? DateOnly.MaxValue) && end >= p.StartDate);
+                    if (hasOverlap)
+                        throw new InvalidOperationException("Periodo se solapa con otro");
+                }
                 
-                await _periodService.UpdatePeriod(userId, periodId, start, end);
+                await _periodService.UpdatePeriod(userId, periodId, dto);
                 return "updated";
             }
             
-            bool hasOverlapCreate = periods.Any(p => start <= (p.EndDate ?? DateOnly.MaxValue) && end >= p.StartDate);
-            if (hasOverlapCreate)
-                throw new InvalidOperationException("Periodo se solapa con otro");
-                
-            var periodDto = new PeriodDto { StartDate = start, EndDate = end };
-            await _periodService.AddPeriodAsync(userId, periodDto);
-            return "created";
+            if (dto.SelectedDays != null && dto.SelectedDays.Any())
+            {
+                var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
+                var start = sortedDays.First().Date;
+                var end = sortedDays.Last().Date;
+
+                bool hasOverlapCreate = periods.Any(p => start <= (p.EndDate ?? DateOnly.MaxValue) && end >= p.StartDate);
+                if (hasOverlapCreate)
+                    throw new InvalidOperationException("Periodo se solapa con otro");
+                    
+                var periodDto = new PeriodDto { StartDate = start, EndDate = end };
+                await _periodService.AddPeriodAsync(userId, periodDto);
+                return "created";
+            }
+
+            return "no_action";
         }
     }
 }

@@ -26,7 +26,7 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
                 if (dto.StartDate == default)
                     return BadRequest("La fecha de inicio es requerida.");
@@ -53,7 +53,7 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
                 object? result = null;
                 
@@ -87,7 +87,7 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
                 var period = await _periodService.GetLatestPeriodAsync(userId);
                 if (period == null)
@@ -112,7 +112,7 @@ namespace backend.Modulos.Periods.Controllers
                          ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             
             Console.WriteLine("UserId in GetHome: " + (userIdString ?? "NULL"));  
-            if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
+            if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
             var result = await _periodService.GetLatestForHomeAsync(userId);
             
@@ -123,34 +123,26 @@ namespace backend.Modulos.Periods.Controllers
         // PUT api/periods/{id}
         // =======================
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePeriod(string id, [FromBody] PeriodDto dto)
+        public async Task<IActionResult> UpdatePeriod(int id, [FromBody] UpdatePeriodDto dto)
         {
             try
             {
+                if(id <= 0)
+                    return BadRequest("Period ID is required.");
+
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
-                if (dto.StartDate == default)
-                    return BadRequest("La fecha de inicio es requerida.");
-                            
-                if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
-                    return BadRequest("La fecha de fin no puede ser menor a la de inicio.");
-
-                var updated = await _periodService.UpdatePeriod(
-                    userId,
-                    id,
-                    dto.StartDate,
-                    dto.EndDate
-                );
+                var updated = await _periodService.UpdatePeriod(userId, id, dto);
 
                 if (!updated)
                     return NotFound("Period not found.");
 
-                return NoContent(); // 204
+                return Ok(dto);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
@@ -163,7 +155,7 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!int.TryParse(userIdString, out int userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
                 var deleted = await _periodService.DeletePeriodAsync(userId, id);
 
