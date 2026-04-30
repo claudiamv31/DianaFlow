@@ -1,3 +1,5 @@
+import apiClient from '../api/apiClient';
+
 export const login = async (email, password) => {
   const res = await fetch('http://localhost:5039/api/users/login', {
     method: 'POST',
@@ -21,18 +23,19 @@ export const register = async (email, password, name, lastName) => {
 };
 
 export function checkUser(callback) {
-  const token = localStorage.getItem('jwtToken');
-  
-  if (token) {
-    // Si hay token asumimos que está logueado por el momento.
-    // (En una app real aquí decodificarías el JWT para sacar el email y nombre del usuario)
-    callback({ isAuthenticated: true });
-  } else {
-    callback(null);
-  }
+  const verifyToken = async () => {
+    const user = await apiClient.checkUser();
+    if (user) {
+      callback(user);
+    } else {
+      callback(null);
+    }
+  };
 
+  verifyToken();
   return () => {};
 }
+
 
 export const logout = async () => {
   localStorage.removeItem('jwtToken');

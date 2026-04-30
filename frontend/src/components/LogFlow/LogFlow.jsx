@@ -9,85 +9,50 @@ import './LogFlow.css';
 function LogFlow({ onClose, onSave, initialDate, previousCycle }) {
   const initialStartDate = parseLocalDate(initialDate) || new Date();
   const initialDuration = previousCycle?.duration || 5;
+  const [activeMonth, setActiveMonth] = useState(() => new Date(initialStartDate));
   const [selectedFlow, setSelectedFlow] = useState('Medium');
   const [range, setRange] = useState(() => {
     const start = new Date(initialStartDate);
-    const end = new Date(start);
-    end.setDate(end.getDate() + initialDuration - 1);
-    return { start, end };
+    const dates = [];
+    for (let i = 0; i < initialDuration; i++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      dates.push(formatDateLocal(date));
+    }
+    return dates;
   });
 
   const selectedDays = useMemo(() => {
-    if (!range?.start || !range?.end) return [];
-    const dates = [];
-    const current = new Date(range.start);
-    while (current <= range.end) {
-      dates.push(formatDateLocal(new Date(current)));
-      current.setDate(current.getDate() + 1);
-    }
-    return dates;
+    return [...range].sort();
   }, [range]);
 
   const firstDayPeriod = selectedDays[0];
   const endDayPeriod = selectedDays[selectedDays.length - 1];
-  const durationPeriod = selectedDays.length;
 
   const handleDayClick = (day) => {
-    const clicked = new Date(day);
-    const clickedString = formatDateLocal(clicked);
-    const startString = formatDateLocal(range.start);
-    const endString = formatDateLocal(range.end);
+    const clickedString = formatDateLocal(day);
 
-    if (selectedDays.length <= 1) {
-      const newStart = selectedDays.length === 0 ? clicked : range.start;
-      const newEnd = selectedDays.length === 0 ? clicked : clicked;
-      if (selectedDays.length === 1 && clickedString < startString) {
-        setRange({ start: clicked, end: range.start });
-      } else if (selectedDays.length === 1) {
-        setRange({ start: range.start, end: clicked });
-      } else {
-        setRange({ start: newStart, end: newEnd });
+    setRange(prev => {
+      if (prev.includes(clickedString)) {
+        return prev.filter(d => d !== clickedString);
       }
-      return;
-    }
-
-    if (clickedString < startString) {
-      setRange({ start: clicked, end: range.end });
-      return;
-    }
-
-    if (clickedString > endString) {
-      setRange({ start: range.start, end: clicked });
-      return;
-    }
-
-    const distanceToStart = clicked - range.start;
-    const distanceToEnd = range.end - clicked;
-
-    if (distanceToStart <= distanceToEnd) {
-      setRange({ start: clicked, end: range.end });
-    } else {
-      setRange({ start: range.start, end: clicked });
-    }
+      return [...prev, clickedString];
+    });
   };
 
-  const onMonthChange = () => {
-    // No cambiar la selección al navegar entre meses.
+  const onMonthChange = ({ activeStartDate }) => {
+    setActiveMonth(activeStartDate);
   };
 
   const handleSave = () => {
     onSave({
-      StartDate: firstDayPeriod,
-      EndDate: endDayPeriod,
-      FlowLevel: selectedFlow
+      SelectedDays: selectedDays
     });
   };
 
   const tileClassName = ({ date }) => {
     const dateString = formatDateLocal(date);
-    if (!selectedDays.includes(dateString)) return null;
-    if (dateString === firstDayPeriod) return 'period-edge period-start';
-    if (dateString === endDayPeriod) return 'period-edge period-end';
+    if (!range.includes(dateString)) return null;
     return 'period-tile period-middle';
   };
 
@@ -105,7 +70,9 @@ function LogFlow({ onClose, onSave, initialDate, previousCycle }) {
           <h3>Select your period dates</h3>
 
           <Calendar
+            key={range.join(',')}
             onClickDay={handleDayClick}
+            activeStartDate={activeMonth}
             onActiveStartDateChange={onMonthChange}
             showNeighboringMonth={false}
             locale="en-US"
@@ -119,7 +86,7 @@ function LogFlow({ onClose, onSave, initialDate, previousCycle }) {
               view === 'month' ? tileClassName({ date }) : null
             }
           />
-          <section className="input-group">
+          {/* <section className="input-group">
             <h3>
               <FaTint /> How is your flow?
             </h3>
@@ -134,7 +101,7 @@ function LogFlow({ onClose, onSave, initialDate, previousCycle }) {
                 </button>
               ))}
             </div>
-          </section>
+          </section> */}
         </div>
         <footer className="log-footer">
           <button className="btn-cancel" onClick={onClose}>

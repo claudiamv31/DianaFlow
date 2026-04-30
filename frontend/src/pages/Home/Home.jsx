@@ -107,9 +107,7 @@ function Home() {
   const safeStatus = statusOfPeriod || {
     cycleStatus: { status: 'unknown' },
     previousCycle: null
-  };
-
-  console.log(statusOfPeriod);
+  }
 
   const periodButtonText = isLogging
     ? 'Close calendar'
@@ -125,7 +123,10 @@ function Home() {
             previousCycle={safeStatus.previousCycle}
             onClose={() => setIsLogging(false)}
             onSave={(payload) => {
-              saveCycle.mutate(payload);
+              saveCycle.mutate({payload:{
+                selectedDays: payload.SelectedDays,
+                periodId: safeStatus.isActive ? safeStatus.currentPeriod.id : null
+              }});
               setIsLogging(false);
             }}
           />
@@ -135,11 +136,11 @@ function Home() {
           <div className="status">
             <form id="update-period" onSubmit={(e) => e.preventDefault()}>
               <div className="home-status">
-                <p className="text-phase bg-white/60">{safeStatus.currentPhase.toLowerCase().toUpperCase()} PHASE</p>
+                <p className="text-phase bg-white/60">{safeStatus.currentPhase ? safeStatus.currentPhase.toUpperCase() : 'No active period'}</p>
                 <p className="text-status">
                   {getCycleMessage(safeStatus.cycleStatus)}
                 </p>
-                <p className="text-cycle">Cycle Day {safeStatus.cycleStatus.days}</p>
+                <p className="text-cycle">{safeStatus.cycleStatus.status === 'active_period' ? 'Cycle Day ' + safeStatus.cycleStatus.days : ''}</p>
 
                 <PrimaryButton
                   type="button"
