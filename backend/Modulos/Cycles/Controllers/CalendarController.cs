@@ -43,7 +43,7 @@ namespace backend.Modulos.Cycles.Controllers
         }
 
         [HttpPost("upsert")]
-        public async Task<IActionResult> Upsert(int periodId,[FromBody] UpdatePeriodDto dto)
+        public async Task<IActionResult> Upsert([FromBody] PeriodInputDto dto)
         {
 
             try
@@ -51,7 +51,7 @@ namespace backend.Modulos.Cycles.Controllers
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
                     
-                var result = await _calendarService.UpdateCalendar(userId, periodId, dto);
+                var result = await _calendarService.UpdateCalendar(userId, dto);
 
                 return result == "created" 
                     ? StatusCode(201, new { message = "Período creado", status = "created" })

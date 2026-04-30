@@ -21,17 +21,24 @@ namespace backend.Modulos.Periods.Controllers
 
         // POST api/periods
         [HttpPost]
-        public async Task<IActionResult> CreatePeriod([FromBody] PeriodDto dto)
+        public async Task<IActionResult> CreatePeriod([FromBody] PeriodInputDto dto)
         {
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
-                if (dto.StartDate == default)
+                if (dto.SelectedDays == null || !dto.SelectedDays.Any())
+                    return BadRequest("Debe seleccionar al menos un día.");
+
+                var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
+                var startDate = sortedDays.First().Date;
+                var endDate = sortedDays.Last().Date;
+
+                if (startDate == default)
                     return BadRequest("La fecha de inicio es requerida.");
                             
-                if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
+                if (endDate < startDate)
                     return BadRequest("La fecha de fin no puede ser menor a la de inicio.");
 
                 await _periodService.AddPeriodAsync(userId,dto);
@@ -122,18 +129,18 @@ namespace backend.Modulos.Periods.Controllers
         // =======================
         // PUT api/periods/{id}
         // =======================
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePeriod(int id, [FromBody] UpdatePeriodDto dto)
+        [HttpPut]
+        public async Task<IActionResult> UpdatePeriod([FromBody] PeriodInputDto dto)
         {
             try
             {
-                if(id <= 0)
+                if(dto.PeriodId == null)
                     return BadRequest("Period ID is required.");
 
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
-                var updated = await _periodService.UpdatePeriod(userId, id, dto);
+                var updated = await _periodService.UpdatePeriod(userId, dto);
 
                 if (!updated)
                     return NotFound("Period not found.");

@@ -14,6 +14,18 @@ namespace backend.Modulos.Periods.DTOs
         public int? Duration { get; set; }
     }
 
+    public class PeriodInputDto
+    {
+        public int? PeriodId { get; set; }
+        public List<DailyRecordInput> SelectedDays { get; set; } = new();
+    }
+
+    public class DailyRecordInput
+    {
+        public DateOnly Date { get; set; }
+        public int Flow { get; set; }
+    }
+
     public class PeriodHomeDto
     {
         public DateOnly StartDate { get; set; }

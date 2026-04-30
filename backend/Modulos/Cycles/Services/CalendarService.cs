@@ -88,23 +88,23 @@ namespace backend.Modulos.Cycles.Services
             };
         }
 
-        public async Task<string> UpdateCalendar(Guid userId, int periodId, UpdatePeriodDto dto)
+        public async Task<string> UpdateCalendar(Guid userId, PeriodInputDto dto)
         {
             var periods = await _periodService.GetLast5PeriodsByUser(userId);
             
-            if (periodId > 0)
+            if (dto.PeriodId > 0)
             {
                 if (dto.SelectedDays != null && dto.SelectedDays.Any())
                 {
                     var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
                     var start = sortedDays.First().Date;
                     var end = sortedDays.Last().Date;
-                    bool hasOverlap = periods.Any(p => p.Id != periodId.ToString() && start <= (p.EndDate ?? DateOnly.MaxValue) && end >= p.StartDate);
+                    bool hasOverlap = periods.Any(p => p.Id != dto.PeriodId.ToString() && start <= (p.EndDate ?? DateOnly.MaxValue) && end >= p.StartDate);
                     if (hasOverlap)
                         throw new InvalidOperationException("Periodo se solapa con otro");
                 }
                 
-                await _periodService.UpdatePeriod(userId, periodId, dto);
+                await _periodService.UpdatePeriod(userId, dto);
                 return "updated";
             }
             
@@ -118,8 +118,7 @@ namespace backend.Modulos.Cycles.Services
                 if (hasOverlapCreate)
                     throw new InvalidOperationException("Periodo se solapa con otro");
                     
-                var periodDto = new PeriodDto { StartDate = start, EndDate = end };
-                await _periodService.AddPeriodAsync(userId, periodDto);
+                await _periodService.AddPeriodAsync(userId, dto);
                 return "created";
             }
 

@@ -136,44 +136,46 @@ namespace backend.Modulos.Periods.Services
             };
         }
 
-        public async Task AddPeriodAsync(Guid userId, PeriodDto request)
+        public async Task AddPeriodAsync(Guid userId, PeriodInputDto dto)
         {
             var timeZoneId = _usersService.GetUserTimeZone(userId);
             var today = _usersService.GetUserToday(timeZoneId);
 
+            var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
+            var startDate = sortedDays.First().Date;
+            var endDate = sortedDays.Last().Date;
+
             var period = new backend.Modulos.Periods.Models.Periods
             {
                 UserId = userId,
-                StartDate = request.StartDate,
-                EndDate = request.EndDate,
-                CreatedAt = DateTime.UtcNow,
+                StartDate = startDate,
+                EndDate = endDate,
                 UpdatedAt = today
             };
 
             _context.Periods.Add(period);
-            await AddPeriodDays(userId, period.Id, period.StartDate, period.EndDate);
+            await AddPeriodDays(period.Id, dto.SelectedDays);
             await _context.SaveChangesAsync();
         }
 
-        private async Task AddPeriodDays(Guid userId, int periodId, DateOnly startDate, DateOnly? endDate)
+        private async Task AddPeriodDays(int periodId, List<DailyRecordInput> dailyRecords)
         {
-            var startDateOnly = startDate.ToDateTime(TimeOnly.MinValue);
-            var endDateOnly = endDate?.ToDateTime(TimeOnly.MaxValue);
-
             var daysToAdd = new List<backend.Modulos.Periods.Models.PeriodDays>();
-            for (DateTime dt = startDateOnly; dt <= endDateOnly; dt = dt.AddDays(1))
+
+            foreach(var day in dailyRecords)
             {
                 daysToAdd.Add(new backend.Modulos.Periods.Models.PeriodDays
                 {
                     PeriodId = periodId,
-                    Date = dt
+                    Date = day.Date,
+                    Flow = day.Flow
                 });
             }
             _context.PeriodDays.AddRange(daysToAdd);
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdatePeriod(Guid userId, int periodId, UpdatePeriodDto dto)
+        public async Task<bool> UpdatePeriod(Guid userId, PeriodInputDto dto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -181,7 +183,7 @@ namespace backend.Modulos.Periods.Services
                 var timeZoneId = _usersService.GetUserTimeZone(userId);
                 var today = _usersService.GetUserToday(timeZoneId);
 
-                var period = await _context.Periods.FirstOrDefaultAsync(p => p.Id == periodId && p.UserId == userId);
+                var period = await _context.Periods.FirstOrDefaultAsync(p => p.Id == dto.PeriodId && p.UserId == userId);
                 if (period == null) return false;
                 
                 if(dto.SelectedDays == null || !dto.SelectedDays.Any()){
@@ -191,7 +193,7 @@ namespace backend.Modulos.Periods.Services
                     return true;
                 } 
 
-                await _context.PeriodDays.Where(pd => pd.PeriodId == periodId).ExecuteDeleteAsync();
+                await _context.PeriodDays.Where(pd => pd.PeriodId == dto.PeriodId).ExecuteDeleteAsync();
                 
                 var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
                 period.StartDate = sortedDays.First().Date;
@@ -200,8 +202,8 @@ namespace backend.Modulos.Periods.Services
 
                 var newPeriodDays = sortedDays.Select(d => new backend.Modulos.Periods.Models.PeriodDays
                 {
-                    PeriodId = periodId,
-                    Date = d.Date.ToDateTime(TimeOnly.MinValue),
+                    PeriodId = period.Id,
+                    Date = d.Date,
                     Flow = d.Flow
                     
                 });
