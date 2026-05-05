@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Data;
@@ -11,9 +12,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260425040657_ChangePeriodUserIdToInt")]
+    partial class ChangePeriodUserIdToInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,8 +36,8 @@ namespace backend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Flow")
                         .HasColumnType("integer");
@@ -46,12 +49,15 @@ namespace backend.Migrations
                     b.Property<int>("PeriodId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int?>("PeriodsId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("UpdatedAt")
+                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PeriodId");
+                    b.HasIndex("PeriodsId");
 
                     b.ToTable("PeriodDays");
                 });
@@ -76,8 +82,8 @@ namespace backend.Migrations
                     b.Property<DateOnly>("UpdatedAt")
                         .HasColumnType("date");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -86,9 +92,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Modulos.Users.Models.UserProfile", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -125,9 +133,7 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Modulos.Periods.Models.Periods", "Periods")
                         .WithMany()
-                        .HasForeignKey("PeriodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PeriodsId");
 
                     b.Navigation("Periods");
                 });

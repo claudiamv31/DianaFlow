@@ -9,33 +9,37 @@ namespace backend.Modulos.Periods.DTOs
     {
         public string Id { get; set; } = string.Empty;
         public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
-        public PeriodFlow PeriodFlow { get; set; }
+        public DateOnly? EndDate { get; set; }
+        public bool IsActive { get; set; }
+        public int? Duration { get; set; }
+    }
+
+    public class PeriodInputDto
+    {
+        public int? PeriodId { get; set; }
+        public List<DailyRecordInput> SelectedDays { get; set; } = new();
+    }
+
+    public class DailyRecordInput
+    {
+        public DateOnly Date { get; set; }
+        public int Flow { get; set; }
     }
 
     public class PeriodHomeDto
     {
+        public int? PeriodId { get; set; }
         public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateOnly? EndDate { get; set; }
         public int DurationDays { get; set; }
         public bool IsActive { get; set; }
-        public int CycleDay { get; set; }
+        public int DaysUntilNextPeriod { get; set; }
         
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ECyclePhase CurrentPhase {get; set;}
 
-        public PeriodStatus? PreviousCycle { get; set; }
-        public PeriodStatus CycleStatus { get; set; } = new();
-    }
-
-    public class PeriodStatus
-    {
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
-        public int CycleLength { get; set; }
-        public CycleRegularityLevel RegularityLevel { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public int Days { get; set; } // for days delayed, days left, etc
+        public CycleStatus? PreviousCycle { get; set; }
+        public CycleStatus CycleStatus { get; set; } = new();
     }
 
     public enum CycleRegularityLevel

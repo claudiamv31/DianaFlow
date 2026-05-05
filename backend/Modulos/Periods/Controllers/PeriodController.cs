@@ -21,26 +21,28 @@ namespace backend.Modulos.Periods.Controllers
 
         // POST api/periods
         [HttpPost]
-        public async Task<IActionResult> CreatePeriod([FromBody] PeriodDto dto)
+        public async Task<IActionResult> CreatePeriod([FromBody] PeriodInputDto dto)
         {
+            Console.WriteLine("CreatePeriod");
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
-                if (dto.StartDate == default || dto.EndDate == default)
-                    return BadRequest("Fechas inválidas");
+                if (dto.SelectedDays == null || !dto.SelectedDays.Any())
+                    return BadRequest("Debe seleccionar al menos un día.");
+
+                var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
+                var startDate = sortedDays.First().Date;
+                var endDate = sortedDays.Last().Date;
+
+                if (startDate == default)
+                    return BadRequest("La fecha de inicio es requerida.");
                             
-                if (dto.EndDate < dto.StartDate)
-                    return BadRequest("EndDate no puede ser menor a StartDate");
+                if (endDate < startDate)
+                    return BadRequest("La fecha de fin no puede ser menor a la de inicio.");
 
-                await _periodService.AddPeriodAsync(
-                    userId,
-                    dto.StartDate,
-                    dto.EndDate,
-                    dto.PeriodFlow
-                );
+                await _periodService.AddPeriodAsync(userId,dto);
 
                 return Created("", new { message = "Periodo guardado correctamente" });
             }
@@ -58,9 +60,8 @@ namespace backend.Modulos.Periods.Controllers
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
                 object? result = null;
                 
@@ -93,9 +94,8 @@ namespace backend.Modulos.Periods.Controllers
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
                 var period = await _periodService.GetLatestPeriodAsync(userId);
                 if (period == null)
@@ -116,12 +116,11 @@ namespace backend.Modulos.Periods.Controllers
             var claims = HttpContext.User.Claims.Select(c => c.Type + "=" + c.Value);
             Console.WriteLine("ALL CLAIMS: " + string.Join(", ", claims));
 
-            var userId = HttpContext.User.FindFirst("sub")?.Value 
+            var userIdString = HttpContext.User.FindFirst("sub")?.Value 
                          ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             
-            Console.WriteLine("UserId in GetHome: " + (userId ?? "NULL"));  
-            if (userId == null)
-                return Unauthorized();
+            Console.WriteLine("UserId in GetHome: " + (userIdString ?? "NULL"));  
+            if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
             var result = await _periodService.GetLatestForHomeAsync(userId);
             
@@ -129,39 +128,29 @@ namespace backend.Modulos.Periods.Controllers
         }
 
         // =======================
-        // PUT api/periods/{id}
+        // PUT api/periods
         // =======================
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePeriod(string id, [FromBody] PeriodDto dto)
+        [HttpPut]
+        public async Task<IActionResult> UpdatePeriod([FromBody] PeriodInputDto dto)
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                if(dto.PeriodId == null)
+                    return BadRequest("Period ID is required.");
 
-                if (dto.StartDate == default || dto.EndDate == default)
-                    return BadRequest("Fechas inválidas");
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
-                if (dto.EndDate < dto.StartDate)
-                    return BadRequest("EndDate no puede ser menor a StartDate");
-
-                var updated = await _periodService.UpdatePeriodAsync(
-                    userId,
-                    id,
-                    dto.StartDate,
-                    dto.EndDate,
-                    dto.PeriodFlow
-                );
+                var updated = await _periodService.UpdatePeriod(userId, dto);
 
                 if (!updated)
                     return NotFound("Period not found.");
 
-                return NoContent(); // 204
+                return Ok(dto);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
@@ -173,9 +162,8 @@ namespace backend.Modulos.Periods.Controllers
         {
             try
             {
-                var userId = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null)
-                    return Unauthorized();
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
                 var deleted = await _periodService.DeletePeriodAsync(userId, id);
 

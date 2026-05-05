@@ -85,7 +85,12 @@ function Home() {
 
   const saveCycle = useMutation({
     mutationFn: async (payload) => {
-      const res = await apiClient.post(`/periods`, payload);
+      let res;
+      if (payload.periodId != null) {
+        res = await apiClient.put(`/periods`, payload);
+      } else {
+        res = await apiClient.post(`/periods`, payload);
+      }
       return res.data;
     },
     onSuccess: () => {
@@ -107,9 +112,7 @@ function Home() {
   const safeStatus = statusOfPeriod || {
     cycleStatus: { status: 'unknown' },
     previousCycle: null
-  };
-
-  console.log(statusOfPeriod);
+  }
 
   const periodButtonText = isLogging
     ? 'Close calendar'
@@ -124,10 +127,15 @@ function Home() {
           <LogFlow
             previousCycle={safeStatus.previousCycle}
             onClose={() => setIsLogging(false)}
-            onSave={(payload) => {
-              saveCycle.mutate(payload);
+            onSave={(data) => {
+              saveCycle.mutate({
+                selectedDays: data.SelectedDays.map(d => ({ date: d, flow: 2 })),
+                periodId: safeStatus.isActive ? safeStatus.periodId : null
+              });
               setIsLogging(false);
             }}
+            initialDate={safeStatus.startDate}
+            endDate={safeStatus.endDate}
           />
         </div>
       ) : (
@@ -135,11 +143,11 @@ function Home() {
           <div className="status">
             <form id="update-period" onSubmit={(e) => e.preventDefault()}>
               <div className="home-status">
-                <p className="text-phase bg-white/60">{safeStatus.currentPhase.toLowerCase().toUpperCase()} PHASE</p>
+                <p className="text-phase bg-white/60">{safeStatus.currentPhase ? safeStatus.currentPhase.toUpperCase() : 'No active period'}</p>
                 <p className="text-status">
                   {getCycleMessage(safeStatus.cycleStatus)}
                 </p>
-                <p className="text-cycle">Cycle Day {safeStatus.cycleStatus.days}</p>
+                <p className="text-cycle">{safeStatus.cycleStatus.status === 'active_period' ? 'Cycle Day ' + safeStatus.cycleStatus.days : ''}</p>
 
                 <PrimaryButton
                   type="button"

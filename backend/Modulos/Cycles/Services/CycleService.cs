@@ -3,11 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Cycles.DTOs;
+using backend.Modulos.Users.Services;
 
 namespace backend.Modulos.Cycles.Services
 {
     public class CycleService
     {
+        private readonly UsersService _usersService;
+
+        public CycleService(UsersService usersService)
+        {
+            _usersService = usersService;
+        }
         public int CalculateAverageCycleLength(List<PeriodDto> periods)
         {
             if (periods == null || periods.Count < 2) return 28; // Default
@@ -29,18 +36,23 @@ namespace backend.Modulos.Cycles.Services
             return current.StartDate.DayNumber - previous.StartDate.DayNumber;
         }
 
-        public PeriodStatus BuildCycleStatus(PeriodDto latest, int cycleLength, int periodLength)
+        public CycleStatus BuildCycleStatus(PeriodDto latest, int cycleLength, int periodLength, DateOnly today)
         {
             var nextPeriodStart = latest.StartDate.AddDays(cycleLength);
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
             
             int daysDiff = nextPeriodStart.DayNumber - today.DayNumber;
+            var cycleDay = today.DayNumber - latest.StartDate.DayNumber + 1;
             
             string status;
-            if (today >= latest.StartDate && today <= latest.EndDate)
+            if (latest.EndDate == null)
             {
                 status = "active_period";
-                daysDiff = latest.EndDate.DayNumber - today.DayNumber;
+                daysDiff = (today.DayNumber - latest.StartDate.DayNumber)+1;
+            }
+            else if (today >= latest.StartDate && today <= latest.EndDate.Value)
+            {
+                status = "active_period";
+                daysDiff = (latest.EndDate.Value.DayNumber - today.DayNumber)+1;
             }
             else if (daysDiff < 0)
             {
@@ -56,12 +68,13 @@ namespace backend.Modulos.Cycles.Services
                 status = "next_period";
             }
 
-            return new PeriodStatus
+            return new CycleStatus
             {
                 StartDate = nextPeriodStart,
                 EndDate = nextPeriodStart.AddDays(periodLength - 1),
                 CycleLength = cycleLength,
                 Status = status,
+                CycleDay = cycleDay,
                 Days = daysDiff
             };
         }
