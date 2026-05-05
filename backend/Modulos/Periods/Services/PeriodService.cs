@@ -106,6 +106,7 @@ namespace backend.Modulos.Periods.Services
 
             return new PeriodHomeDto
             {
+                PeriodId = int.Parse(latest.Id),
                 StartDate = latest.StartDate,
                 EndDate = latest.EndDate,
                 DurationDays = periodLength,
@@ -154,8 +155,8 @@ namespace backend.Modulos.Periods.Services
             };
 
             _context.Periods.Add(period);
+            await _context.SaveChangesAsync(); // Esto guarda el periodo en la DB y EF Core auto-asigna el period.Id
             await AddPeriodDays(period.Id, dto.SelectedDays);
-            await _context.SaveChangesAsync();
         }
 
         private async Task AddPeriodDays(int periodId, List<DailyRecordInput> dailyRecords)

@@ -23,6 +23,7 @@ namespace backend.Modulos.Periods.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePeriod([FromBody] PeriodInputDto dto)
         {
+            Console.WriteLine("CreatePeriod");
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -127,7 +128,7 @@ namespace backend.Modulos.Periods.Controllers
         }
 
         // =======================
-        // PUT api/periods/{id}
+        // PUT api/periods
         // =======================
         [HttpPut]
         public async Task<IActionResult> UpdatePeriod([FromBody] PeriodInputDto dto)
