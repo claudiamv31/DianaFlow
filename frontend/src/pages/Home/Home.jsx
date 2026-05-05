@@ -85,7 +85,12 @@ function Home() {
 
   const saveCycle = useMutation({
     mutationFn: async (payload) => {
-      const res = await apiClient.post(`/periods`, payload);
+      let res;
+      if (payload.periodId != null) {
+        res = await apiClient.put(`/periods`, payload);
+      } else {
+        res = await apiClient.post(`/periods`, payload);
+      }
       return res.data;
     },
     onSuccess: () => {
@@ -122,13 +127,15 @@ function Home() {
           <LogFlow
             previousCycle={safeStatus.previousCycle}
             onClose={() => setIsLogging(false)}
-            onSave={(payload) => {
-              saveCycle.mutate({payload:{
-                selectedDays: payload.SelectedDays,
-                periodId: safeStatus.isActive ? safeStatus.currentPeriod.id : null
-              }});
+            onSave={(data) => {
+              saveCycle.mutate({
+                selectedDays: data.SelectedDays.map(d => ({ date: d, flow: 2 })),
+                periodId: safeStatus.isActive ? safeStatus.periodId : null
+              });
               setIsLogging(false);
             }}
+            initialDate={safeStatus.startDate}
+            endDate={safeStatus.endDate}
           />
         </div>
       ) : (

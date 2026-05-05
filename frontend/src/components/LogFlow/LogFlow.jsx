@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
 import { FaTint, FaRegSmileBeam, FaTimes } from 'react-icons/fa';
 import PrimaryButton from '../PrimaryButton';
-import FloatingCalendar from '../FloatingCalendar';
 import Calendar from 'react-calendar';
 import { formatDateLocal, parseLocalDate } from '../../utils/calendarUtils';
 import './LogFlow.css';
 
-function LogFlow({ onClose, onSave, initialDate, previousCycle }) {
+function LogFlow({ onClose, onSave, initialDate, previousCycle, endDate }) {
   const initialStartDate = parseLocalDate(initialDate) || new Date();
   const initialDuration = previousCycle?.duration || 5;
   const [activeMonth, setActiveMonth] = useState(() => new Date(initialStartDate));
@@ -14,10 +13,18 @@ function LogFlow({ onClose, onSave, initialDate, previousCycle }) {
   const [range, setRange] = useState(() => {
     const start = new Date(initialStartDate);
     const dates = [];
-    for (let i = 0; i < initialDuration; i++) {
-      const date = new Date(start);
-      date.setDate(start.getDate() + i);
-      dates.push(formatDateLocal(date));
+    if (endDate && initialDate) {
+      const sDate = parseLocalDate(initialDate);
+      const eDate = parseLocalDate(endDate);
+      for(let i = sDate; i <= eDate; i.setDate(i.getDate() + 1)){
+        dates.push(formatDateLocal(i));
+      }
+    }else{
+      for (let i = 0; i < initialDuration; i++) {
+        const date = new Date(start);
+        date.setDate(start.getDate() + i);
+        dates.push(formatDateLocal(date));
+      }
     }
     return dates;
   });
@@ -25,9 +32,6 @@ function LogFlow({ onClose, onSave, initialDate, previousCycle }) {
   const selectedDays = useMemo(() => {
     return [...range].sort();
   }, [range]);
-
-  const firstDayPeriod = selectedDays[0];
-  const endDayPeriod = selectedDays[selectedDays.length - 1];
 
   const handleDayClick = (day) => {
     const clickedString = formatDateLocal(day);
@@ -52,8 +56,14 @@ function LogFlow({ onClose, onSave, initialDate, previousCycle }) {
 
   const tileClassName = ({ date }) => {
     const dateString = formatDateLocal(date);
-    if (!range.includes(dateString)) return null;
-    return 'period-tile period-middle';
+    const today = formatDateLocal(new Date());
+    const isSelected = range.includes(dateString);
+
+    let classes = [];
+    if (isSelected) classes.push('period-tile', 'period-middle');
+    if (dateString === today) classes.push('period-today');
+    
+    return classes.length ? classes.join(' ') : null;
   };
 
   return (
