@@ -46,13 +46,13 @@ namespace backend.Modulos.Cycles.Services
 
                 calendar.Add(new CalendarDayDto
                 {
+                    PeriodId = isPeriod ? latestPeriod.Id : null,   
                     Date = day,
                     CycleDay = cycleInfo.CycleDay,
                     IsPeriod = isPeriod,
                     IsFertile = cycleInfo.IsFertile,
                     IsOvulation = cycleInfo.IsOvulation,
-                    FertilityLevel = cycleInfo.FertilityLevel,
-                    Symptoms = new List<SymptomsDto>()
+                    FertilityLevel = cycleInfo.FertilityLevel
                 });
             }
 

@@ -51,6 +51,7 @@ builder.Services.AddAuthorization();
 // Register Module Services
 builder.Services.AddScoped<PeriodService>();
 builder.Services.AddScoped<CycleService>();
+builder.Services.AddScoped<CalendarService>();
 builder.Services.AddScoped<UsersService>();
 
 var app = builder.Build();

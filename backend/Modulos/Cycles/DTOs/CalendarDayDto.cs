@@ -12,6 +12,5 @@ namespace backend.Modulos.Cycles.DTOs
         public bool IsOvulation {get; set; }
         public string? Notes { get; set; }
         public string? FertilityLevel { get; set; } 
-        public List<SymptomsDto> Symptoms { get; set; } = new();
     }
 }

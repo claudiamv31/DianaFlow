@@ -22,12 +22,21 @@ namespace backend.Modulos.Cycles.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCalendar([FromQuery] int year, [FromQuery] int month)
         {
-            var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+            try{
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
 
-            var result = await _calendarService.GetCalendarAsync(userId, year, month);
+                var result = await _calendarService.GetCalendarAsync(userId, year, month);
 
-            return Ok(result);
+                if(result == null)
+                    return NotFound("No periods found.");
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
          // GET /api/calendar/day?date=2026-01-01
