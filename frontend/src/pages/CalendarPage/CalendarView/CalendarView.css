@@ -1,10 +1,12 @@
 .calendar {
-  margin: 20px;
-  padding: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-grow: 1;
+}
+
+.calendar .react-calendar{
+  background-color: var(--tags-content);
 }
 
 .calendar--full {

@@ -1,0 +1,39 @@
+.log-period-card-container{
+    position: relative;
+    overflow: hidden;
+    padding: 1rem 2rem;
+    border-radius: 1.5rem;
+    background: linear-gradient(
+    to left,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+}
+
+.log-period-card-container h2{
+    font-family: 'Manrope', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    margin: 1rem 0;
+}
+
+.log-period-card-container p{
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: white;
+}
+
+.log-period-card-container button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    background: white;
+    border-color: transparent;
+    color: var(--primary-color);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+

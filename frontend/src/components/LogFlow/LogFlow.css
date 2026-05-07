@@ -175,13 +175,16 @@
   cursor: pointer;
 }
 
-.react-calendar {
+.log-scroll-content .react-calendar {
+  background: var(--accent-color);
+  padding: 1rem;
+}
+
+.react-calendar{
+  box-shadow: 0 20px 50px rgba(117, 63, 96, 0.08);
   width: 100%;
   border: none;
   border-radius: 1.25rem;
-  background: var(--accent-color);
-  box-shadow: 0 20px 50px rgba(117, 63, 96, 0.08);
-  padding: 1rem;
 }
 
 .react-calendar__navigation {

@@ -1,0 +1,12 @@
+.legend-card-container {
+    background-color: var(--accent-color);
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.legend-card-container h2{
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}

@@ -6,6 +6,9 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorScreen from '../../components/ErrorScreen';
 import './CalendarPage.css';
 import CalendarInfo from './CalendarInfo/CalendarInfo';
+import Card from '../../components/Card/Card';
+import LegendCard from './LegendCard/LegendCard';
+import LogPeriodCard from './LogPeriodCard/LogPeriodCard';
 import CalendarView from './CalendarView/CalendarView';
 import { parseLocalDate, formatDateLocal } from '../../utils/calendarUtils';
 
@@ -117,22 +120,34 @@ const CalendarPage = () => {
 
   return (
     <div className="calendar-page">
-      <CalendarView
-        date={date}
-        calendarDays={calendarDays}
-        periods={periods}
-        isInfoActive={isInfoActive}
-        onMonthChange={handleMonthChange}
-        periodDays={periodDays}
-        isEditingPeriod={isEditingPeriod}
-        setDate={setDate}
-        setSelectedDate={setSelectedDate}
-        setIsInfoActive={setIsInfoActive}
-        setPeriodDays={setPeriodDays}
-        setCurrentPeriod={setCurrentPeriod}
-      />
-
-      <CalendarInfo
+      <h2 className="title">Cycle Rhythm</h2>
+      <h3 className="subtitle">Your sanctuary of flow and focus.</h3>
+      <div className="calendar-page-container">
+        <div className="calendar-view-container">
+          <CalendarView
+          date={date}
+          calendarDays={calendarDays}
+          periods={periods}
+          isInfoActive={isInfoActive}
+          onMonthChange={handleMonthChange}
+          periodDays={periodDays}
+          isEditingPeriod={isEditingPeriod}
+          setDate={setDate}
+          setSelectedDate={setSelectedDate}
+          setIsInfoActive={setIsInfoActive}
+          setPeriodDays={setPeriodDays}
+          setCurrentPeriod={setCurrentPeriod}
+        />
+        </div>
+      <div className="cards-container">
+        <LogPeriodCard
+          isEditingPeriod={isEditingPeriod}
+          setIsEditingPeriod={setIsEditingPeriod}
+        />
+        <LegendCard />
+        <Card title="Insigths"/>
+      </div>
+      {/* <CalendarInfo
         date={date}
         cycleInfo={cycleInfo}
         isEditingPeriod={isEditingPeriod}
@@ -140,7 +155,8 @@ const CalendarPage = () => {
         periodDays={periodDays}
         currentPeriod={currentPeriod}
         setPeriodDays={setPeriodDays}
-      />
+      /> */}
+      </div>
     </div>
   );
 };
