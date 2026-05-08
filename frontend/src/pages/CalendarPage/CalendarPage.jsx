@@ -145,7 +145,7 @@ const CalendarPage = () => {
           setIsEditingPeriod={setIsEditingPeriod}
         />
         <LegendCard />
-        <Card title="Insigths"/>
+        <Card title="Insights" description="Log your menstrual cycle to track your ovulation and fertility." icon />
       </div>
       {/* <CalendarInfo
         date={date}
