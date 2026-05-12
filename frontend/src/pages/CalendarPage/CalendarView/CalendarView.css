@@ -6,7 +6,8 @@
 }
 
 .calendar .react-calendar{
-  background-color: var(--tags-content);
+  background-color: theme('colors.surface-container-lowest');
+  padding: 1rem;
 }
 
 .calendar--full {
@@ -24,7 +25,7 @@
 .calendar--compact .react-calendar__month-view__weekdays__weekday abbr,
 .calendar--compact .react-calendar__tile {
   font-size: 0.9rem;
-  color: var(--text-main, #333);
+  color: theme('colors.on-surface');
   font-weight: 600;
 }
 
@@ -82,10 +83,11 @@
 }
 
 .calendar .react-calendar__tile {
-  padding: 10px;
+  padding: 1rem;
   border-radius: 8px;
   text-align: center;
   font-size: 1rem;
+  margin-top: 0.5rem;
 }
 
 .period-selected {
@@ -96,6 +98,11 @@
 
 .react-calendar__tile {
   cursor: pointer;
+}
+
+.calendar .react-calendar__tile--now:not(.react-calendar__tile--active) {
+  background-color: transparent !important;
+  border: 2px solid theme('colors.secondary') !important;
 }
 
 @media (max-width: 1000px) {

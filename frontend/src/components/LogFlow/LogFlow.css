@@ -251,7 +251,7 @@
 
 .react-calendar__tile:enabled:hover,
 .react-calendar__tile:enabled:focus {
-  background: var(--tercendary-color);
+  @apply !border !border-secondary/70;
   transform: none;
 }
 
@@ -260,8 +260,7 @@
 }
 
 .react-calendar__tile.period-middle {
-  background: var(--tercendary-color) !important;
-  color: #7d4562 !important;
+  @apply !bg-primary/20 !border !border-primary/70 !rounded !text-on-surface;
 }
 
 .react-calendar__tile.period-edge {

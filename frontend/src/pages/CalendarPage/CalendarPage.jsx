@@ -11,6 +11,7 @@ import LegendCard from './LegendCard/LegendCard';
 import LogPeriodCard from './LogPeriodCard/LogPeriodCard';
 import CalendarView from './CalendarView/CalendarView';
 import { parseLocalDate, formatDateLocal } from '../../utils/calendarUtils';
+import LogFlow from '../../components/LogFlow/LogFlow';
 
 const CalendarPage = () => {
   const [user, setUser] = useState(null);
@@ -47,8 +48,6 @@ const CalendarPage = () => {
     },
     enabled: !!user
   });
-
-  console.log("Calendar Days: ", calendarDays); 
 
   // 🔹 Periods (solo para pintar / seleccionar)
   const { data: periods } = useQuery({
@@ -119,7 +118,16 @@ const CalendarPage = () => {
   if (error) return <ErrorScreen onRetry={() => refetch()} />;
 
   return (
-    <div className="calendar-page">
+    <>
+      {isEditingPeriod ? (
+        <LogFlow
+          onClose={() => setIsEditingPeriod(false)}
+          onSave={(data) => {
+            console.log(data);
+          }}
+        />
+      ) : (
+        <div className="calendar-page">
       <h2 className="title">Cycle Rhythm</h2>
       <h3 className="subtitle">Your sanctuary of flow and focus.</h3>
       <div className="calendar-page-container">
@@ -158,6 +166,8 @@ const CalendarPage = () => {
       /> */}
       </div>
     </div>
+      )}
+    </>
   );
 };
 
