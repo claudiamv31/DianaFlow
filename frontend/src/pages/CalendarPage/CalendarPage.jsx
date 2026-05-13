@@ -12,15 +12,16 @@ import LogPeriodCard from './LogPeriodCard/LogPeriodCard';
 import CalendarView from './CalendarView/CalendarView';
 import { parseLocalDate, formatDateLocal } from '../../utils/calendarUtils';
 import LogFlow from '../../components/LogFlow/LogFlow';
+import DailyInsigths from './DailyInsights/DailyInsights';
 
 const CalendarPage = () => {
   const [user, setUser] = useState(null);
   const [date, setDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [isInfoActive, setIsInfoActive] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [isEditingPeriod, setIsEditingPeriod] = useState(false);
   const [periodDays, setPeriodDays] = useState([]);
   const [currentPeriod, setCurrentPeriod] = useState(null);
+  const [isDailyLogActive, setIsDailyLogActive] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() + 1 };
@@ -117,6 +118,8 @@ const CalendarPage = () => {
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorScreen onRetry={() => refetch()} />;
 
+  console.log(cycleInfo);
+
   return (
     <>
       {isEditingPeriod ? (
@@ -128,44 +131,34 @@ const CalendarPage = () => {
         />
       ) : (
         <div className="calendar-page">
-      <h2 className="title">Cycle Rhythm</h2>
-      <h3 className="subtitle">Your sanctuary of flow and focus.</h3>
-      <div className="calendar-page-container">
-        <div className="calendar-view-container">
-          <CalendarView
-          date={date}
-          calendarDays={calendarDays}
-          periods={periods}
-          isInfoActive={isInfoActive}
-          onMonthChange={handleMonthChange}
-          periodDays={periodDays}
-          isEditingPeriod={isEditingPeriod}
-          setDate={setDate}
-          setSelectedDate={setSelectedDate}
-          setIsInfoActive={setIsInfoActive}
-          setPeriodDays={setPeriodDays}
-          setCurrentPeriod={setCurrentPeriod}
-        />
+          <h2 className="title">Cycle Rhythm</h2>
+          <h3 className="subtitle">Your sanctuary of flow and focus.</h3>
+          <div className="calendar-page-container">
+            <div className="calendar-view-container">
+              <CalendarView
+                date={date}
+                calendarDays={calendarDays}
+                periods={periods}
+                onMonthChange={handleMonthChange}
+                periodDays={periodDays}
+                isEditingPeriod={isEditingPeriod}
+                setDate={setDate}
+                setSelectedDate={setSelectedDate}
+                setPeriodDays={setPeriodDays}
+                setCurrentPeriod={setCurrentPeriod}
+              />
+            </div>
+            <div className="cards-container">
+              <DailyInsigths
+                cycleInfo={cycleInfo}
+                setIsEditingPeriod={setIsEditingPeriod}
+                selectedDate={selectedDate}
+                setIsDailyLogActive={setIsDailyLogActive}
+              />
+              <LegendCard />
+            </div>
+          </div>
         </div>
-      <div className="cards-container">
-        <LogPeriodCard
-          isEditingPeriod={isEditingPeriod}
-          setIsEditingPeriod={setIsEditingPeriod}
-        />
-        <LegendCard />
-        <Card title="Insights" description="Log your menstrual cycle to track your ovulation and fertility." icon />
-      </div>
-      {/* <CalendarInfo
-        date={date}
-        cycleInfo={cycleInfo}
-        isEditingPeriod={isEditingPeriod}
-        setIsEditingPeriod={setIsEditingPeriod}
-        periodDays={periodDays}
-        currentPeriod={currentPeriod}
-        setPeriodDays={setPeriodDays}
-      /> */}
-      </div>
-    </div>
       )}
     </>
   );

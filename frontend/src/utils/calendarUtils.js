@@ -35,3 +35,21 @@ export const parseLocalDate = (dateString) => {
 
   return new Date(dateString);
 };
+
+export const formatLongDate = (date) => {
+  const dateObj = parseLocalDate(date);
+  return dateObj?.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
+
+export const formatMonthDay = (date) => {
+  const dateObj = parseLocalDate(date);
+  return dateObj?.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric'
+  });
+};

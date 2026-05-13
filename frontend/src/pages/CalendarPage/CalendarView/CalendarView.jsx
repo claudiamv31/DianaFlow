@@ -6,17 +6,14 @@ const CalendarView = ({
   date: selectedDate,
   calendarDays,
   periods,
-  isInfoActive,
   onMonthChange,
   periodDays,
   isEditingPeriod,
   highlightPeriodDays = [],
   setDate,
   setSelectedDate,
-  setIsInfoActive,
   setPeriodDays,
-  setCurrentPeriod,
-  variant = 'full'
+  setCurrentPeriod
 }) => {
   const tileClassName = ({ date }) => {
     const dateString = formatDateLocal(date);
@@ -24,22 +21,28 @@ const CalendarView = ({
     const dayInfo = calendarDays?.find((d) => d.date === dateString);
 
     let classes = [];
-    
+
     const isToday = dateString === today;
-    const isSelected = selectedDate && dateString === formatDateLocal(selectedDate);
-    const isPeriodDay = periodDays.includes(dateString) || dayInfo?.isPeriod || highlightPeriodDays?.includes(dateString);
+    const isSelected =
+      selectedDate && dateString === formatDateLocal(selectedDate);
+    const isPeriodDay =
+      periodDays.includes(dateString) ||
+      dayInfo?.isPeriod ||
+      highlightPeriodDays?.includes(dateString);
 
     if (isSelected) {
       // Selected date: Solid lilac
       classes.push('!bg-secondary !text-white !rounded-full !border-none');
     } else if (isToday) {
       // Today (not selected): only borders
-      classes.push('!bg-transparent !border !border-solid !border-secondary !text-on-surface !rounded-full');
+      classes.push(
+        '!bg-transparent !border !border-solid !border-secondary !text-on-surface !rounded-full'
+      );
     } else if (isPeriodDay) {
       // Period days: light pink background
       classes.push('!bg-primary/20 !border !border-primary/70 !rounded-full');
     }
-    
+
     return classes.length ? classes.join(' ') : null;
   };
 
@@ -52,7 +55,6 @@ const CalendarView = ({
 
     setDate(day);
     setSelectedDate(day);
-    setIsInfoActive(true);
 
     // 📅 Modo edición: solo seleccionar/deseleccionar días
     if (isEditingPeriod) {
@@ -70,11 +72,7 @@ const CalendarView = ({
   };
 
   return (
-    <div
-      className={`calendar ${
-        isInfoActive ? 'calendar--inactive' : 'calendar--active'
-      } ${variant === 'compact' ? 'calendar--compact' : 'calendar--full'}`}
-    >
+    <div className={`calendar 'calendar--inactive' : 'calendar--active'`}>
       <Calendar
         value={selectedDate}
         onClickDay={handleDayClick}

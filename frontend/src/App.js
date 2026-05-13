@@ -1,7 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { PublicRoute, PrivateRoute } from './routes/guards/routesGuards.jsx';
 import { Toaster } from 'react-hot-toast';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Login from './pages//Login/Login.jsx';
 import SignUp from './pages//SignUp/SignUp.jsx';
 import Home from './pages//Home/Home.jsx';
