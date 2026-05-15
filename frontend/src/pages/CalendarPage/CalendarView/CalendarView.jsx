@@ -3,7 +3,8 @@ import { formatDateLocal } from '../../../utils/calendarUtils';
 import './CalendarView.css';
 
 const CalendarView = ({
-  date: selectedDate,
+  date: activeMonthDate,
+  selectedDate,
   calendarDays,
   periods,
   onMonthChange,
@@ -13,22 +14,30 @@ const CalendarView = ({
   setDate,
   setSelectedDate,
   setPeriodDays,
-  setCurrentPeriod
+  setCurrentPeriod,
+  nextPeriod
 }) => {
-  const tileClassName = ({ date }) => {
+  const tileClassName = ({ date, activeStartDate }) => {
     const dateString = formatDateLocal(date);
     const today = formatDateLocal(new Date());
     const dayInfo = calendarDays?.find((d) => d.date === dateString);
 
     let classes = [];
 
-    const isToday = dateString === today;
+    const isNeighboringMonth = activeStartDate && date.getMonth() !== activeStartDate.getMonth();
+
+    const isToday = dateString === today && !isNeighboringMonth;
     const isSelected =
-      selectedDate && dateString === formatDateLocal(selectedDate);
+      selectedDate && dateString === formatDateLocal(selectedDate) && !isNeighboringMonth;
     const isPeriodDay =
       periodDays.includes(dateString) ||
       dayInfo?.isPeriod ||
       highlightPeriodDays?.includes(dateString);
+
+    const isPredictedPeriodDay =
+      nextPeriod &&
+      dateString >= nextPeriod.startDate &&
+      dateString <= nextPeriod.endDate;
 
     if (isSelected) {
       // Selected date: Solid lilac
@@ -41,6 +50,9 @@ const CalendarView = ({
     } else if (isPeriodDay) {
       // Period days: light pink background
       classes.push('!bg-primary/20 !border !border-primary/70 !rounded-full');
+    } else if (isPredictedPeriodDay) {
+      // Predicted period days: dashed border
+      classes.push('!border-2 !border-dashed !border-primary/40 !rounded-full !bg-transparent');
     }
 
     return classes.length ? classes.join(' ') : null;
@@ -72,12 +84,13 @@ const CalendarView = ({
   };
 
   return (
-    <div className={`calendar 'calendar--inactive' : 'calendar--active'`}>
+    <div className={`calendar`}>
       <Calendar
         value={selectedDate}
+        activeStartDate={activeMonthDate}
         onClickDay={handleDayClick}
         onActiveStartDateChange={onMonthChange}
-        showNeighboringMonth={false}
+        showNeighboringMonth={true}
         locale="en-US"
         formatShortWeekday={(locale, date) =>
           date
@@ -85,8 +98,8 @@ const CalendarView = ({
             .slice(0, 1)
             .toUpperCase()
         }
-        tileClassName={({ date, view }) =>
-          view === 'month' ? tileClassName({ date }) : null
+        tileClassName={({ date, view, activeStartDate }) =>
+          view === 'month' ? tileClassName({ date, activeStartDate }) : null
         }
       />
     </div>

@@ -66,6 +66,11 @@
   text-decoration: none;
 }
 
+.calendar .react-calendar__month-view__days__day--neighboringMonth {
+  color: theme('colors.outline') !important;
+  opacity: 0.5;
+}
+
 /* Responsive global para CalendarView */
 .calendar {
   width: 100%;
