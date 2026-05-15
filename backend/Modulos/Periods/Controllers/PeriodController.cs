@@ -48,7 +48,7 @@ namespace backend.Modulos.Periods.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
@@ -82,7 +82,7 @@ namespace backend.Modulos.Periods.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
 
@@ -105,7 +105,27 @@ namespace backend.Modulos.Periods.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("next")]
+        public async Task<IActionResult> GetNextPeriod()
+        {
+            try
+            {
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+
+                var period = await _periodService.GetNextPeriodPredictionAsync(userId);
+                if (period == null)
+                    return NotFound("No period found.");
+
+                return Ok(period);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
         
@@ -174,7 +194,7 @@ namespace backend.Modulos.Periods.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
     }

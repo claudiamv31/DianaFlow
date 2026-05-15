@@ -259,5 +259,25 @@ namespace backend.Modulos.Periods.Services
                 EndDate = entity.EndDate
             };
         }
+
+        public async Task<PeriodPredictionDto?> GetNextPeriodPredictionAsync(Guid userId)
+        {
+            var periods = await GetLast5PeriodsByUser(userId);
+
+            if(periods == null || periods.Count == 0)
+                return null;
+
+            var avgCycleLength = _cycleService.CalculateAverageCycleLength(periods);
+            var lastPeriod = periods.OrderByDescending(p => p.StartDate).First();
+
+            var nextStartDate = lastPeriod.StartDate.AddDays(avgCycleLength);
+            var avgPeriodLength = CalculateAveragePeriodLength(periods);
+
+            return new PeriodPredictionDto
+            {
+                StartDate = nextStartDate,
+                EndDate = nextStartDate.AddDays(avgPeriodLength - 1)
+            };
+        }
     }
 }

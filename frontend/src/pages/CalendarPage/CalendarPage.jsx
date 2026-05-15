@@ -115,10 +115,17 @@ const CalendarPage = () => {
     enabled: !!user && !!selectedDate
   });
 
+  const { data: nextPeriod } = useQuery({
+    queryKey: ['next-cycle', user?.uid],
+    queryFn: async () => {
+      const res = await apiClient.get(`/periods/next`);
+      return res.data;
+    },
+    enabled: !!user
+  });
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorScreen onRetry={() => refetch()} />;
-
-  console.log(cycleInfo);
 
   return (
     <>
@@ -137,6 +144,7 @@ const CalendarPage = () => {
             <div className="calendar-view-container">
               <CalendarView
                 date={date}
+                selectedDate={selectedDate}
                 calendarDays={calendarDays}
                 periods={periods}
                 onMonthChange={handleMonthChange}
@@ -146,6 +154,7 @@ const CalendarPage = () => {
                 setSelectedDate={setSelectedDate}
                 setPeriodDays={setPeriodDays}
                 setCurrentPeriod={setCurrentPeriod}
+                nextPeriod={nextPeriod}
               />
             </div>
             <div className="cards-container">

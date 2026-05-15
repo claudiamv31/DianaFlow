@@ -12,5 +12,7 @@ namespace backend.Modulos.Cycles.DTOs
         public bool IsOvulation {get; set; }
         public string? Notes { get; set; }
         public string? FertilityLevel { get; set; } 
+        public string? Phase { get; set; }
+        public string? DailyInsight { get; set; }
     }
 }

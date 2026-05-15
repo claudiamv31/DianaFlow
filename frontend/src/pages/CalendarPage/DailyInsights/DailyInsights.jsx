@@ -30,7 +30,7 @@ const DailyInsigths = ({
             Daily Insight
           </p>
           <p className="text-sm text-on-surface-variant">
-            {cycleInfo?.phaseDescription ||
+            {cycleInfo?.dailyInsight ||
               'Track your cycle to get personalized insights'}
           </p>
         </div>
