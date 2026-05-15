@@ -2,6 +2,7 @@ using System;
 using backend.Modulos.Periods.Models;
 using backend.Modulos.Cycles.DTOs;
 using System.Text.Json.Serialization;
+using backend.Modulos.Cycles.Enums;
 
 namespace backend.Modulos.Periods.DTOs
 {
@@ -12,6 +13,12 @@ namespace backend.Modulos.Periods.DTOs
         public DateOnly? EndDate { get; set; }
         public bool IsActive { get; set; }
         public int? Duration { get; set; }
+    }
+
+    public class PeriodPredictionDto
+    {
+        public DateOnly StartDate { get; set; }
+        public DateOnly? EndDate { get; set; }
     }
 
     public class PeriodInputDto

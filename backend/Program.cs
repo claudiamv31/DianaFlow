@@ -54,6 +54,7 @@ builder.Services.AddScoped<CycleService>();
 builder.Services.AddScoped<CalendarService>();
 builder.Services.AddScoped<UsersService>();
 
+builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 app.UseCors("AllowReactApp");

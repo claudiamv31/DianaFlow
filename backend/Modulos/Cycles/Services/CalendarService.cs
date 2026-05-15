@@ -43,16 +43,20 @@ namespace backend.Modulos.Cycles.Services
                 }
 
                 var cycleInfo = latestPeriod != null ? _cycleService.CalculateCycleInfo(latestPeriod, day, averageCycleLength) : new CycleInfo();
+                var cyclePhase = latestPeriod != null ? _cycleService.GetCyclePhase(latestPeriod.StartDate, averageCycleLength, day) : ECyclePhase.Menstruation;
+                var message = await _cycleService.GetCachedDailyInsightAsync(userId, cyclePhase, day);
 
                 calendar.Add(new CalendarDayDto
                 {
-                    PeriodId = isPeriod ? latestPeriod.Id : null,   
+                    PeriodId = isPeriod ? latestPeriod?.Id : null,   
                     Date = day,
                     CycleDay = cycleInfo.CycleDay,
                     IsPeriod = isPeriod,
                     IsFertile = cycleInfo.IsFertile,
                     IsOvulation = cycleInfo.IsOvulation,
-                    FertilityLevel = cycleInfo.FertilityLevel
+                    FertilityLevel = cycleInfo.FertilityLevel,
+                    Phase = cyclePhase.ToString(),
+                    DailyInsight = message   
                 });
             }
 
@@ -74,6 +78,8 @@ namespace backend.Modulos.Cycles.Services
             }
 
             var averageCycleLength = _cycleService.CalculateAverageCycleLength(periods);
+            var cyclePhase = _cycleService.GetCyclePhase(latestPeriod.StartDate, averageCycleLength, date);
+            var message = await _cycleService.GetCachedDailyInsightAsync(userId, cyclePhase, date);
 
             var cycleInfo = _cycleService.CalculateCycleInfo(latestPeriod, date, averageCycleLength);
 
@@ -84,7 +90,9 @@ namespace backend.Modulos.Cycles.Services
                 IsPeriod = date >= latestPeriod.StartDate && date <= latestPeriod.EndDate,
                 IsOvulation = cycleInfo.IsOvulation,
                 IsFertile = cycleInfo.IsFertile,
-                FertilityLevel = cycleInfo.FertilityLevel?.ToLower() ?? "low"
+                FertilityLevel = cycleInfo.FertilityLevel?.ToLower() ?? "low",
+                Phase = cyclePhase.ToString(),
+                DailyInsight = message
             };
         }
 

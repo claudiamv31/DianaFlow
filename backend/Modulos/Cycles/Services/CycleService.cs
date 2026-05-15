@@ -4,16 +4,24 @@ using System.Linq;
 using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Cycles.DTOs;
 using backend.Modulos.Users.Services;
+using backend.Data;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.EntityFrameworkCore;
+using backend.Modulos.Cycles.Enums;
 
 namespace backend.Modulos.Cycles.Services
 {
     public class CycleService
     {
         private readonly UsersService _usersService;
+        private readonly AppDbContext _context;
+        private readonly IMemoryCache _cache;
 
-        public CycleService(UsersService usersService)
+        public CycleService(UsersService usersService, AppDbContext context, IMemoryCache cache)
         {
             _usersService = usersService;
+            _context = context;
+            _cache = cache;
         }
         public int CalculateAverageCycleLength(List<PeriodDto> periods)
         {
@@ -128,5 +136,30 @@ namespace backend.Modulos.Cycles.Services
             return ECyclePhase.Luteal;
         }
 
+        public async Task<string> GetCachedDailyInsightAsync(Guid userId, ECyclePhase phase, DateOnly requestedDate)
+        {
+            // La llave única ahora usa la fecha que seleccionó la usuaria en el calendario
+            string cacheKey = $"DailyInsight_{userId}_{requestedDate:yyyyMMdd}";
+
+            if (!_cache.TryGetValue(cacheKey, out string? cachedMessage))
+            {
+                var messages = await _context.PhaseMessages
+                    .Where(m => m.Phase == phase)
+                    .Select(m => m.Message)
+                    .ToListAsync();
+
+                cachedMessage = messages.Any() 
+                    ? messages[new Random().Next(messages.Count)] 
+                    : "Listen to your body today.";
+
+                // Guardamos en caché para que si vuelve a tocar ese mismo día en la misma sesión, cargue al instante
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromHours(2)); 
+
+                _cache.Set(cacheKey, cachedMessage, cacheEntryOptions);
+            }
+
+            return cachedMessage ?? "Listen to your body today.";
+        }       
     }
 }

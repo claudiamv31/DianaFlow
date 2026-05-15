@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using backend.Modulos.Users.Models; 
 using backend.Modulos.Periods.Models;
+using backend.Modulos.Cycles.Enums;
 
 namespace backend.Data
 {
@@ -14,6 +15,7 @@ namespace backend.Data
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Periods> Periods { get; set; }
         public DbSet<PeriodDays> PeriodDays { get; set; }
+        public DbSet<PhaseMessages> PhaseMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -17,13 +17,7 @@ namespace backend.Modulos.Cycles.DTOs
         public string FertilityLevel { get; set; } = "low";
     }
 
-    public enum ECyclePhase
-    {
-        Menstruation,
-        Follicular,
-        Ovulation,
-        Luteal
-    }
+    
 
     public class CycleStatus
     {
