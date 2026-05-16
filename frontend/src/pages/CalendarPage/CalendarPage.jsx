@@ -13,6 +13,7 @@ import CalendarView from './CalendarView/CalendarView';
 import { parseLocalDate, formatDateLocal } from '../../utils/calendarUtils';
 import LogFlow from '../../components/LogFlow/LogFlow';
 import DailyInsigths from './DailyInsights/DailyInsights';
+import EditLog from '../../components/EditLog/EditLog';
 
 const CalendarPage = () => {
   const [user, setUser] = useState(null);
@@ -129,7 +130,14 @@ const CalendarPage = () => {
 
   return (
     <>
-      {isEditingPeriod ? (
+      {isDailyLogActive ? (
+        <EditLog
+          onClose={() => setIsDailyLogActive(false)}
+          selectedDate={selectedDate}
+          isPeriodActive={cycleInfo?.isPeriod}
+          cycleInfo={cycleInfo}
+        />
+      ) : isEditingPeriod ? (
         <LogFlow
           onClose={() => setIsEditingPeriod(false)}
           onSave={(data) => {
@@ -163,6 +171,7 @@ const CalendarPage = () => {
                 setIsEditingPeriod={setIsEditingPeriod}
                 selectedDate={selectedDate}
                 setIsDailyLogActive={setIsDailyLogActive}
+                isPeriod={cycleInfo?.isPeriod}
               />
               <LegendCard />
             </div>

@@ -1,15 +1,18 @@
 {
-    "sqltools.connections": [
-        {
-            "ssh": "Disabled",
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5432,
-            "driver": "PostgreSQL",
-            "database": "diana_flow_db",
-            "username": "diana_flow_user",
-            "name": "DianaFlow",
-            "password": "diana_flow_password"
-        }
-    ]
+  "sqltools.connections": [
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "database": "diana_flow_db",
+      "username": "diana_flow_user",
+      "name": "DianaFlow",
+      "password": "diana_flow_password"
+    }
+  ],
+  "css.lint.unknownAtRules": "ignore",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
 }

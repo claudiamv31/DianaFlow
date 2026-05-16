@@ -14,5 +14,7 @@ namespace backend.Modulos.Cycles.DTOs
         public string? FertilityLevel { get; set; } 
         public string? Phase { get; set; }
         public string? DailyInsight { get; set; }
+        public int? Flow { get; set; }  
+        public int? PeriodDaysId { get; set; }
     }
 }
