@@ -4,7 +4,8 @@ import { formatMonthDay, formatDateLocal } from '../../../utils/calendarUtils';
 const DailyInsigths = ({
   cycleInfo,
   setIsEditingPeriod,
-  setIsDailyLogActive
+  setIsDailyLogActive,
+  isPeriod
 }) => {
   const isToday = cycleInfo?.date === formatDateLocal(new Date());
   return (
@@ -35,15 +36,17 @@ const DailyInsigths = ({
           </p>
         </div>
         <div className="flex flex-col gap-4">
-          <button
-            className="w-full py-3 rounded-full !bg-primary text-white font-headline font-bold text-base shadow-lg !shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
-            onClick={() => setIsDailyLogActive(true)}
-          >
-            <span className="material-symbols-outlined text-xl">
-              <FaEdit />
-            </span>
-            Edit Log
-          </button>
+          {isPeriod && (
+            <button
+              className="w-full py-3 rounded-full !bg-primary text-white font-headline font-bold text-base shadow-lg !shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+              onClick={() => setIsDailyLogActive(true)}
+            >
+              <span className="material-symbols-outlined text-xl">
+                <FaEdit />
+              </span>
+              Edit Log
+            </button>
+          )}
           <button
             className="w-full py-3 rounded-full border !border-primary/30 !text-primary/70 font-headline font-semibold text-xs hover:!bg-primary/5 transition-colors uppercase tracking-wider"
             onClick={() => setIsEditingPeriod(true)}
