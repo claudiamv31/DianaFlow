@@ -137,6 +137,14 @@ namespace backend.Modulos.Periods.Services
             };
         }
 
+        public async Task<List<backend.Modulos.Periods.Models.PeriodDays>> GetPeriodsDaysByUserId(Guid userId)
+        {
+            return await _context.PeriodDays
+                .Include(pd => pd.Periods)
+                .Where(pd => pd.Periods!.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task AddPeriodAsync(Guid userId, PeriodInputDto dto)
         {
             var timeZoneId = _usersService.GetUserTimeZone(userId);
@@ -219,6 +227,51 @@ namespace backend.Modulos.Periods.Services
             {
                 await transaction.RollbackAsync();
                 throw;
+            }
+        }
+
+        public async Task<bool> UpdatePeriodDayAsync(Guid userId, DailyRecordInput dto)
+        {
+            var periodDay = await _context.PeriodDays
+                .Include(pd => pd.Periods)
+                .FirstOrDefaultAsync(pd => pd.Date == dto.Date && pd.Periods!.UserId == userId);
+
+            if (dto.Flow == 0)
+            {
+                // If Flow is 0 ("None"), we delete the record if it exists
+                if (periodDay != null)
+                {
+                    _context.PeriodDays.Remove(periodDay);
+                    await _context.SaveChangesAsync();
+                }
+                return true;
+            }
+
+            if (periodDay != null)
+            {
+                periodDay.Flow = dto.Flow;
+                periodDay.UpdatedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                // Find if the date is within an existing period
+                var period = await _context.Periods
+                    .FirstOrDefaultAsync(p => p.UserId == userId && p.StartDate <= dto.Date && p.EndDate >= dto.Date);
+                
+                if (period != null)
+                {
+                    _context.PeriodDays.Add(new backend.Modulos.Periods.Models.PeriodDays { PeriodId = period.Id, Date = dto.Date, Flow = dto.Flow });
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    // Si no existe un periodo que cubra este día, no deberíamos poder registrar flujo
+                    // (ya que el flujo pertenece a un periodo).
+                    return false;
+                }
             }
         }
 

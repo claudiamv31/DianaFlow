@@ -23,6 +23,7 @@ namespace backend.Modulos.Cycles.Services
         public async Task<List<CalendarDayDto>> GetCalendarAsync(Guid userId, int year, int month)
         {
             var periods = await _periodService.GetLast5PeriodsByUser(userId);
+            var periodsDays = await _periodService.GetPeriodsDaysByUserId(userId);
 
             var startMonth = new DateOnly(year, month, 1);
             var endMonth = startMonth.AddMonths(1).AddDays(-1);
@@ -56,7 +57,9 @@ namespace backend.Modulos.Cycles.Services
                     IsOvulation = cycleInfo.IsOvulation,
                     FertilityLevel = cycleInfo.FertilityLevel,
                     Phase = cyclePhase.ToString(),
-                    DailyInsight = message   
+                    DailyInsight = message,
+                    Flow = periodsDays.FirstOrDefault(pd => pd.Date == day)?.Flow,
+                    PeriodDaysId = periodsDays.FirstOrDefault(pd => pd.Date == day)?.Id
                 });
             }
 
@@ -66,6 +69,7 @@ namespace backend.Modulos.Cycles.Services
         public async Task<CalendarDayDto> GetCalendarDayAsync(Guid userId, DateOnly date)
         {
             var periods = await _periodService.GetLast5PeriodsByUser(userId);
+            var periodsDays = await _periodService.GetPeriodsDaysByUserId(userId);
 
             var latestPeriod = periods
                 .Where(p => p.StartDate <= date)
@@ -92,7 +96,9 @@ namespace backend.Modulos.Cycles.Services
                 IsFertile = cycleInfo.IsFertile,
                 FertilityLevel = cycleInfo.FertilityLevel?.ToLower() ?? "low",
                 Phase = cyclePhase.ToString(),
-                DailyInsight = message
+                DailyInsight = message,
+                Flow = periodsDays.FirstOrDefault(pd => pd.Date == date)?.Flow,
+                PeriodDaysId = periodsDays.FirstOrDefault(pd => pd.Date == date)?.Id
             };
         }
 

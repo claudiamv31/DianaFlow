@@ -175,6 +175,33 @@ namespace backend.Modulos.Periods.Controllers
         }
 
         // =======================
+        // PUT api/periods/day
+        // =======================
+        [HttpPut("day")]
+        public async Task<IActionResult> UpdatePeriodDay([FromBody] DailyRecordInput dto)
+        {
+            try
+            {
+                if (dto.Date == default)
+                    return BadRequest("Date is required.");
+
+                var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+
+                var updated = await _periodService.UpdatePeriodDayAsync(userId, dto);
+
+                if (!updated)
+                    return StatusCode(500, "Could not update period day.");
+
+                return Ok(new { message = "Daily log updated successfully", data = dto });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        // =======================
         // DELETE api/periods/{id}
         // =======================
         [HttpDelete("{id}")]
