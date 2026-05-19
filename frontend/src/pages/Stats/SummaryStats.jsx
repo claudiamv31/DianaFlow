@@ -1,25 +1,60 @@
-import { parseLocalDate, formatDateMexican } from '../../utils/calendarUtils';
+import { formatDateShort } from '../../utils/calendarUtils';
 
-const SummaryStats = ({ dataSummary }) => {
-  if (dataSummary?.lastPeriodStart) {
-    const parsed = parseLocalDate(dataSummary.lastPeriodStart);
-    console.log('Fecha parseada:', parsed);
-  }
+const SummaryStats = ({ summary }) => {
+  if (!summary) return null;
 
-  return dataSummary ? (
-    <div>
-      <h2>My Cycles</h2>
-      <p>{dataSummary.totalPeriods} cycles in total</p>
-      <p>{dataSummary.avgPeriodLength} Days. Average of period</p>
-      <p>{dataSummary.avgCycleLength} Days. Average of Cycle</p>
-      <p>
-        {dataSummary.lastPeriodStart
-          ? formatDateMexican(parseLocalDate(dataSummary.lastPeriodStart))
-          : 'Sin datos'}
-      </p>
-    </div>
-  ) : (
-    <p>Cargando datos...</p>
+  return (
+    <>
+      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
+          <span class="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
+            Average Cycle
+          </span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-3xl font-headline font-bold text-on-surface">
+              {summary.averageCycleLength}
+            </span>
+            <span class="text-on-surface-variant text-sm font-medium">
+              days
+            </span>
+          </div>
+        </div>
+        <div class="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
+          <span class="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
+            Average Duration
+          </span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-3xl font-headline font-bold text-on-surface">
+              {summary.averagePeriodLength}
+            </span>
+            <span class="text-on-surface-variant text-sm font-medium">
+              days
+            </span>
+          </div>
+        </div>
+        <div class="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
+          <span class="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
+            Regularity
+          </span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-3xl font-headline font-bold text-on-surface">
+              {summary.regularity}
+            </span>
+            <span class="text-on-surface-variant text-sm font-medium">%</span>
+          </div>
+        </div>
+        <div class="bg-primary-container/20 p-6 rounded-lg space-y-2 flex flex-col justify-between">
+          <span class="text-primary/100 font-label text-xs uppercase tracking-widest font-semibold">
+            Next Estimate
+          </span>
+          <div class="flex items-baseline gap-1">
+            <span class="text-3xl font-headline font-bold text-primary/100">
+              {formatDateShort(summary.nextPeriodStart)}
+            </span>
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 
