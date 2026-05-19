@@ -24,12 +24,12 @@ namespace backend.Modulos.Periods.Services
             _usersService = usersService;
         }
 
-        public async Task<List<PeriodDto>> GetLast5PeriodsByUser(Guid userId)
+        public async Task<List<PeriodDto>> GetLast6PeriodsByUser(Guid userId)
         {
             var periods = await _context.Periods
                 .Where(p => p.UserId == userId)
                 .OrderByDescending(p => p.StartDate)
-                .Take(5)
+                .Take(6)
                 .ToListAsync();
 
             return periods.Select(MapToDto).ToList();
@@ -89,7 +89,7 @@ namespace backend.Modulos.Periods.Services
             var userTimeZoneId = _usersService.GetUserTimeZone(userId) ?? "UTC";
             var today = _usersService.GetUserToday(userTimeZoneId);
 
-            var periods = await GetLast5PeriodsByUser(userId);
+            var periods = await GetLast6PeriodsByUser(userId);
             if (!periods.Any()) return null;
 
             var cycleLength = _cycleService.CalculateAverageCycleLength(periods);
@@ -309,13 +309,16 @@ namespace backend.Modulos.Periods.Services
             {
                 Id = entity.Id.ToString(),
                 StartDate = entity.StartDate,
-                EndDate = entity.EndDate
+                EndDate = entity.EndDate,
+                Duration = entity.EndDate.HasValue 
+                        ? (entity.EndDate.Value.DayNumber - entity.StartDate.DayNumber) + 1 
+                        : null
             };
         }
 
         public async Task<PeriodPredictionDto?> GetNextPeriodPredictionAsync(Guid userId)
         {
-            var periods = await GetLast5PeriodsByUser(userId);
+            var periods = await GetLast6PeriodsByUser(userId);
 
             if(periods == null || periods.Count == 0)
                 return null;

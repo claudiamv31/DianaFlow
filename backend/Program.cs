@@ -6,6 +6,7 @@ using System.Text;
 using backend.Modulos.Periods.Services;
 using backend.Modulos.Cycles.Services;
 using backend.Modulos.Users.Services;
+using backend.Modulos.Stats.Services;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +54,7 @@ builder.Services.AddScoped<PeriodService>();
 builder.Services.AddScoped<CycleService>();
 builder.Services.AddScoped<CalendarService>();
 builder.Services.AddScoped<UsersService>();
+builder.Services.AddScoped<StatsService>();
 
 builder.Services.AddMemoryCache();
 var app = builder.Build();

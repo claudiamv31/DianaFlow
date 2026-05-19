@@ -22,7 +22,7 @@ namespace backend.Modulos.Cycles.Services
 
         public async Task<List<CalendarDayDto>> GetCalendarAsync(Guid userId, int year, int month)
         {
-            var periods = await _periodService.GetLast5PeriodsByUser(userId);
+            var periods = await _periodService.GetLast6PeriodsByUser(userId);
             var periodsDays = await _periodService.GetPeriodsDaysByUserId(userId);
 
             var startMonth = new DateOnly(year, month, 1);
@@ -68,7 +68,7 @@ namespace backend.Modulos.Cycles.Services
 
         public async Task<CalendarDayDto> GetCalendarDayAsync(Guid userId, DateOnly date)
         {
-            var periods = await _periodService.GetLast5PeriodsByUser(userId);
+            var periods = await _periodService.GetLast6PeriodsByUser(userId);
             var periodsDays = await _periodService.GetPeriodsDaysByUserId(userId);
 
             var latestPeriod = periods
@@ -104,7 +104,7 @@ namespace backend.Modulos.Cycles.Services
 
         public async Task<string> UpdateCalendar(Guid userId, PeriodInputDto dto)
         {
-            var periods = await _periodService.GetLast5PeriodsByUser(userId);
+            var periods = await _periodService.GetLast6PeriodsByUser(userId);
             
             if (dto.PeriodId > 0)
             {
