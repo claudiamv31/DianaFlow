@@ -11,6 +11,7 @@ import HeaderNotLogged from './components/Header/HeaderNotLogged.jsx';
 import CalendarPage from './pages/CalendarPage/CalendarPage.jsx';
 import StatsPage from './pages/Stats/Stats.jsx';
 import Menu from './components/Menu/Menu.jsx';
+import ArchivePage from './pages/Archive/ArchivePage.jsx';
 
 function App() {
   return (
@@ -94,6 +95,19 @@ function App() {
                 <Header />
                 <div className="main-content">
                   <StatsPage />
+                </div>
+                <Menu />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/archive"
+            element={
+              <PrivateRoute>
+                <Header />
+                <div className="main-content">
+                  <ArchivePage />
                 </div>
                 <Menu />
               </PrivateRoute>

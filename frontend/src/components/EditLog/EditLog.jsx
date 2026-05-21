@@ -50,14 +50,14 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
 
   return (
     <>
-      <div class="fixed inset-0 bg-blurred-calendar grayscale-[0.2] blur-xl opacity-40 scale-105"></div>
-      <div class="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/5 backdrop-blur-sm p-4 md:p-8">
-        <div class="bg-surface-container-lowest w-full max-w-lg max-h-[921px] overflow-y-auto rounded-xl shadow-[0_12px_32px_rgba(52,50,47,0.06)] flex flex-col relative">
-          <div class="px-8 pt-10 pb-6 text-center">
-            <p class="font-display text-primary/70 text-sm font-semibold tracking-widest uppercase mb-1">
+      <div className="fixed inset-0 bg-blurred-calendar grayscale-[0.2] blur-xl opacity-40 scale-105"></div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/5 backdrop-blur-sm p-4 md:p-8">
+        <div className="bg-surface-container-lowest w-full max-w-lg max-h-[921px] overflow-y-auto rounded-xl shadow-[0_12px_32px_rgba(52,50,47,0.06)] flex flex-col relative">
+          <div className="px-8 pt-10 pb-6 text-center">
+            <p className="font-display text-primary/70 text-sm font-semibold tracking-widest uppercase mb-1">
               Edit Daily Log
             </p>
-            <h1 class="font-display text-on-surface text-3xl font-bold tracking-tight">
+            <h1 className="font-display text-on-surface text-3xl font-bold tracking-tight">
               {selectedDate?.toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: undefined,
@@ -65,68 +65,68 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
                 day: 'numeric'
               })}
             </h1>
-            <p class="text-on-surface-variant font-medium mt-1">
+            <p className="text-on-surface-variant font-medium mt-1">
               Day {cycleInfo?.cycleDay} — {cycleInfo?.phase}
             </p>
           </div>
-          <div class="px-8 pb-10 space-y-10">
+          <div className="px-8 pb-10 space-y-10">
             <section>
-              <h2 class="font-display text-on-surface text-lg font-bold mb-6 flex items-center gap-2">
+              <h2 className="font-display text-on-surface text-lg font-bold mb-6 flex items-center gap-2">
                 Flow Intensity
               </h2>
-              <div class="flex justify-between items-center px-4">
-                <div class="flex flex-col items-center gap-3 group cursor-pointer">
+              <div className="flex justify-between items-center px-4">
+                <div className="flex flex-col items-center gap-3 group cursor-pointer">
                   <div
-                    class={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(0)}`}
+                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(0)}`}
                     onClick={() => setCurrentFlowIntensity(0)}
                   >
                     <span
-                      class="material-symbols-outlined text-3xl"
+                      className="material-symbols-outlined text-3xl"
                       data-icon="block"
                     >
                       block
                     </span>
                   </div>
                   <span
-                    class={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(
+                    className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(
                       0
                     )}`}
                   >
                     None
                   </span>
                 </div>
-                <div class="flex flex-col items-center gap-3 group cursor-pointer">
+                <div className="flex flex-col items-center gap-3 group cursor-pointer">
                   <div
-                    class={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(1)}`}
+                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(1)}`}
                     onClick={() => setCurrentFlowIntensity(1)}
                   >
                     <span
-                      class="material-symbols-outlined text-3xl"
+                      className="material-symbols-outlined text-3xl"
                       data-icon="water_drop"
                     >
                       water_drop
                     </span>
                   </div>
                   <span
-                    class={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(1)}`}
+                    className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(1)}`}
                   >
                     Light
                   </span>
                 </div>
-                <div class="flex flex-col items-center gap-3 group cursor-pointer">
+                <div className="flex flex-col items-center gap-3 group cursor-pointer">
                   <div
-                    class={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(2)}`}
+                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(2)}`}
                     onClick={() => setCurrentFlowIntensity(2)}
                   >
-                    <div class="flex gap-[-4px]">
+                    <div className="flex gap-[-4px]">
                       <span
-                        class="material-symbols-outlined text-2xl"
+                        className="material-symbols-outlined text-2xl"
                         data-icon="water_drop"
                       >
                         water_drop
                       </span>
                       <span
-                        class="material-symbols-outlined text-2xl"
+                        className="material-symbols-outlined text-2xl"
                         data-icon="water_drop"
                       >
                         water_drop
@@ -134,43 +134,43 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
                     </div>
                   </div>
                   <span
-                    class={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(2)}`}
+                    className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(2)}`}
                   >
                     Medium
                   </span>
                 </div>
-                <div class="flex flex-col items-center gap-3 group cursor-pointer">
+                <div className="flex flex-col items-center gap-3 group cursor-pointer">
                   <div
-                    class={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(3)}`}
+                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(3)}`}
                     onClick={() => setCurrentFlowIntensity(3)}
                   >
                     <span
-                      class="material-symbols-outlined text-4xl"
+                      className="material-symbols-outlined text-4xl"
                       data-icon="opacity"
                     >
                       opacity
                     </span>
                   </div>
                   <span
-                    class={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(3)}`}
+                    className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(3)}`}
                   >
                     Heavy
                   </span>
                 </div>
               </div>
             </section>
-            <div class="flex flex-col gap-4 pt-4">
+            <div className="flex flex-col gap-4 pt-4">
               <button
-                class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-display font-semibold py-3 rounded-full shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-display font-semibold py-3 rounded-full shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
                 onClick={handleSaveLog}
               >
-                <span class="material-symbols-outlined" data-icon="check">
+                <span className="material-symbols-outlined" data-icon="check">
                   check
                 </span>
                 Save Daily Log
               </button>
               <button
-                class="w-full text-on-surface-variant font-label font-semibold text-sm uppercase tracking-widest py-2 hover:text-on-surface transition-colors"
+                className="w-full text-on-surface-variant font-label font-semibold text-sm uppercase tracking-widest py-2 hover:text-on-surface transition-colors"
                 onClick={handleCancel}
               >
                 Cancel

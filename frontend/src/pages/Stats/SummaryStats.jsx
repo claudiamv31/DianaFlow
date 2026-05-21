@@ -5,50 +5,50 @@ const SummaryStats = ({ summary }) => {
 
   return (
     <>
-      <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
-          <span class="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
+          <span className="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
             Average Cycle
           </span>
-          <div class="flex items-baseline gap-1">
-            <span class="text-3xl font-headline font-bold text-on-surface">
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-headline font-bold text-on-surface">
               {summary.averageCycleLength}
             </span>
-            <span class="text-on-surface-variant text-sm font-medium">
+            <span className="text-on-surface-variant text-sm font-medium">
               days
             </span>
           </div>
         </div>
-        <div class="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
-          <span class="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
+        <div className="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
+          <span className="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
             Average Duration
           </span>
-          <div class="flex items-baseline gap-1">
-            <span class="text-3xl font-headline font-bold text-on-surface">
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-headline font-bold text-on-surface">
               {summary.averagePeriodLength}
             </span>
-            <span class="text-on-surface-variant text-sm font-medium">
+            <span className="text-on-surface-variant text-sm font-medium">
               days
             </span>
           </div>
         </div>
-        <div class="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
-          <span class="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
+        <div className="bg-surface-container-low p-6 rounded-lg space-y-2 flex flex-col justify-between">
+          <span className="text-primary-dim font-label text-xs uppercase tracking-widest font-semibold">
             Regularity
           </span>
-          <div class="flex items-baseline gap-1">
-            <span class="text-3xl font-headline font-bold text-on-surface">
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-headline font-bold text-on-surface">
               {summary.regularity}
             </span>
-            <span class="text-on-surface-variant text-sm font-medium">%</span>
+            <span className="text-on-surface-variant text-sm font-medium">%</span>
           </div>
         </div>
-        <div class="bg-primary-container/20 p-6 rounded-lg space-y-2 flex flex-col justify-between">
-          <span class="text-primary/100 font-label text-xs uppercase tracking-widest font-semibold">
+        <div className="bg-primary-container/20 p-6 rounded-lg space-y-2 flex flex-col justify-between">
+          <span className="text-primary/100 font-label text-xs uppercase tracking-widest font-semibold">
             Next Estimate
           </span>
-          <div class="flex items-baseline gap-1">
-            <span class="text-3xl font-headline font-bold text-primary/100">
+          <div className="flex items-baseline gap-1">
+            <span className="text-3xl font-headline font-bold text-primary/100">
               {formatDateShort(summary.nextPeriodStart)}
             </span>
           </div>
