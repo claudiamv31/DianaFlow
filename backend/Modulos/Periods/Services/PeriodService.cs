@@ -32,7 +32,12 @@ namespace backend.Modulos.Periods.Services
                 .Take(6)
                 .ToListAsync();
 
-            return periods.Select(MapToDto).ToList();
+            var periodIds = periods.Select(p => p.Id).ToList();
+            var days = await _context.PeriodDays
+                .Where(pd => periodIds.Contains(pd.PeriodId))
+                .ToListAsync();
+
+            return periods.Select(p => MapToDto(p, days.Where(d => d.PeriodId == p.Id).ToList())).ToList();
         }
 
         public async Task<List<PeriodDto>> GetPeriodsByYearAsync(Guid userId, int year)
@@ -45,7 +50,12 @@ namespace backend.Modulos.Periods.Services
                 .OrderByDescending(p => p.StartDate)
                 .ToListAsync();
 
-            return periods.Select(MapToDto).ToList();
+            var periodIds = periods.Select(p => p.Id).ToList();
+            var days = await _context.PeriodDays
+                .Where(pd => periodIds.Contains(pd.PeriodId))
+                .ToListAsync();
+
+            return periods.Select(p => MapToDto(p, days.Where(d => d.PeriodId == p.Id).ToList())).ToList();
         }
 
         public async Task<List<PeriodDto>> GetPeriodsByMonthAsync(Guid userId, int year, int month)
@@ -58,7 +68,12 @@ namespace backend.Modulos.Periods.Services
                 .OrderByDescending(p => p.StartDate)
                 .ToListAsync();
 
-            return periods.Select(MapToDto).ToList();
+            var periodIds = periods.Select(p => p.Id).ToList();
+            var days = await _context.PeriodDays
+                .Where(pd => periodIds.Contains(pd.PeriodId))
+                .ToListAsync();
+
+            return periods.Select(p => MapToDto(p, days.Where(d => d.PeriodId == p.Id).ToList())).ToList();
         }
 
         public async Task<List<PeriodDto>> GetPeriodsPagination(Guid userId, int page, int pageSize)
@@ -70,7 +85,12 @@ namespace backend.Modulos.Periods.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            return periods.Select(MapToDto).ToList();
+            var periodIds = periods.Select(p => p.Id).ToList();
+            var days = await _context.PeriodDays
+                .Where(pd => periodIds.Contains(pd.PeriodId))
+                .ToListAsync();
+
+            return periods.Select(p => MapToDto(p, days.Where(d => d.PeriodId == p.Id).ToList())).ToList();
         }
 
         public async Task<PeriodDto?> GetLatestPeriodAsync(Guid userId)
@@ -80,7 +100,13 @@ namespace backend.Modulos.Periods.Services
                 .OrderByDescending(p => p.StartDate)
                 .FirstOrDefaultAsync();
 
-            return period != null ? MapToDto(period) : null;
+            if (period == null) return null;
+
+            var days = await _context.PeriodDays
+                .Where(pd => pd.PeriodId == period.Id)
+                .ToListAsync();
+
+            return MapToDto(period, days);
         }
 
         public async Task<PeriodHomeDto?> GetLatestForHomeAsync(Guid userId)
@@ -124,6 +150,9 @@ namespace backend.Modulos.Periods.Services
             if (period == null) return null;
             
             var today = _usersService.GetUserToday(userTimeZoneId);
+            var days = await _context.PeriodDays
+                .Where(pd => pd.PeriodId == period.Id)
+                .ToListAsync();
 
             return new PeriodDto
             {
@@ -133,7 +162,8 @@ namespace backend.Modulos.Periods.Services
                 IsActive = !period.EndDate.HasValue || period.EndDate.Value >= today,
                 Duration = period.EndDate.HasValue 
                         ? (period.EndDate.Value.DayNumber - period.StartDate.DayNumber) + 1 
-                        : null
+                        : null,
+                PredominantFlow = MapToDto(period, days).PredominantFlow
             };
         }
 
@@ -303,8 +333,29 @@ namespace backend.Modulos.Periods.Services
             return CycleRegularityLevel.VeryIrregular;
         }
 
-        private PeriodDto MapToDto(backend.Modulos.Periods.Models.Periods entity)
+        private PeriodDto MapToDto(backend.Modulos.Periods.Models.Periods entity, List<backend.Modulos.Periods.Models.PeriodDays>? days = null)
         {
+            string? predominantFlow = null;
+            if (days != null && days.Any())
+            {
+                var flowGroup = days
+                    .Where(d => d.Flow > 0)
+                    .GroupBy(d => d.Flow)
+                    .OrderByDescending(g => g.Count())
+                    .FirstOrDefault();
+
+                if (flowGroup != null)
+                {
+                    predominantFlow = flowGroup.Key switch
+                    {
+                        1 => "Light Flow",
+                        2 => "Medium Flow",
+                        3 => "Heavy Flow",
+                        _ => null
+                    };
+                }
+            }
+
             return new PeriodDto
             {
                 Id = entity.Id.ToString(),
@@ -312,7 +363,8 @@ namespace backend.Modulos.Periods.Services
                 EndDate = entity.EndDate,
                 Duration = entity.EndDate.HasValue 
                         ? (entity.EndDate.Value.DayNumber - entity.StartDate.DayNumber) + 1 
-                        : null
+                        : null,
+                PredominantFlow = predominantFlow
             };
         }
 

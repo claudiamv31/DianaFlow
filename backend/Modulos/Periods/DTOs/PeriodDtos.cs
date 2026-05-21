@@ -13,6 +13,7 @@ namespace backend.Modulos.Periods.DTOs
         public DateOnly? EndDate { get; set; }
         public bool IsActive { get; set; }
         public int? Duration { get; set; }
+        public string? PredominantFlow { get; set; }
     }
 
     public class PeriodPredictionDto
