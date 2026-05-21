@@ -6,6 +6,8 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorScreen from '../../components/ErrorScreen';
 import SummaryStats from './SummaryStats';
 import HistoryPeriod from './HistoryPeriods';
+import VisualInsights from './VisualInsights';
+import Card from '../../components/Card/Card.jsx';
 
 const StatsPage = () => {
   const [user, setUser] = useState(null);
@@ -18,9 +20,9 @@ const StatsPage = () => {
   }, []);
 
   const {
-    data: dataSummary,
-    error: errorSummary,
-    isLoading: isLoadingSummary,
+    data: summary,
+    error,
+    isLoading,
     refetch: refetchSummary
   } = useQuery({
     queryKey: ['summary', user?.uid],
@@ -32,37 +34,47 @@ const StatsPage = () => {
     enabled: !!user
   });
 
-  const {
-    data: latestPeriods,
-    error: errorPeriods,
-    isLoading: isLoadingPeriods,
-    refetch: refetchPeriods
-  } = useQuery({
-    queryKey: ['periods', user?.uid],
-    queryFn: async () => {
-      if (!user) return null;
-      const res = await apiClient.get(`periods`);
-      return res.data;
-    },
-    enabled: !!user
-  });
-
-  if (isLoadingSummary || isLoadingPeriods) return <LoadingSpinner />;
-  if (errorSummary || errorPeriods)
+  if (isLoading) return <LoadingSpinner />;
+  if (error)
     return (
       <ErrorScreen
         onRetry={() => {
           refetchSummary();
-          refetchPeriods();
         }}
       />
     );
 
+  console.log('Summary: ', summary);
+
   return (
-    <>
-      <SummaryStats user={user} dataSummary={dataSummary} />
-      <HistoryPeriod user={user} latestPeriods={latestPeriods} />
-    </>
+    <div className="mx-5 my-10">
+      <p className="text-primary/100 font-headline font-bold tracking-tight text-lg pt-4">
+        Analysis
+      </p>
+      <h1 className="font-headline font-extrabold text-4xl tracking-tighter text-on-surface">
+        Your Cycle Sanctuary
+      </h1>
+      <p className="text-on-surface-variant max-w-md pt-2 pb-4">
+        Detailed insights into your patterns and biological rhythms over the
+        last six months.
+      </p>
+      <SummaryStats summary={summary} />
+      <div className="mt-8 flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row gap-6 items-stretch">
+          <div className="w-full md:w-[80%]">
+            <VisualInsights summary={summary} />
+          </div>
+          <div className="w-full md:w-[20%]">
+            <Card
+              title="Empathetic Insight"
+              description="Your cycle has been highly consistent. This month, consider prioritizing iron-rich foods as your luteal phase approaches."
+              icon={true}
+            />
+          </div>
+        </div>
+        <HistoryPeriod latestPeriods={summary?.periods} />
+      </div>
+    </div>
   );
 };
 

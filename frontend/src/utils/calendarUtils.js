@@ -53,3 +53,11 @@ export const formatMonthDay = (date) => {
     day: 'numeric'
   });
 };
+
+export const formatDateShort = (date) => {
+  const dateObj = parseLocalDate(date);
+  return dateObj?.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+};
