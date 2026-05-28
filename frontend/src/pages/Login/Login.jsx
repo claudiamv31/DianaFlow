@@ -63,7 +63,7 @@ function Login() {
       <div className="w-full max-w-[460px] z-10 flex flex-col items-center">
         {/* Header */}
         <h1 className="text-4xl font-headline font-bold text-[#6D3B47] mb-1">
-          Luna
+          DianaFlow
         </h1>
         <p className="text-sm text-[#716164] mb-8">
           Enter your digital sanctuary
@@ -167,7 +167,7 @@ function Login() {
 
         {/* Bottom Signup Text */}
         <div className="text-center mt-8 text-sm text-[#716164]">
-          New to Luna?{' '}
+          New to DianaFlow?{' '}
           <Link
             to="/register"
             className="font-bold text-[#904958] hover:underline"
