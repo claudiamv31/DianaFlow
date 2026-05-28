@@ -23,7 +23,6 @@ function App() {
             path="/login"
             element={
               <PublicRoute>
-                <HeaderNotLogged />
                 <Login />
               </PublicRoute>
             }
@@ -32,7 +31,7 @@ function App() {
             path="/register"
             element={
               <>
-                <HeaderNotLogged /> <SignUp />
+                <SignUp />
               </>
             }
           />

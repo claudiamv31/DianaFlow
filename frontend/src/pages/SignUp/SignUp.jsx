@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './SignUp.css';
 import image from '../../assets/register-img.png';
 import Input from '../../components/Input';
-import PrimaryButton from '../../components/PrimaryButton';
+import Button from '../../components/Button';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -15,21 +15,18 @@ const SignUp = () => {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(
-        'http://localhost:5039/api/users/sign-up',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            Name: name,
-            LastName: lastName,
-            Email: email,
-            Password: password
-          })
-        }
-      );
+      const res = await fetch('http://localhost:5039/api/users/sign-up', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          Name: name,
+          LastName: lastName,
+          Email: email,
+          Password: password
+        })
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -74,7 +71,9 @@ const SignUp = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <PrimaryButton type="submit">Sign Up</PrimaryButton>
+          <Button type="submit" variant="primary">
+            Sign Up
+          </Button>
         </form>
         <div className="signup-text">
           Already have an account? <Link to={'/login'}>Log In</Link>

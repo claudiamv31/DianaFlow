@@ -1,27 +1,22 @@
 .main-btn {
+  /* Base button, no width constraint */
+}
+
+/* Gradient button style */
+.gradient-btn {
   background: linear-gradient(
     to left,
     var(--secondary-color),
     var(--primary-color)
   );
   border-color: transparent;
-  width: 50%;
+  color: white;
 }
 
-.main-btn:hover {
-  background: linear-gradient(
-    to left,
-    var(--secondary-color),
-    var(--primary-color)
-  );
-  border-color: transparent;
+.gradient-btn:hover {
+  filter: brightness(1.1);
 }
 
-.main-btn:active {
-  background: linear-gradient(
-    to left,
-    var(--secondary-color),
-    var(--primary-color)
-  ) !important;
-  border-color: transparent !important;
+.gradient-btn:active {
+  filter: brightness(0.9);
 }

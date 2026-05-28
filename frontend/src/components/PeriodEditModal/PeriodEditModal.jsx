@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import Button from '../Button';
 
 const PeriodEditModal = ({ period, onClose, onSave }) => {
   const [startDate, setStartDate] = useState('');
@@ -23,26 +24,26 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
     // Return in YYYY-MM-DD format for the input's `min` attribute.
     return end.toISOString().split('T')[0];
   }, [period]);
-// Update selectedDates whenever startDate or bleedingDays change
-useEffect(() => {
-  if (!startDate) {
-    setSelectedDates([]);
-    return;
-  }
-  const dates = [];
-  for (let i = 0; i < bleedingDays; i++) {
-    const d = new Date(startDate);
-    d.setDate(d.getDate() + i);
-    dates.push(d.toISOString().split('T')[0]);
-  }
-  setSelectedDates(dates);
-}, [startDate, bleedingDays]);
+  // Update selectedDates whenever startDate or bleedingDays change
+  useEffect(() => {
+    if (!startDate) {
+      setSelectedDates([]);
+      return;
+    }
+    const dates = [];
+    for (let i = 0; i < bleedingDays; i++) {
+      const d = new Date(startDate);
+      d.setDate(d.getDate() + i);
+      dates.push(d.toISOString().split('T')[0]);
+    }
+    setSelectedDates(dates);
+  }, [startDate, bleedingDays]);
   if (!period) return null;
 
   const handleSave = () => {
     onSave({
       PeriodId: period.id,
-      SelectedDays: selectedDates.map(date => ({
+      SelectedDays: selectedDates.map((date) => ({
         date,
         flow: 1
       }))
@@ -53,7 +54,9 @@ useEffect(() => {
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       <div
         className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
@@ -77,7 +80,8 @@ useEffect(() => {
         {/* Scrollable Content */}
         <div className="px-8 pb-8 overflow-y-auto">
           <p className="text-on-surface-variant text-sm mb-8 px-2">
-            Select the start date of your period and how many days the bleeding lasted.
+            Select the start date of your period and how many days the bleeding
+            lasted.
           </p>
 
           <div className="space-y-6 mb-8">
@@ -128,7 +132,9 @@ useEffect(() => {
                   max="15"
                   value={bleedingDays}
                   onChange={(e) =>
-                    setBleedingDays(Math.min(15, Math.max(1, parseInt(e.target.value) || 1)))
+                    setBleedingDays(
+                      Math.min(15, Math.max(1, parseInt(e.target.value) || 1))
+                    )
                   }
                 />
                 <button
@@ -145,17 +151,14 @@ useEffect(() => {
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-4 px-2">
             <button
-              className="h-14 flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
+              className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
               onClick={onClose}
             >
               Cancel
             </button>
-            <button
-              className="h-14 flex items-center justify-center font-headline font-bold text-on-primary/100 bg-gradient-to-br from-primary to-primary-container shadow-[0_8px_16px_rgba(144,73,88,0.15)] hover:opacity-90 transition-all rounded-full active:scale-95"
-              onClick={handleSave}
-            >
+            <Button className="w-full" variant="primary" onClick={handleSave}>
               Save
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -56,3 +56,25 @@ code {
   margin-bottom: 80px;
   padding-bottom: 6rem;
 }
+
+
+/* Gradient button styles */
+.main-btn,
+.btn,
+.btn-primary,
+.btn-outline-primary {
+  background: linear-gradient(
+    to left,
+    var(--secondary-color),
+    var(--primary-color)
+  );
+  border-color: transparent;
+  color: white;
+}
+
+.main-btn:hover,
+.btn:hover,
+.btn-primary:hover,
+.btn-outline-primary:hover {
+  filter: brightness(1.1);
+}
