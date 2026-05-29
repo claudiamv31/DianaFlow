@@ -6,7 +6,6 @@ import './Home.css';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorScreen from '../../components/ErrorScreen';
-import PrimaryButton from '../../components/PrimaryButton';
 import CycleInsightsCard from './CycleInsightsCard/CycleInsigthCard';
 import YourPeriodCard from './YourPeriod/YourPeriodCard';
 import CurrentCycleCard from './CurrentCycleCard/CurrentCycleCard';
@@ -56,31 +55,30 @@ function Home() {
       case 'active_period':
         return (
           <>
-            Periodo en<span className="days">{status.days} días</span>
+            You have <span className="days">{status?.daysLeftInPeriod} </span>
+            days left
           </>
         );
       case 'next_period':
         return (
           <>
-            Tu próximo periodo en{' '}
-            <span className="days">{status.days} días</span>
+            Your next period in <span className="days">{status.days} days</span>
           </>
         );
       case 'period_should_start_today':
         return (
           <>
-            Tu periodo debería empezar <span className="days">hoy</span>.
+            Your period should start <span className="days">today</span>.
           </>
         );
       case 'delayed':
         return (
           <>
-            Tu periodo se ha retrasado{' '}
-            <span className="days">{status.days} días</span>
+            Period is late <span className="days">{status.days} days</span>
           </>
         );
       default:
-        return <>Registra tu ciclo para ver predicciones</>;
+        return <>No period recorded yet</>;
     }
   };
 
@@ -118,8 +116,10 @@ function Home() {
   const periodButtonText = isLogging
     ? 'Close calendar'
     : safeStatus?.cycleStatus?.status === 'active_period'
-      ? 'Update period'
+      ? 'Edit Cycle'
       : 'Start period';
+
+  console.log(safeStatus);
 
   return (
     <>
@@ -140,6 +140,10 @@ function Home() {
             }}
             initialDate={safeStatus.startDate}
             endDate={safeStatus.endDate}
+            isInActivePeriod={
+              safeStatus.cycleStatus?.status === 'active_period'
+            }
+            durationDays={safeStatus.DurationDays}
           />
         </div>
       ) : (
@@ -151,15 +155,10 @@ function Home() {
               <p className="text-phase">
                 {safeStatus.currentPhase
                   ? safeStatus.currentPhase.toUpperCase()
-                  : 'SIN PERÍODO'}
+                  : 'NO PERIOD RECORDED'}
               </p>
               <p className="text-status">
                 {getCycleMessage(safeStatus.cycleStatus)}
-              </p>
-              <p className="text-cycle">
-                {safeStatus.cycleStatus.status === 'active_period'
-                  ? 'Día ' + safeStatus.cycleStatus.days
-                  : ''}
               </p>
             </div>
             {/* Action button */}
@@ -177,8 +176,8 @@ function Home() {
             <>
               <div className="homepage-info">
                 <CurrentCycleCard
-                  periodDuration={null}
-                  cycleDay={null}
+                  periodDuration={safeStatus?.cycleStatus?.days}
+                  cycleDay={safeStatus?.cycleStatus?.cycleDay}
                 />
                 <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
               </div>

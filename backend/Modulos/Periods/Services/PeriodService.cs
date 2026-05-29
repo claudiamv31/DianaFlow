@@ -7,6 +7,7 @@ using backend.Data;
 using backend.Modulos.Periods.Models;
 using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Cycles.Services;
+using backend.Modulos.Cycles.DTOs;
 using backend.Modulos.Users.Services;
 
 namespace backend.Modulos.Periods.Services
@@ -124,10 +125,45 @@ namespace backend.Modulos.Periods.Services
             var latest = periods.First();
             var previous = periods.Skip(1).FirstOrDefault();
 
-            var previousCycleStatus = previous != null 
-                ? _cycleService.BuildCycleStatus(previous, cycleLength, periodLength, today)
-                : null;
-            var cycleStatus = _cycleService.BuildCycleStatus(latest, cycleLength, periodLength, today);
+            // Build actual current cycle status based on latest period
+            var actualCycleStatus = _cycleService.BuildCycleStatus(latest, cycleLength, periodLength, today);
+            
+            // Calculate current period day (which day of the period we're on)
+            int currentPeriodDay = 0;
+            int daysLeftInPeriod = 0;
+            if (actualCycleStatus.Status == "active_period")
+            {
+                currentPeriodDay = today.DayNumber - latest.StartDate.DayNumber + 1;
+                
+                // Calculate days left in period (excluding today)
+                if (latest.EndDate.HasValue && today <= latest.EndDate.Value)
+                {
+                    daysLeftInPeriod = latest.EndDate.Value.DayNumber - today.DayNumber;
+                }
+            }
+            
+            // Set period-specific values in cycle status
+            actualCycleStatus.CurrentPeriodDay = currentPeriodDay;
+            actualCycleStatus.DaysLeftInPeriod = daysLeftInPeriod;
+            
+            // Build PREVIOUS cycle info (not a prediction, but the actual previous period)
+            CycleStatus? previousCycleStatus = null;
+            if (previous != null)
+            {
+                // For previous cycle: just map the actual dates from the period
+                var nextPeriodAfterPrevious = previous.StartDate.AddDays(cycleLength);
+                previousCycleStatus = new CycleStatus
+                {
+                    StartDate = previous.StartDate,
+                    EndDate = previous.EndDate ?? previous.StartDate.AddDays(periodLength - 1),
+                    CycleLength = cycleLength,
+                    Status = "completed", // Previous cycles are completed
+                    CycleDay = 0,
+                    Consistency = GetRegularityLevel(cycleLength),
+                    Days = previous.EndDate.HasValue ? (previous.EndDate.Value.DayNumber - previous.StartDate.DayNumber + 1) : periodLength
+                };
+            }
+
             var currentPhase = _cycleService.GetCyclePhase(latest.StartDate, cycleLength, today);
 
             return new PeriodHomeDto
@@ -136,11 +172,11 @@ namespace backend.Modulos.Periods.Services
                 StartDate = latest.StartDate,
                 EndDate = latest.EndDate,
                 DurationDays = periodLength,
-                DaysUntilNextPeriod = cycleStatus.Days,
-                IsActive = cycleStatus.Status == "active_period",
+                DaysUntilNextPeriod = actualCycleStatus.Days,
+                IsActive = actualCycleStatus.Status == "active_period",
                 CurrentPhase = currentPhase,
                 PreviousCycle = previousCycleStatus,
-                CycleStatus = cycleStatus
+                CycleStatus = actualCycleStatus
             };
         }
 
@@ -319,9 +355,21 @@ namespace backend.Modulos.Periods.Services
 
         private int CalculateAveragePeriodLength(List<PeriodDto> periods)
         {
-            var completedPeriods = periods.Where(p => p.EndDate.HasValue).ToList();
+            var completedPeriods = periods
+                .Where(p => p.EndDate.HasValue && p.EndDate.Value >= p.StartDate)
+                .ToList();
+
             if (!completedPeriods.Any()) return 5;
-            return (int)Math.Round(completedPeriods.Average(p => p.EndDate!.Value.DayNumber - p.StartDate.DayNumber + 1));
+
+            var durations = completedPeriods
+                .Select(p => p.EndDate!.Value.DayNumber - p.StartDate.DayNumber + 1)
+                .Where(d => d > 0)
+                .ToList();
+
+            if (!durations.Any()) return 5;
+
+            var avg = (int)Math.Round(durations.Average());
+            return avg > 0 ? avg : 5;
         }
 
         private CycleRegularityLevel GetRegularityLevel(int cycleLength)

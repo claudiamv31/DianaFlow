@@ -1,4 +1,6 @@
 using backend.Modulos.Periods.Models;
+using System.Text.Json.Serialization;
+using backend.Modulos.Cycles.Enums;
 
 namespace backend.Modulos.Cycles.DTOs
 {
@@ -27,6 +29,12 @@ namespace backend.Modulos.Cycles.DTOs
         public string Status { get; set; } = "unknown";
         public int CycleDay { get; set; }
         public int Days { get; set; }
+        public int CurrentPeriodDay { get; set; }
+        public int DaysLeftInPeriod { get; set; }
+        public int PeriodDuration { get; set; }
+        
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public CycleRegularityLevel Consistency { get; set; } = CycleRegularityLevel.Unknown;
     }
 
     public class UpsertPeriodDto

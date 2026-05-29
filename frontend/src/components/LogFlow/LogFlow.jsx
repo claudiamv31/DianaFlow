@@ -5,21 +5,44 @@ import Calendar from 'react-calendar';
 import { formatDateLocal, parseLocalDate } from '../../utils/calendarUtils';
 import './LogFlow.css';
 
-function LogFlow({ onClose, onSave, initialDate, previousCycle, endDate }) {
+function LogFlow({
+  onClose,
+  onSave,
+  initialDate,
+  previousCycle,
+  endDate,
+  isInActivePeriod,
+  durationDays
+}) {
   const initialStartDate = parseLocalDate(initialDate) || new Date();
-  const initialDuration = previousCycle?.duration || 5;
-  const [activeMonth, setActiveMonth] = useState(() => new Date(initialStartDate));
+  const initialDuration = previousCycle?.duration || durationDays || 5;
+  const [activeMonth, setActiveMonth] = useState(
+    () => new Date(initialStartDate)
+  );
   const [selectedFlow, setSelectedFlow] = useState('Medium');
   const [range, setRange] = useState(() => {
     const start = new Date(initialStartDate);
     const dates = [];
-    if (endDate && initialDate) {
+
+    // If in active period with both start and end dates, use them
+    if (isInActivePeriod && endDate && initialDate) {
       const sDate = parseLocalDate(initialDate);
       const eDate = parseLocalDate(endDate);
-      for(let i = sDate; i <= eDate; i.setDate(i.getDate() + 1)){
+      for (let i = sDate; i <= eDate; i.setDate(i.getDate() + 1)) {
         dates.push(formatDateLocal(i));
       }
-    }else{
+    }
+    // If NOT in active period, pre-select from today + duration
+    else if (!isInActivePeriod) {
+      const today = new Date();
+      for (let i = 0; i < initialDuration; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        dates.push(formatDateLocal(date));
+      }
+    }
+    // Otherwise use the initial duration from the provided date
+    else {
       for (let i = 0; i < initialDuration; i++) {
         const date = new Date(start);
         date.setDate(start.getDate() + i);
@@ -36,9 +59,9 @@ function LogFlow({ onClose, onSave, initialDate, previousCycle, endDate }) {
   const handleDayClick = (day) => {
     const clickedString = formatDateLocal(day);
 
-    setRange(prev => {
+    setRange((prev) => {
       if (prev.includes(clickedString)) {
-        return prev.filter(d => d !== clickedString);
+        return prev.filter((d) => d !== clickedString);
       }
       return [...prev, clickedString];
     });
@@ -62,7 +85,7 @@ function LogFlow({ onClose, onSave, initialDate, previousCycle, endDate }) {
     let classes = [];
     if (isSelected) classes.push('period-tile', 'period-middle');
     if (dateString === today) classes.push('period-today');
-    
+
     return classes.length ? classes.join(' ') : null;
   };
 
