@@ -47,7 +47,7 @@ const Header = () => {
       {/* Logo */}
       <NavLink to="/" className="header-logo">
         <FaMoon className="moon-icon" />
-        <h1>Shine</h1>
+        <h1>DianaFlow</h1>
       </NavLink>
 
       {/* User */}

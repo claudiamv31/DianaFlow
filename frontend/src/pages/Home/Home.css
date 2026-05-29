@@ -6,65 +6,112 @@ p {
   min-height: calc(100vh - 140px);
 }
 
-.status {
-  margin: 1rem;
-  border-radius: 1.5rem;
+/* ── Hero ─────────────────────────────────────────── */
+.home-hero {
   position: relative;
-  overflow: hidden;
-  height: 60vh;
+  width: 100%;
+  min-height: 60vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  overflow: hidden;
+  padding: 3rem 1rem 4rem;
 }
 
-.status::before {
+.home-hero::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image: url('../../assets/homepage.png');
   background-size: cover;
   background-position: center;
-  opacity: 0.3;
+  opacity: 0.25;
   pointer-events: none;
   z-index: 0;
 }
 
-.status > * {
+.home-hero > * {
   position: relative;
   z-index: 1;
 }
 
-.home-status {
+/* Orb */
+.home-orb {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 24px 64px rgba(144, 73, 88, 0.10);
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.home-status .text-status {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--primary-color);
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1.5rem;
   text-align: center;
 }
 
-.home-status .text-phase {
-  font-size: 0.9rem;
-  color: var(--label-color);
-  background-color: var(--tags-content);
-  border-radius: 1rem;
-  border-color: var(--tags-content);
-  padding: 0.5rem;
+.home-orb .text-phase {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--label-color, #7a4f5a);
+  opacity: 0.7;
 }
 
-.home-status .text-cycle {
-  font-size: 1.2rem;
-  color: var(--primary-color);
-  margin-bottom: 1.7rem;
+.home-orb .text-status {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--on-surface, #34322f);
+  line-height: 1.2;
 }
 
+.home-orb .text-status .days {
+  color: var(--primary-color, #904958);
+  display: block;
+}
+
+.home-orb .text-cycle {
+  font-size: 0.875rem;
+  color: var(--label-color, #7a4f5a);
+  opacity: 0.6;
+  font-style: italic;
+}
+
+/* Hero button */
+.home-hero-btn {
+  padding: 1rem 2.5rem !important;
+  font-size: 1.05rem !important;
+  border-radius: 999px !important;
+}
+
+/* ── Info cards side-by-side ─────────────────────── */
 .homepage-info {
   display: flex;
   flex-direction: row;
-  gap: 2rem;
-  margin: 1rem;
+  gap: 1.5rem;
+  margin: 2rem 1.5rem 0;
 }
+
+.homepage-info > * {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Phase card full width below ─────────────────── */
+.homepage-phase {
+  margin: 0 1.5rem 2rem;
+}
+
+.homepage-phase .your-period-card {
+  width: 100%;
+  margin: 0;
+}
+
+

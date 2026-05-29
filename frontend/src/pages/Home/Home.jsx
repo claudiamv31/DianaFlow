@@ -9,7 +9,9 @@ import ErrorScreen from '../../components/ErrorScreen';
 import PrimaryButton from '../../components/PrimaryButton';
 import CycleInsightsCard from './CycleInsightsCard/CycleInsigthCard';
 import YourPeriodCard from './YourPeriod/YourPeriodCard';
+import CurrentCycleCard from './CurrentCycleCard/CurrentCycleCard';
 import LogFlow from '../../components/LogFlow/LogFlow';
+import Button from '../../components/Button';
 
 function Home() {
   const [user, setUser] = useState(null);
@@ -54,32 +56,31 @@ function Home() {
       case 'active_period':
         return (
           <>
-            You have <span className="days">{status.days} days</span> left in
-            your current period
+            Periodo en<span className="days">{status.days} días</span>
           </>
         );
       case 'next_period':
         return (
           <>
-            Your next period starts in{' '}
-            <span className="days">{status.days} days</span>
+            Tu próximo periodo en{' '}
+            <span className="days">{status.days} días</span>
           </>
         );
       case 'period_should_start_today':
         return (
           <>
-            Your period should start <span className="days">today</span>.
+            Tu periodo debería empezar <span className="days">hoy</span>.
           </>
         );
       case 'delayed':
         return (
           <>
-            Your period is delayed by{' '}
-            <span className="days">{status.days} days</span>
+            Tu periodo se ha retrasado{' '}
+            <span className="days">{status.days} días</span>
           </>
         );
       default:
-        return <>Track your cycle to get predictions</>;
+        return <>Registra tu ciclo para ver predicciones</>;
     }
   };
 
@@ -112,7 +113,7 @@ function Home() {
   const safeStatus = statusOfPeriod || {
     cycleStatus: { status: 'unknown' },
     previousCycle: null
-  }
+  };
 
   const periodButtonText = isLogging
     ? 'Close calendar'
@@ -129,7 +130,10 @@ function Home() {
             onClose={() => setIsLogging(false)}
             onSave={(data) => {
               saveCycle.mutate({
-                selectedDays: data.SelectedDays.map(d => ({ date: d, flow: 2 })),
+                selectedDays: data.SelectedDays.map((d) => ({
+                  date: d,
+                  flow: 2
+                })),
                 periodId: safeStatus.isActive ? safeStatus.periodId : null
               });
               setIsLogging(false);
@@ -140,27 +144,49 @@ function Home() {
         </div>
       ) : (
         <div className="homepage">
-          <div className="status">
-            <form id="update-period" onSubmit={(e) => e.preventDefault()}>
-              <div className="home-status">
-                <p className="text-phase bg-white/60">{safeStatus.currentPhase ? safeStatus.currentPhase.toUpperCase() : 'No active period'}</p>
-                <p className="text-status">
-                  {getCycleMessage(safeStatus.cycleStatus)}
-                </p>
-                <p className="text-cycle">{safeStatus.cycleStatus.status === 'active_period' ? 'Cycle Day ' + safeStatus.cycleStatus.days : ''}</p>
+          {/* ── Hero section ── */}
+          <section className="home-hero">
+            {/* Orb */}
+            <div className="home-orb">
+              <p className="text-phase">
+                {safeStatus.currentPhase
+                  ? safeStatus.currentPhase.toUpperCase()
+                  : 'SIN PERÍODO'}
+              </p>
+              <p className="text-status">
+                {getCycleMessage(safeStatus.cycleStatus)}
+              </p>
+              <p className="text-cycle">
+                {safeStatus.cycleStatus.status === 'active_period'
+                  ? 'Día ' + safeStatus.cycleStatus.days
+                  : ''}
+              </p>
+            </div>
+            {/* Action button */}
+            <Button
+              variant="primary"
+              className="w-48"
+              onClick={() => setIsLogging(!isLogging)}
+            >
+              {periodButtonText}
+            </Button>
+          </section>
 
-                <PrimaryButton
-                  type="button"
-                  onClick={() => setIsLogging(!isLogging)}
-                >
-                  {periodButtonText}
-                </PrimaryButton>
+          {/* ── Info cards side by side ── */}
+          {safeStatus.previousCycle && (
+            <>
+              <div className="homepage-info">
+                <CurrentCycleCard
+                  periodDuration={null}
+                  cycleDay={null}
+                />
+                <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
               </div>
-            </form>
-          </div>
-          <div className="homepage-info">
-            {safeStatus.previousCycle && <><CycleInsightsCard previousCycle={safeStatus.previousCycle} /><YourPeriodCard /></>}
-          </div>
+              <div className="homepage-phase">
+                <YourPeriodCard />
+              </div>
+            </>
+          )}
         </div>
       )}
     </>
