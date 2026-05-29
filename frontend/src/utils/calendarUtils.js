@@ -61,3 +61,12 @@ export const formatDateShort = (date) => {
     day: 'numeric'
   });
 };
+
+export const formatDateDayMonthYear = (date) => {
+  const dateObj = parseLocalDate(date);
+  return dateObj?.toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+};

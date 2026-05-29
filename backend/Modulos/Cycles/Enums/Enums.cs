@@ -5,3 +5,11 @@ public enum ECyclePhase
     Ovulation,
     Luteal
 }
+
+public enum CycleRegularityLevel
+{
+    Unknown,
+    Regular,
+    Irregular,
+    VeryIrregular
+}
