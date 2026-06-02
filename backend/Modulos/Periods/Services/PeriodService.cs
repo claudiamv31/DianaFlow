@@ -9,6 +9,7 @@ using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Cycles.Services;
 using backend.Modulos.Cycles.DTOs;
 using backend.Modulos.Users.Services;
+using backend.Modulos.Cycles.Enums;
 
 namespace backend.Modulos.Periods.Services
 {
@@ -165,6 +166,7 @@ namespace backend.Modulos.Periods.Services
             }
 
             var currentPhase = _cycleService.GetCyclePhase(latest.StartDate, cycleLength, today);
+            var dailyFocus = await _cycleService.GetCachedDailyInsightAsync(userId, currentPhase, today, EPhaseMessageType.Focus);
 
             return new PeriodHomeDto
             {
@@ -176,7 +178,8 @@ namespace backend.Modulos.Periods.Services
                 IsActive = actualCycleStatus.Status == "active_period",
                 CurrentPhase = currentPhase,
                 PreviousCycle = previousCycleStatus,
-                CycleStatus = actualCycleStatus
+                CycleStatus = actualCycleStatus,
+                DailyFocus = dailyFocus
             };
         }
 

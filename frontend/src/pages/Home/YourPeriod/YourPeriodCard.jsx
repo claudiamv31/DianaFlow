@@ -1,18 +1,17 @@
-import './YourPeriodCard.css';
+const YourPeriodCard = ({ period }) => {
+  const focusText = period?.dailyFocus || "Listen to your body today.";
 
-const YourPeriodCard = () => {
   return (
-    <div className="your-period-card">
-      <div>
-        <h2>Your Period</h2>
-      </div>
-      <div className="your-period-info">
-        <h3>Lutheal Phase</h3>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat.
+    <div className="md:col-span-2 bg-gradient-to-br from-secondary-container/50 to-tertiary-container/50 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 mt-4">
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="material-symbols-outlined text-secondary" data-icon="self_improvement">
+            self_improvement
+          </span>
+          <h3 className="font-headline text-lg font-bold text-on-surface">Your Focus</h3>
+        </div>
+        <p className="text-on-surface-variant text-sm mb-4">
+          {focusText}
         </p>
       </div>
     </div>

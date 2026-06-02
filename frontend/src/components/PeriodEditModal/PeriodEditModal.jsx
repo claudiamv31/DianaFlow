@@ -2,6 +2,13 @@ import { useState, useEffect, useMemo } from 'react';
 import Button from '../Button';
 
 const PeriodEditModal = ({ period, onClose, onSave }) => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   const [startDate, setStartDate] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);
   const [bleedingDays, setBleedingDays] = useState(1);
@@ -53,7 +60,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -78,13 +85,13 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
         </div>
 
         {/* Scrollable Content */}
-        <div className="px-8 pb-8 overflow-y-auto">
+        <div className="px-8 pb-4 overflow-y-auto flex-1">
           <p className="text-on-surface-variant text-sm mb-8 px-2">
             Select the start date of your period and how many days the bleeding
             lasted.
           </p>
 
-          <div className="space-y-6 mb-8">
+          <div className="space-y-6 mb-4">
             {/* Fecha de inicio */}
             <div className="space-y-2">
               <label
@@ -147,8 +154,10 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Action Buttons */}
+        {/* Action Buttons (Fixed at bottom) */}
+        <div className="px-8 pb-8 pt-4 bg-surface-container-lowest mt-auto">
           <div className="grid grid-cols-2 gap-4 px-2">
             <button
               className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"

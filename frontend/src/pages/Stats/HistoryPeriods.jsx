@@ -121,11 +121,13 @@ const HistoryPeriod = ({ latestPeriods }) => {
         </div>
       </section>
 
-      <PeriodEditModal
-        period={selectedPeriod}
-        onClose={() => setSelectedPeriod(null)}
-        onSave={handleSave}
-      />
+      {selectedPeriod && (
+        <PeriodEditModal
+          period={selectedPeriod}
+          onClose={() => setSelectedPeriod(null)}
+          onSave={handleSave}
+        />
+      )}
     </>
   );
 };

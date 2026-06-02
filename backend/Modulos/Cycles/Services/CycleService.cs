@@ -83,7 +83,8 @@ namespace backend.Modulos.Cycles.Services
                 CycleLength = cycleLength,
                 Status = status,
                 CycleDay = cycleDay,
-                Days = daysDiff
+                Days = daysDiff,
+                PeriodDuration = (latest.EndDate?.DayNumber ?? 0) - latest.StartDate.DayNumber + 1
             };
         }
 
@@ -136,15 +137,15 @@ namespace backend.Modulos.Cycles.Services
             return ECyclePhase.Luteal;
         }
 
-        public async Task<string> GetCachedDailyInsightAsync(Guid userId, ECyclePhase phase, DateOnly requestedDate)
+        public async Task<string> GetCachedDailyInsightAsync(Guid userId, ECyclePhase phase, DateOnly requestedDate, EPhaseMessageType messageType = EPhaseMessageType.Short)
         {
             // La llave única ahora usa la fecha que seleccionó la usuaria en el calendario
-            string cacheKey = $"DailyInsight_{userId}_{requestedDate:yyyyMMdd}";
+            string cacheKey = $"DailyInsight_{userId}_{requestedDate:yyyyMMdd}_{messageType}";
 
             if (!_cache.TryGetValue(cacheKey, out string? cachedMessage))
             {
                 var messages = await _context.PhaseMessages
-                    .Where(m => m.Phase == phase)
+                    .Where(m => m.Phase == phase && m.MessageType == messageType)
                     .Select(m => m.Message)
                     .ToListAsync();
 
@@ -163,3 +164,4 @@ namespace backend.Modulos.Cycles.Services
         }       
     }
 }
+

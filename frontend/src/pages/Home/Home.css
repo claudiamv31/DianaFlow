@@ -46,7 +46,7 @@ p {
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1.5px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 0 24px 64px rgba(144, 73, 88, 0.10);
+  box-shadow: 0 24px 64px rgba(144, 73, 88, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -74,7 +74,6 @@ p {
 
 .home-orb .text-status .days {
   color: var(--primary-color, #904958);
-  display: block;
 }
 
 .home-orb .text-cycle {
@@ -113,5 +112,3 @@ p {
   width: 100%;
   margin: 0;
 }
-
-

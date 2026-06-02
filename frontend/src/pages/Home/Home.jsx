@@ -53,6 +53,9 @@ function Home() {
   const getCycleMessage = (status) => {
     switch (status?.status) {
       case 'active_period':
+        if (status?.daysLeftInPeriod == 0) {
+          return 'Last day of your period';
+        }
         return (
           <>
             You have <span className="days">{status?.daysLeftInPeriod} </span>
@@ -123,70 +126,66 @@ function Home() {
 
   return (
     <>
-      {isLogging ? (
-        <div className="logflow-container">
-          <LogFlow
-            previousCycle={safeStatus.previousCycle}
-            onClose={() => setIsLogging(false)}
-            onSave={(data) => {
-              saveCycle.mutate({
-                selectedDays: data.SelectedDays.map((d) => ({
-                  date: d,
-                  flow: 2
-                })),
-                periodId: safeStatus.isActive ? safeStatus.periodId : null
-              });
-              setIsLogging(false);
-            }}
-            initialDate={safeStatus.startDate}
-            endDate={safeStatus.endDate}
-            isInActivePeriod={
-              safeStatus.cycleStatus?.status === 'active_period'
-            }
-            durationDays={safeStatus.DurationDays}
-          />
-        </div>
-      ) : (
-        <div className="homepage">
-          {/* ── Hero section ── */}
-          <section className="home-hero">
-            {/* Orb */}
-            <div className="home-orb">
-              <p className="text-phase">
-                {safeStatus.currentPhase
-                  ? safeStatus.currentPhase.toUpperCase()
-                  : 'NO PERIOD RECORDED'}
-              </p>
-              <p className="text-status">
-                {getCycleMessage(safeStatus.cycleStatus)}
-              </p>
-            </div>
-            {/* Action button */}
-            <Button
-              variant="primary"
-              className="w-48"
-              onClick={() => setIsLogging(!isLogging)}
-            >
-              {periodButtonText}
-            </Button>
-          </section>
+      <div className="homepage">
+        {/* ── Hero section ── */}
+        <section className="home-hero">
+          {/* Orb */}
+          <div className="home-orb">
+            <p className="text-phase">
+              {safeStatus.currentPhase
+                ? safeStatus.currentPhase.toUpperCase()
+                : 'NO PERIOD RECORDED'}
+            </p>
+            <p className="text-status">
+              {getCycleMessage(safeStatus.cycleStatus)}
+            </p>
+          </div>
+          {/* Action button */}
+          <Button
+            variant="primary"
+            className="w-48"
+            onClick={() => setIsLogging(true)}
+          >
+            {periodButtonText}
+          </Button>
+        </section>
 
-          {/* ── Info cards side by side ── */}
-          {safeStatus.previousCycle && (
-            <>
-              <div className="homepage-info">
-                <CurrentCycleCard
-                  periodDuration={safeStatus?.cycleStatus?.days}
-                  cycleDay={safeStatus?.cycleStatus?.cycleDay}
-                />
-                <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
-              </div>
-              <div className="homepage-phase">
-                <YourPeriodCard />
-              </div>
-            </>
-          )}
-        </div>
+        {/* ── Info cards side by side ── */}
+        {safeStatus.previousCycle && (
+          <>
+            <div className="homepage-info">
+              <CurrentCycleCard
+                periodDuration={safeStatus?.cycleStatus?.periodDuration}
+                cycleDay={safeStatus?.cycleStatus?.cycleDay}
+              />
+              <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
+            </div>
+            <div className="homepage-phase">
+              <YourPeriodCard period={safeStatus} />
+            </div>
+          </>
+        )}
+      </div>
+
+      {isLogging && (
+        <LogFlow
+          previousCycle={safeStatus.previousCycle}
+          onClose={() => setIsLogging(false)}
+          onSave={(data) => {
+            saveCycle.mutate({
+              selectedDays: data.SelectedDays.map((d) => ({
+                date: d,
+                flow: 2
+              })),
+              periodId: safeStatus.isActive ? safeStatus.periodId : null
+            });
+            setIsLogging(false);
+          }}
+          initialDate={safeStatus.startDate}
+          endDate={safeStatus.endDate}
+          isInActivePeriod={safeStatus.cycleStatus?.status === 'active_period'}
+          durationDays={safeStatus.DurationDays}
+        />
       )}
     </>
   );

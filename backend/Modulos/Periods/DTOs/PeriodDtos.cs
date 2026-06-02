@@ -48,6 +48,7 @@ namespace backend.Modulos.Periods.DTOs
 
         public CycleStatus? PreviousCycle { get; set; }
         public CycleStatus CycleStatus { get; set; } = new();
+        public string? DailyFocus { get; set; }
     }
 
     public enum CycleRegularityLevel

@@ -52,9 +52,9 @@ const Header = () => {
 
       {/* User */}
       <div className="options">
-        <NavLink to="/config" className="user-menu-link">
+        {/*<NavLink to="/config" className="user-menu-link">
           <FontAwesomeIcon icon={faUser} className="user-icon" />
-        </NavLink>
+        </NavLink>*/}
       </div>
     </header>
   );
