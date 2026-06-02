@@ -12,6 +12,7 @@ import CalendarPage from './pages/CalendarPage/CalendarPage.jsx';
 import StatsPage from './pages/Stats/Stats.jsx';
 import Menu from './components/Menu/Menu.jsx';
 import ArchivePage from './pages/Archive/ArchivePage.jsx';
+import Settings from './pages/Settings/Settings.jsx';
 
 function App() {
   return (
@@ -107,6 +108,19 @@ function App() {
                 <Header />
                 <div className="main-content">
                   <ArchivePage />
+                </div>
+                <Menu />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/configuration"
+            element={
+              <PrivateRoute>
+                <Header />
+                <div className="main-content">
+                  <Settings />
                 </div>
                 <Menu />
               </PrivateRoute>

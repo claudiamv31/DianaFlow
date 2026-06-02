@@ -1,9 +1,17 @@
 import apiClient from '../../api/apiClient';
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { formatDateLocal } from '../../utils/calendarUtils';
+import Button from '../Button';
 
 const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   const [currentFlowIntensity, setCurrentFlowIntensity] = useState(
     cycleInfo?.flow || 0
   );
@@ -49,137 +57,153 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
   };
 
   return (
-    <>
-      <div className="fixed inset-0 bg-blurred-calendar grayscale-[0.2] blur-xl opacity-40 scale-105"></div>
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-on-surface/5 backdrop-blur-sm p-4 md:p-8">
-        <div className="bg-surface-container-lowest w-full max-w-lg max-h-[921px] overflow-y-auto rounded-xl shadow-[0_12px_32px_rgba(52,50,47,0.06)] flex flex-col relative">
-          <div className="px-8 pt-10 pb-6 text-center">
-            <p className="font-display text-primary/70 text-sm font-semibold tracking-widest uppercase mb-1">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) handleCancel();
+      }}
+    >
+      <div
+        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
+        style={{ maxHeight: '90vh', borderRadius: '3rem' }}
+      >
+        {/* Header */}
+        <div className="px-8 pt-10 pb-4 flex items-center justify-between">
+          <div>
+            <h2 className="font-headline font-bold text-2xl text-on-surface">
               Edit Daily Log
-            </p>
-            <h1 className="font-display text-on-surface text-3xl font-bold tracking-tight">
+            </h2>
+            <p className="text-sm font-semibold tracking-widest uppercase text-primary/70 mt-1">
               {selectedDate?.toLocaleDateString('en-US', {
                 weekday: 'long',
-                year: undefined,
                 month: 'short',
                 day: 'numeric'
               })}
-            </h1>
-            <p className="text-on-surface-variant font-medium mt-1">
-              Day {cycleInfo?.cycleDay} — {cycleInfo?.phase}
             </p>
           </div>
-          <div className="px-8 pb-10 space-y-10">
-            <section>
-              <h2 className="font-display text-on-surface text-lg font-bold mb-6 flex items-center gap-2">
-                Flow Intensity
-              </h2>
-              <div className="flex justify-between items-center px-4">
-                <div className="flex flex-col items-center gap-3 group cursor-pointer">
-                  <div
-                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(0)}`}
-                    onClick={() => setCurrentFlowIntensity(0)}
-                  >
-                    <span
-                      className="material-symbols-outlined text-3xl"
-                      data-icon="block"
-                    >
-                      block
-                    </span>
-                  </div>
+          <button
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
+            onClick={handleCancel}
+          >
+            <span className="material-symbols-outlined text-on-surface-variant group-active:scale-90 transition-transform">
+              close
+            </span>
+          </button>
+        </div>
+
+        {/* Scrollable Content */}
+        <div className="px-8 pb-4 overflow-y-auto flex-1">
+          <p className="text-on-surface-variant text-sm mb-8 px-2">
+            Day {cycleInfo?.cycleDay} — {cycleInfo?.phase}
+          </p>
+
+          <section className="mb-4">
+            <h3 className="font-headline text-on-surface text-lg font-bold mb-6 px-2">
+              Flow Intensity
+            </h3>
+            <div className="flex justify-between items-center px-4">
+              <div className="flex flex-col items-center gap-3 group cursor-pointer">
+                <div
+                  className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(0)}`}
+                  onClick={() => setCurrentFlowIntensity(0)}
+                >
                   <span
-                    className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(
-                      0
-                    )}`}
+                    className="material-symbols-outlined text-3xl"
+                    data-icon="block"
                   >
-                    None
+                    block
                   </span>
                 </div>
-                <div className="flex flex-col items-center gap-3 group cursor-pointer">
-                  <div
-                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(1)}`}
-                    onClick={() => setCurrentFlowIntensity(1)}
+                <span
+                  className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(
+                    0
+                  )}`}
+                >
+                  None
+                </span>
+              </div>
+              <div className="flex flex-col items-center gap-3 group cursor-pointer">
+                <div
+                  className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(1)}`}
+                  onClick={() => setCurrentFlowIntensity(1)}
+                >
+                  <span
+                    className="material-symbols-outlined text-3xl"
+                    data-icon="water_drop"
                   >
+                    water_drop
+                  </span>
+                </div>
+                <span
+                  className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(1)}`}
+                >
+                  Light
+                </span>
+              </div>
+              <div className="flex flex-col items-center gap-3 group cursor-pointer">
+                <div
+                  className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(2)}`}
+                  onClick={() => setCurrentFlowIntensity(2)}
+                >
+                  <div className="flex gap-[-4px]">
                     <span
-                      className="material-symbols-outlined text-3xl"
+                      className="material-symbols-outlined text-2xl"
+                      data-icon="water_drop"
+                    >
+                      water_drop
+                    </span>
+                    <span
+                      className="material-symbols-outlined text-2xl"
                       data-icon="water_drop"
                     >
                       water_drop
                     </span>
                   </div>
-                  <span
-                    className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(1)}`}
-                  >
-                    Light
-                  </span>
                 </div>
-                <div className="flex flex-col items-center gap-3 group cursor-pointer">
-                  <div
-                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(2)}`}
-                    onClick={() => setCurrentFlowIntensity(2)}
-                  >
-                    <div className="flex gap-[-4px]">
-                      <span
-                        className="material-symbols-outlined text-2xl"
-                        data-icon="water_drop"
-                      >
-                        water_drop
-                      </span>
-                      <span
-                        className="material-symbols-outlined text-2xl"
-                        data-icon="water_drop"
-                      >
-                        water_drop
-                      </span>
-                    </div>
-                  </div>
-                  <span
-                    className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(2)}`}
-                  >
-                    Medium
-                  </span>
-                </div>
-                <div className="flex flex-col items-center gap-3 group cursor-pointer">
-                  <div
-                    className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(3)}`}
-                    onClick={() => setCurrentFlowIntensity(3)}
-                  >
-                    <span
-                      className="material-symbols-outlined text-4xl"
-                      data-icon="opacity"
-                    >
-                      opacity
-                    </span>
-                  </div>
-                  <span
-                    className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(3)}`}
-                  >
-                    Heavy
-                  </span>
-                </div>
-              </div>
-            </section>
-            <div className="flex flex-col gap-4 pt-4">
-              <button
-                className="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-display font-semibold py-3 rounded-full shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                onClick={handleSaveLog}
-              >
-                <span className="material-symbols-outlined" data-icon="check">
-                  check
+                <span
+                  className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(2)}`}
+                >
+                  Medium
                 </span>
-                Save Daily Log
-              </button>
-              <button
-                className="w-full text-on-surface-variant font-label font-semibold text-sm uppercase tracking-widest py-2 hover:text-on-surface transition-colors"
-                onClick={handleCancel}
-              >
-                Cancel
-              </button>
+              </div>
+              <div className="flex flex-col items-center gap-3 group cursor-pointer">
+                <div
+                  className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(3)}`}
+                  onClick={() => setCurrentFlowIntensity(3)}
+                >
+                  <span
+                    className="material-symbols-outlined text-4xl"
+                    data-icon="opacity"
+                  >
+                    opacity
+                  </span>
+                </div>
+                <span
+                  className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(3)}`}
+                >
+                  Heavy
+                </span>
+              </div>
             </div>
+          </section>
+        </div>
+
+        {/* Action Buttons (Fixed at bottom) */}
+        <div className="px-8 pb-8 pt-4 bg-surface-container-lowest mt-auto">
+          <div className="grid grid-cols-2 gap-4 px-2">
+            <button
+              className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+            <Button className="w-full" variant="primary" onClick={handleSaveLog}>
+              Save Log
+            </Button>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

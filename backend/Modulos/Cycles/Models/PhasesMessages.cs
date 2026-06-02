@@ -7,6 +7,7 @@ namespace backend.Modulos.Cycles.Enums
     {
         public int Id { get; set; }
         public ECyclePhase Phase { get; set; }
-        public string? Message { get; set; }    
+        public string? Message { get; set; }
+        public EPhaseMessageType MessageType { get; set; } = EPhaseMessageType.Short;
     }
 }

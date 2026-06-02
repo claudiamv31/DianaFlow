@@ -5,10 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorScreen from '../../components/ErrorScreen';
 import './CalendarPage.css';
-import CalendarInfo from './CalendarInfo/CalendarInfo';
-import Card from '../../components/Card/Card';
 import LegendCard from './LegendCard/LegendCard';
-import LogPeriodCard from './LogPeriodCard/LogPeriodCard';
 import CalendarView from './CalendarView/CalendarView';
 import { parseLocalDate, formatDateLocal } from '../../utils/calendarUtils';
 import LogFlow from '../../components/LogFlow/LogFlow';
@@ -130,53 +127,56 @@ const CalendarPage = () => {
 
   return (
     <>
-      {isDailyLogActive ? (
+      <div className="calendar-page">
+        <h2 className="title">Cycle Rhythm</h2>
+        <h3 className="subtitle">Your sanctuary of flow and focus.</h3>
+        <div className="calendar-page-container">
+          <div className="calendar-view-container">
+            <CalendarView
+              date={date}
+              selectedDate={selectedDate}
+              calendarDays={calendarDays}
+              periods={periods}
+              onMonthChange={handleMonthChange}
+              periodDays={periodDays}
+              isEditingPeriod={isEditingPeriod}
+              setDate={setDate}
+              setSelectedDate={setSelectedDate}
+              setPeriodDays={setPeriodDays}
+              setCurrentPeriod={setCurrentPeriod}
+              nextPeriod={nextPeriod}
+            />
+          </div>
+          <div className="cards-container">
+            <DailyInsigths
+              cycleInfo={cycleInfo}
+              setIsEditingPeriod={setIsEditingPeriod}
+              selectedDate={selectedDate}
+              setIsDailyLogActive={setIsDailyLogActive}
+              isPeriod={cycleInfo?.isPeriod}
+            />
+            <LegendCard />
+          </div>
+        </div>
+      </div>
+
+      {isDailyLogActive && (
         <EditLog
           onClose={() => setIsDailyLogActive(false)}
           selectedDate={selectedDate}
           isPeriodActive={cycleInfo?.isPeriod}
           cycleInfo={cycleInfo}
         />
-      ) : isEditingPeriod ? (
+      )}
+      
+      {isEditingPeriod && (
         <LogFlow
           onClose={() => setIsEditingPeriod(false)}
           onSave={(data) => {
             console.log(data);
+            setIsEditingPeriod(false);
           }}
         />
-      ) : (
-        <div className="calendar-page">
-          <h2 className="title">Cycle Rhythm</h2>
-          <h3 className="subtitle">Your sanctuary of flow and focus.</h3>
-          <div className="calendar-page-container">
-            <div className="calendar-view-container">
-              <CalendarView
-                date={date}
-                selectedDate={selectedDate}
-                calendarDays={calendarDays}
-                periods={periods}
-                onMonthChange={handleMonthChange}
-                periodDays={periodDays}
-                isEditingPeriod={isEditingPeriod}
-                setDate={setDate}
-                setSelectedDate={setSelectedDate}
-                setPeriodDays={setPeriodDays}
-                setCurrentPeriod={setCurrentPeriod}
-                nextPeriod={nextPeriod}
-              />
-            </div>
-            <div className="cards-container">
-              <DailyInsigths
-                cycleInfo={cycleInfo}
-                setIsEditingPeriod={setIsEditingPeriod}
-                selectedDate={selectedDate}
-                setIsDailyLogActive={setIsDailyLogActive}
-                isPeriod={cycleInfo?.isPeriod}
-              />
-              <LegendCard />
-            </div>
-          </div>
-        </div>
       )}
     </>
   );

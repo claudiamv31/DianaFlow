@@ -1,39 +1,82 @@
-.log-period-card-container{
-    position: relative;
-    overflow: hidden;
-    padding: 1rem 2rem;
-    border-radius: 1.5rem;
-    background: linear-gradient(
-    to left,
-    var(--secondary-color),
-    var(--primary-color)
-  );
+.log-period-card-glass {
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 2rem 2.5rem;
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  margin: 1rem 1.5rem;
 }
 
-.log-period-card-container h2{
-    font-family: 'Manrope', sans-serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: white;
-    margin: 1rem 0;
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
 }
 
-.log-period-card-container p{
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: white;
+.log-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  display: flex;
+  align-items: center;
 }
 
-.log-period-card-container button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 1rem;
-    background: white;
-    border-color: transparent;
-    color: var(--primary-color);
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
+.log-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--on-surface);
+  cursor: pointer;
 }
 
+.log-description {
+  font-size: 0.9rem;
+  color: var(--on-surface);
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+}
 
+/* Actions container */
+.log-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.log-button {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--on-surface);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.log-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.log-button.primary:hover {
+  background: var(--primary-color-dark, #7a3a48);
+}
+
+.log-button.cancel {
+  background: transparent;
+  border: 1px solid var(--on-surface);
+  color: var(--on-surface);
+}
+
+.log-button.cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

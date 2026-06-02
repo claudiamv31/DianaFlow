@@ -215,11 +215,13 @@ const ArchivePage = () => {
 
       </main>
 
-      <PeriodEditModal
-        period={selectedPeriod}
-        onClose={() => setSelectedPeriod(null)}
-        onSave={handleSave}
-      />
+      {selectedPeriod && (
+        <PeriodEditModal
+          period={selectedPeriod}
+          onClose={() => setSelectedPeriod(null)}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 };

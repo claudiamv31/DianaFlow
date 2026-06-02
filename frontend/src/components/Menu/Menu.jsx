@@ -1,22 +1,15 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faArrowTrendUp,
+  faHouse,
   faCalendar,
-  faGear,
-  faHouse
+  faArrowTrendUp,
+  faGear
 } from '@fortawesome/free-solid-svg-icons';
-
 import './Menu.css';
 
 const Menu = () => {
-  document.querySelectorAll('nav a').forEach((link) => {
-    if (link.href === window.location.href) {
-      link.classList.add('active');
-    }
-  });
-
   return (
     <div className="menu-container">
       <nav className="nav-links">
