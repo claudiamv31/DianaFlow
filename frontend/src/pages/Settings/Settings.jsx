@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout, checkUser } from '../../database/authService';
+import EditProfileModal from './EditProfileModal/EditProfileModal';
+import { useGetProfile } from '../../hooks/useProfileHooks';
 
 const Settings = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: profileData, isLoading: profileLoading } = useGetProfile();
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser) => {
@@ -13,10 +17,29 @@ const Settings = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (profileData?.name && profileData?.email) {
+      setUser({
+        ...user,
+        name: profileData.name,
+        email: profileData.email,
+        lastName: profileData.lastName,
+        avatarUrl: profileData.avatarUrl,
+      });
+    }
+  }, [profileData]);
+
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
+
+  const displayName = profileData?.name || user?.name || 'User';
+  const displayEmail = profileData?.email || user?.email || '';
+  
+  const avatarUrl = profileData?.avatarUrl 
+    ? `http://localhost:5039${profileData.avatarUrl}`
+    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuA8HWNwPd9r7UA9XRDyDhAQ9sdIidNXZJJy-QaVKwG9JwB27KR6JCgXNZspna8sATiKA2KmZGH1VFufgJGpaFhQx0IdVzb9vNW5J9GOotGMzfhbe1_BOwkjml5fn355Gfl4LTupcQJm5K6NQijisQ8L6NBxlldvGs3B3L9gQBB3V2_GZi0_9MINcTCc7Uhr4zXtGRX2bvBvG2ss_gAZSFfZWEYJ9Axj6z3fIqAc1Y_qCLjH9CUxMnQwEJdhifGplGsFbkDzzzmWBAn3';
 
   return (
     <main className="pt-24 pb-32 px-6 max-w-md mx-auto min-h-screen">
@@ -27,28 +50,60 @@ const Settings = () => {
             <img
               alt="User Profile"
               className="w-full h-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8HWNwPd9r7UA9XRDyDhAQ9sdIidNXZJJy-QaVKwG9JwB27KR6JCgXNZspna8sATiKA2KmZGH1VFufgJGpaFhQx0IdVzb9vNW5J9GOotGMzfhbe1_BOwkjml5fn355Gfl4LTupcQJm5K6NQijisQ8L6NBxlldvGs3B3L9gQBB3V2_GZi0_9MINcTCc7Uhr4zXtGRX2bvBvG2ss_gAZSFfZWEYJ9Axj6z3fIqAc1Y_qCLjH9CUxMnQwEJdhifGplGsFbkDzzzmWBAn3"
+              src={avatarUrl}
             />
           </div>
-          <button className="absolute bottom-0 right-0 bg-primary p-2 rounded-full text-on-primary shadow-[0_12px_32px_rgba(52,50,47,0.04)] active:scale-90 transition-transform">
+          <button 
+            onClick={() => setIsEditModalOpen(true)}
+            className="absolute bottom-0 right-0 bg-primary p-2 rounded-full text-on-primary shadow-[0_12px_32px_rgba(52,50,47,0.04)] active:scale-90 transition-transform"
+          >
             <span className="material-symbols-outlined text-sm" data-icon="edit">
               edit
             </span>
           </button>
         </div>
         <h1 className="font-headline text-3xl font-bold tracking-tight text-on-surface mb-1">
-          {user?.name || 'Elena Rostova'}
+          {displayName}
         </h1>
-        <p className="font-body text-on-surface-variant font-medium">
-          Cycle Day 14 • Ovulation
+        <p className="font-body text-on-surface-variant font-medium text-sm">
+          {displayEmail || 'No email set'}
         </p>
       </section>
 
       {/* Settings Grid / Menu Items */}
       <div className="space-y-4">
+        {/* Profile Info Card */}
+        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl p-6 mb-6">
+          <h2 className="font-label font-semibold text-on-surface mb-4">Profile Information</h2>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-on-surface-variant text-sm">Name:</span>
+              <span className="text-on-surface font-semibold">{displayName}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-on-surface-variant text-sm">Email:</span>
+              <span className="text-on-surface font-semibold text-sm">{displayEmail}</span>
+            </div>
+            {profileData?.timeZone && (
+              <div className="flex justify-between items-center">
+                <span className="text-on-surface-variant text-sm">Timezone:</span>
+                <span className="text-on-surface font-semibold text-sm">{profileData.timeZone}</span>
+              </div>
+            )}
+            {profileLoading && (
+              <div className="text-center py-2">
+                <span className="text-on-surface-variant text-xs">Loading profile...</span>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Profile Settings Group */}
         <div className="bg-surface-container-low p-2 rounded-2xl">
-          <button className="w-full flex items-center justify-between p-4 bg-surface-container-lowest rounded-[1rem] hover:bg-surface-container-high transition-colors duration-200 mb-2">
+          <button 
+            onClick={() => setIsEditModalOpen(true)}
+            className="w-full flex items-center justify-between p-4 bg-surface-container-lowest rounded-[1rem] hover:bg-surface-container-high transition-colors duration-200 mb-2"
+          >
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center">
                 <span
@@ -69,7 +124,10 @@ const Settings = () => {
               chevron_right
             </span>
           </button>
-          <button className="w-full flex items-center justify-between p-4 bg-surface-container-lowest rounded-[1rem] hover:bg-surface-container-high transition-colors duration-200">
+          <button 
+            onClick={() => setIsEditModalOpen(true)}
+            className="w-full flex items-center justify-between p-4 bg-surface-container-lowest rounded-[1rem] hover:bg-surface-container-high transition-colors duration-200"
+          >
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center">
                 <span
@@ -157,6 +215,9 @@ const Settings = () => {
         "Embrace the shifting tides of your body with kindness. You are not just
         tracking numbers; you are listening to your own rhythm."
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
     </main>
   );
 };

@@ -55,6 +55,8 @@ builder.Services.AddScoped<CycleService>();
 builder.Services.AddScoped<CalendarService>();
 builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<StatsService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 
 builder.Services.AddMemoryCache();
 var app = builder.Build();
@@ -71,6 +73,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Static files for avatars
+app.UseStaticFiles();
 
 app.MapControllers();
 
