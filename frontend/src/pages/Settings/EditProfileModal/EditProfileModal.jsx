@@ -1,42 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   useUpdateProfile,
-  useUploadAvatar,
-  useChangePassword,
   useGetProfile
-} from '../../hooks/useProfileHooks';
+} from '../../../hooks/useProfileHooks';
+import Button from '../../../components/Button';
+
+const DEFAULT_AVATAR = 'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
 
 const EditProfileModal = ({ isOpen, onClose }) => {
   const { data: profileData, isLoading: profileLoading } = useGetProfile();
   const updateProfileMutation = useUpdateProfile();
-  const uploadAvatarMutation = useUploadAvatar();
-  const changePasswordMutation = useChangePassword();
 
-  // Profile Details State
-  const [profileDetails, setProfileDetails] = useState({
-    name: '',
-    lastName: '',
-    email: ''
-  });
+  const fileInputRef = useRef(null);
 
-  // Avatar State
-  const [avatarPreview, setAvatarPreview] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-
-  // Password Change State
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-
-  // Active Tab State
-  const [activeTab, setActiveTab] = useState('profile');
-
-  // Error Messages
+  const [profileDetails, setProfileDetails] = useState({ name: '', lastName: '', email: '' });
+  // avatarPreview is always a displayable string (data URL or http URL or default)
+  const [avatarPreview, setAvatarPreview] = useState(DEFAULT_AVATAR);
+  // avatarBase64 is only set when the user picks a NEW image — it's the raw data URL to send to the API
+  const [avatarBase64, setAvatarBase64] = useState(null);
   const [errors, setErrors] = useState({});
 
-  // Initialize form with user data
+  // Populate form from fetched profile data
   useEffect(() => {
     if (profileData) {
       setProfileDetails({
@@ -45,505 +29,264 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         email: profileData.email || ''
       });
       if (profileData.avatarUrl) {
-        setAvatarPreview(`http://localhost:5039${profileData.avatarUrl}`);
+        setAvatarPreview(
+          profileData.avatarUrl.startsWith('data:')
+            ? profileData.avatarUrl
+            : `http://localhost:5039${profileData.avatarUrl}`
+        );
+      } else {
+        setAvatarPreview(DEFAULT_AVATAR);
       }
     }
   }, [profileData]);
 
-  // Handle body scroll
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+    return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
-  const handleProfileDetailsChange = (e) => {
+  const handleFieldChange = (e) => {
     const { name, value } = e.target;
-    setProfileDetails((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    setProfileDetails(prev => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswordData((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
-  const handleAvatarSelect = (e) => {
+  const handleFileSelect = (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setAvatarPreview(event.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target.result;
+      setAvatarPreview(dataUrl);   // show immediately in preview
+      setAvatarBase64(dataUrl);    // remember to send on save
+    };
+    reader.readAsDataURL(file);
   };
 
-  const validateProfileDetails = () => {
+  const validate = () => {
     const newErrors = {};
-
-    if (!profileDetails.name.trim()) {
-      newErrors.name = 'El nombre es requerido';
-    }
-    if (!profileDetails.email.trim()) {
-      newErrors.email = 'El correo es requerido';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileDetails.email)) {
-      newErrors.email = 'El formato del correo no es válido';
-    }
-
+    if (!profileDetails.name.trim()) newErrors.name = 'El nombre es requerido';
+    if (!profileDetails.email.trim()) newErrors.email = 'El correo es requerido';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileDetails.email)) newErrors.email = 'El formato del correo no es válido';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const validatePasswordChange = () => {
-    const newErrors = {};
-
-    if (!passwordData.currentPassword) {
-      newErrors.currentPassword = 'La contraseña actual es requerida';
-    }
-    if (!passwordData.newPassword) {
-      newErrors.newPassword = 'La nueva contraseña es requerida';
-    } else if (passwordData.newPassword.length < 8) {
-      newErrors.newPassword =
-        'La nueva contraseña debe tener al menos 8 caracteres';
-    }
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
-    }
-    if (passwordData.currentPassword === passwordData.newPassword) {
-      newErrors.newPassword =
-        'La nueva contraseña debe ser diferente a la actual';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSaveProfileDetails = async () => {
-    if (!validateProfileDetails()) return;
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
 
     try {
+      // Single API call — avatar Base64 travels alongside name/email
       await updateProfileMutation.mutateAsync({
         name: profileDetails.name,
         lastName: profileDetails.lastName,
-        email: profileDetails.email
+        email: profileDetails.email,
+        ...(avatarBase64 ? { avatarUrl: avatarBase64 } : {})
       });
-      // Success message would be shown via toast notification in real app
-      console.log('Profile updated successfully');
+      setAvatarBase64(null);
+      onClose();
     } catch (error) {
-      setErrors({
-        submit: error.response?.data?.message || 'Error al actualizar el perfil'
-      });
-    }
-  };
-
-  const handleUploadAvatar = async () => {
-    if (!selectedFile) {
-      setErrors({ avatar: 'Por favor selecciona una imagen' });
-      return;
-    }
-
-    try {
-      await uploadAvatarMutation.mutateAsync(selectedFile);
-      setSelectedFile(null);
-      console.log('Avatar uploaded successfully');
-    } catch (error) {
-      setErrors({
-        avatar: error.response?.data?.message || 'Error al subir el avatar'
-      });
-    }
-  };
-
-  const handleChangePassword = async () => {
-    if (!validatePasswordChange()) return;
-
-    try {
-      await changePasswordMutation.mutateAsync({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
-      });
-      // Clear password fields on success
-      setPasswordData({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-      setActiveTab('profile'); // Switch back to profile tab
-      console.log('Password changed successfully');
-    } catch (error) {
-      setErrors({
-        passwordSubmit:
-          error.response?.data?.message || 'Error al cambiar la contraseña'
-      });
+      setErrors({ submit: error.response?.data?.message || 'Error al actualizar el perfil' });
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
+        style={{ maxHeight: '90vh', borderRadius: '3rem' }}
+      >
+        {/* Header */}
+        <div className="px-8 pt-10 pb-4 flex items-center justify-between">
+          <h2 className="font-headline font-bold text-2xl text-on-surface">
+            Edit Profile
+          </h2>
+          <button
+            type="button"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
+            onClick={onClose}
+          >
+            <span className="material-symbols-outlined text-on-surface-variant group-active:scale-90 transition-transform">
+              close
+            </span>
+          </button>
+        </div>
 
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-        <div className="bg-surface-container-lowest w-full sm:max-w-2xl sm:rounded-3xl rounded-t-3xl max-h-[90vh] overflow-y-auto">
-          {/* Header */}
-          <div className="sticky top-0 bg-surface-container-lowest border-b border-outline-variant/20 px-6 py-4 flex items-center justify-between">
-            <h2 className="font-headline text-2xl font-bold text-on-surface">
-              Editar Perfil
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-surface-container-high rounded-full transition-colors"
-            >
-              <span
-                className="material-symbols-outlined text-on-surface"
-                data-icon="close"
-              >
-                close
-              </span>
-            </button>
-          </div>
+        {/* Scrollable Content inside form */}
+        <form
+          onSubmit={handleSave}
+          className="flex flex-col flex-1 overflow-hidden"
+        >
+          <div className="px-8 pb-6 overflow-y-auto flex-1">
+            <p className="text-on-surface-variant text-sm mb-6 px-2">
+              Update your personal information.
+            </p>
 
-          {/* Tabs */}
-          <div className="flex border-b border-outline-variant/20 px-6">
-            <button
-              onClick={() => {
-                setActiveTab('profile');
-                setErrors({});
-              }}
-              className={`flex-1 py-4 px-4 font-label font-semibold text-center transition-colors ${
-                activeTab === 'profile'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-on-surface-variant'
-              }`}
-            >
-              Perfil
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('avatar');
-                setErrors({});
-              }}
-              className={`flex-1 py-4 px-4 font-label font-semibold text-center transition-colors ${
-                activeTab === 'avatar'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-on-surface-variant'
-              }`}
-            >
-              Avatar
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('password');
-                setErrors({});
-              }}
-              className={`flex-1 py-4 px-4 font-label font-semibold text-center transition-colors ${
-                activeTab === 'password'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-on-surface-variant'
-              }`}
-            >
-              Contraseña
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            {/* Profile Details Tab */}
-            {activeTab === 'profile' && (
-              <div className="space-y-6">
-                {errors.submit && (
-                  <div className="p-4 bg-error/10 border border-error/30 rounded-lg text-error text-sm">
-                    {errors.submit}
-                  </div>
-                )}
-
-                <div>
-                  <label className="block font-label font-semibold text-on-surface mb-2">
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={profileDetails.name}
-                    onChange={handleProfileDetailsChange}
-                    disabled={profileLoading || updateProfileMutation.isPending}
-                    className="w-full px-4 py-3 rounded-lg bg-surface-container border border-outline-variant text-on-surface font-body placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
-                    placeholder="Tu nombre"
-                  />
-                  {errors.name && (
-                    <p className="text-error text-sm mt-1 font-body">
-                      {errors.name}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block font-label font-semibold text-on-surface mb-2">
-                    Apellido
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={profileDetails.lastName}
-                    onChange={handleProfileDetailsChange}
-                    disabled={profileLoading || updateProfileMutation.isPending}
-                    className="w-full px-4 py-3 rounded-lg bg-surface-container border border-outline-variant text-on-surface font-body placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
-                    placeholder="Tu apellido"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-label font-semibold text-on-surface mb-2">
-                    Correo Electrónico
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={profileDetails.email}
-                    onChange={handleProfileDetailsChange}
-                    disabled={profileLoading || updateProfileMutation.isPending}
-                    className="w-full px-4 py-3 rounded-lg bg-surface-container border border-outline-variant text-on-surface font-body placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
-                    placeholder="tu@correo.com"
-                  />
-                  {errors.email && (
-                    <p className="text-error text-sm mt-1 font-body">
-                      {errors.email}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleSaveProfileDetails}
-                  disabled={updateProfileMutation.isPending || profileLoading}
-                  className="w-full bg-primary text-on-primary font-label font-semibold py-3 rounded-lg hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            <div className="space-y-6">
+              {/* Avatar Section */}
+              <div className="flex flex-col items-center mb-2">
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-[0_8px_24px_rgba(52,50,47,0.08)] bg-surface-container-low cursor-pointer relative group transition-all"
                 >
-                  {updateProfileMutation.isPending ? (
-                    <>
-                      <span className="animate-spin">⏳</span>
-                      Guardando...
-                    </>
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar preview"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
-                    <>
-                      <span
-                        className="material-symbols-outlined text-sm"
-                        data-icon="check"
-                      >
-                        check
-                      </span>
-                      Guardar Cambios
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Avatar Tab */}
-            {activeTab === 'avatar' && (
-              <div className="space-y-6">
-                {errors.avatar && (
-                  <div className="p-4 bg-error/10 border border-error/30 rounded-lg text-error text-sm">
-                    {errors.avatar}
-                  </div>
-                )}
-
-                <div className="flex flex-col items-center">
-                  <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-surface-container mb-6 bg-surface-container-high flex items-center justify-center">
-                    {avatarPreview ? (
-                      <img
-                        src={avatarPreview}
-                        alt="Avatar preview"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="material-symbols-outlined text-6xl text-on-surface-variant">
+                    <div className="w-full h-full flex items-center justify-center bg-surface-container-low text-on-surface-variant">
+                      <span className="material-symbols-outlined text-5xl">
                         account_circle
                       </span>
-                    )}
-                  </div>
-
-                  <label className="w-full">
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
-                      onChange={handleAvatarSelect}
-                      disabled={uploadAvatarMutation.isPending}
-                      className="hidden"
-                    />
-                    <span className="block w-full px-6 py-3 bg-secondary-container text-on-secondary-container font-label font-semibold rounded-lg text-center cursor-pointer hover:bg-secondary-container/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                      {selectedFile ? 'Cambiar Imagen' : 'Seleccionar Imagen'}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span className="material-symbols-outlined text-white text-xl">
+                      photo_camera
                     </span>
-                  </label>
-
-                  {selectedFile && (
-                    <p className="text-on-surface-variant text-sm mt-2 font-body">
-                      {selectedFile.name}
-                    </p>
-                  )}
-
-                  <p className="text-on-surface-variant text-xs mt-4 text-center font-body">
-                    Formatos: JPG, PNG, WebP • Tamaño máximo: 5MB
-                  </p>
-                </div>
-
-                <button
-                  onClick={handleUploadAvatar}
-                  disabled={!selectedFile || uploadAvatarMutation.isPending}
-                  className="w-full bg-primary text-on-primary font-label font-semibold py-3 rounded-lg hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {uploadAvatarMutation.isPending ? (
-                    <>
-                      <span className="animate-spin">⏳</span>
-                      Subiendo...
-                    </>
-                  ) : (
-                    <>
-                      <span
-                        className="material-symbols-outlined text-sm"
-                        data-icon="upload"
-                      >
-                        upload
-                      </span>
-                      Subir Avatar
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Password Change Tab */}
-            {activeTab === 'password' && (
-              <div className="space-y-6">
-                {errors.passwordSubmit && (
-                  <div className="p-4 bg-error/10 border border-error/30 rounded-lg text-error text-sm">
-                    {errors.passwordSubmit}
                   </div>
-                )}
-
-                <div className="bg-warning-container/20 border border-warning-container/50 rounded-lg p-4 text-on-surface-variant text-sm font-body">
-                  Por seguridad, ingresa tu contraseña actual antes de
-                  establecer una nueva.
                 </div>
-
-                <div>
-                  <label className="block font-label font-semibold text-on-surface mb-2">
-                    Contraseña Actual
-                  </label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={passwordData.currentPassword}
-                    onChange={handlePasswordChange}
-                    disabled={changePasswordMutation.isPending}
-                    className="w-full px-4 py-3 rounded-lg bg-surface-container border border-outline-variant text-on-surface font-body placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
-                    placeholder="Ingresa tu contraseña actual"
-                  />
-                  {errors.currentPassword && (
-                    <p className="text-error text-sm mt-1 font-body">
-                      {errors.currentPassword}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block font-label font-semibold text-on-surface mb-2">
-                    Nueva Contraseña
-                  </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={passwordData.newPassword}
-                    onChange={handlePasswordChange}
-                    disabled={changePasswordMutation.isPending}
-                    className="w-full px-4 py-3 rounded-lg bg-surface-container border border-outline-variant text-on-surface font-body placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
-                    placeholder="Crea una nueva contraseña segura"
-                  />
-                  {errors.newPassword && (
-                    <p className="text-error text-sm mt-1 font-body">
-                      {errors.newPassword}
-                    </p>
-                  )}
-                  <p className="text-on-surface-variant text-xs mt-2 font-body">
-                    Mínimo 8 caracteres
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block font-label font-semibold text-on-surface mb-2">
-                    Confirmar Nueva Contraseña
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={passwordData.confirmPassword}
-                    onChange={handlePasswordChange}
-                    disabled={changePasswordMutation.isPending}
-                    className="w-full px-4 py-3 rounded-lg bg-surface-container border border-outline-variant text-on-surface font-body placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
-                    placeholder="Confirma tu nueva contraseña"
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-error text-sm mt-1 font-body">
-                      {errors.confirmPassword}
-                    </p>
-                  )}
-                </div>
-
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
                 <button
-                  onClick={handleChangePassword}
-                  disabled={changePasswordMutation.isPending}
-                  className="w-full bg-primary text-on-primary font-label font-semibold py-3 rounded-lg hover:bg-primary/90 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 text-xs font-bold text-primary/100 hover:underline"
                 >
-                  {changePasswordMutation.isPending ? (
-                    <>
-                      <span className="animate-spin">⏳</span>
-                      Actualizando...
-                    </>
-                  ) : (
-                    <>
-                      <span
-                        className="material-symbols-outlined text-sm"
-                        data-icon="lock"
-                      >
-                        lock
-                      </span>
-                      Cambiar Contraseña
-                    </>
-                  )}
+                  Change profile picture
                 </button>
+                {avatarBase64 && (
+                  <span className="text-[11px] text-on-surface-variant mt-1">
+                    ✓ Nueva foto seleccionada
+                  </span>
+                )}
               </div>
-            )}
+
+              {errors.submit && (
+                <div className="p-4 bg-error/10 border border-error/20 rounded-2xl text-error text-xs font-semibold px-4">
+                  {errors.submit}
+                </div>
+              )}
+
+              {/* Name Field */}
+              <div className="space-y-2">
+                <label
+                  className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
+                  htmlFor="modal-profile-name"
+                >
+                  Name
+                </label>
+                <input
+                  className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                  id="modal-profile-name"
+                  type="text"
+                  name="name"
+                  value={profileDetails.name}
+                  onChange={handleFieldChange}
+                  disabled={profileLoading || updateProfileMutation.isPending}
+                  required
+                  placeholder="Your name"
+                />
+                {errors.name && (
+                  <p className="text-error text-xs px-2 font-semibold">
+                    {errors.name}
+                  </p>
+                )}
+              </div>
+
+              {/* LastName Field */}
+              <div className="space-y-2">
+                <label
+                  className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
+                  htmlFor="modal-profile-lastname"
+                >
+                  Last Name
+                </label>
+                <input
+                  className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                  id="modal-profile-lastname"
+                  type="text"
+                  name="lastName"
+                  value={profileDetails.lastName}
+                  onChange={handleFieldChange}
+                  disabled={profileLoading || updateProfileMutation.isPending}
+                  placeholder="Your last name"
+                />
+              </div>
+
+              {/* Email Field */}
+              <div className="space-y-2">
+                <label
+                  className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
+                  htmlFor="modal-profile-email"
+                >
+                  Email
+                </label>
+                <input
+                  className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                  id="modal-profile-email"
+                  type="email"
+                  name="email"
+                  value={profileDetails.email}
+                  onChange={handleFieldChange}
+                  disabled={
+                    profileLoading ||
+                    updateProfileMutation.isPending
+                  }
+                  required
+                  placeholder="your@email.com"
+                />
+                {errors.email && (
+                  <p className="text-error text-xs px-2 font-semibold">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Footer spacing */}
-          <div className="h-6" />
-        </div>
+          {/* Action Buttons (Fixed at bottom) */}
+          <div className="px-8 pb-8 pt-4 bg-surface-container-lowest mt-auto border-t border-surface-container-low">
+            <div className="grid grid-cols-2 gap-4 px-2">
+              <button
+                type="button"
+                className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
+                onClick={onClose}
+                disabled={
+                  updateProfileMutation.isPending
+                }
+              >
+                Cancel
+              </button>
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full h-14"
+                disabled={updateProfileMutation.isPending || profileLoading}
+              >
+                {updateProfileMutation.isPending ? 'Guardando...' : 'Guardar'}
+              </Button>
+            </div>
+          </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 

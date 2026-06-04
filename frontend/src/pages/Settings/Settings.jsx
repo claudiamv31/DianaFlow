@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout, checkUser } from '../../database/authService';
 import EditProfileModal from './EditProfileModal/EditProfileModal';
+import ChangePasswordModal from './ChangePasswordModal/ChangePasswordModal';
 import { useGetProfile } from '../../hooks/useProfileHooks';
 
 const Settings = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const { data: profileData, isLoading: profileLoading } = useGetProfile();
 
   useEffect(() => {
@@ -36,10 +38,11 @@ const Settings = () => {
 
   const displayName = profileData?.name || user?.name || 'User';
   const displayEmail = profileData?.email || user?.email || '';
-  
-  const avatarUrl = profileData?.avatarUrl 
-    ? `http://localhost:5039${profileData.avatarUrl}`
-    : 'https://lh3.googleusercontent.com/aida-public/AB6AXuA8HWNwPd9r7UA9XRDyDhAQ9sdIidNXZJJy-QaVKwG9JwB27KR6JCgXNZspna8sATiKA2KmZGH1VFufgJGpaFhQx0IdVzb9vNW5J9GOotGMzfhbe1_BOwkjml5fn355Gfl4LTupcQJm5K6NQijisQ8L6NBxlldvGs3B3L9gQBB3V2_GZi0_9MINcTCc7Uhr4zXtGRX2bvBvG2ss_gAZSFfZWEYJ9Axj6z3fIqAc1Y_qCLjH9CUxMnQwEJdhifGplGsFbkDzzzmWBAn3';
+
+  const rawAvatarUrl = profileData?.avatarUrl || user?.avatarUrl;
+  const avatarUrl = rawAvatarUrl
+    ? (rawAvatarUrl.startsWith('data:') ? rawAvatarUrl : `http://localhost:5039${rawAvatarUrl}`)
+    : 'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
 
   return (
     <main className="pt-24 pb-32 px-6 max-w-md mx-auto min-h-screen">
@@ -53,11 +56,14 @@ const Settings = () => {
               src={avatarUrl}
             />
           </div>
-          <button 
+          <button
             onClick={() => setIsEditModalOpen(true)}
-            className="absolute bottom-0 right-0 bg-primary p-2 rounded-full text-on-primary shadow-[0_12px_32px_rgba(52,50,47,0.04)] active:scale-90 transition-transform"
+            className="absolute bottom-0 right-0 bg-primary/100 p-2 rounded-full text-on-primary shadow-[0_12px_32px_rgba(52,50,47,0.04)] active:scale-90 transition-transform"
           >
-            <span className="material-symbols-outlined text-sm" data-icon="edit">
+            <span
+              className="material-symbols-outlined text-sm"
+              data-icon="edit"
+            >
               edit
             </span>
           </button>
@@ -72,35 +78,9 @@ const Settings = () => {
 
       {/* Settings Grid / Menu Items */}
       <div className="space-y-4">
-        {/* Profile Info Card */}
-        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl p-6 mb-6">
-          <h2 className="font-label font-semibold text-on-surface mb-4">Profile Information</h2>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-on-surface-variant text-sm">Name:</span>
-              <span className="text-on-surface font-semibold">{displayName}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-on-surface-variant text-sm">Email:</span>
-              <span className="text-on-surface font-semibold text-sm">{displayEmail}</span>
-            </div>
-            {profileData?.timeZone && (
-              <div className="flex justify-between items-center">
-                <span className="text-on-surface-variant text-sm">Timezone:</span>
-                <span className="text-on-surface font-semibold text-sm">{profileData.timeZone}</span>
-              </div>
-            )}
-            {profileLoading && (
-              <div className="text-center py-2">
-                <span className="text-on-surface-variant text-xs">Loading profile...</span>
-              </div>
-            )}
-          </div>
-        </div>
-
         {/* Profile Settings Group */}
         <div className="bg-surface-container-low p-2 rounded-2xl">
-          <button 
+          <button
             onClick={() => setIsEditModalOpen(true)}
             className="w-full flex items-center justify-between p-4 bg-surface-container-lowest rounded-[1rem] hover:bg-surface-container-high transition-colors duration-200 mb-2"
           >
@@ -124,8 +104,8 @@ const Settings = () => {
               chevron_right
             </span>
           </button>
-          <button 
-            onClick={() => setIsEditModalOpen(true)}
+          <button
+            onClick={() => setIsPasswordModalOpen(true)}
             className="w-full flex items-center justify-between p-4 bg-surface-container-lowest rounded-[1rem] hover:bg-surface-container-high transition-colors duration-200"
           >
             <div className="flex items-center gap-4">
@@ -150,7 +130,7 @@ const Settings = () => {
           </button>
         </div>
 
-        {/* App Settings Group */}
+        {/* App Settings Group 
         <div className="bg-surface-container-low p-2 rounded-2xl">
           <button className="w-full flex items-center justify-between p-4 bg-surface-container-lowest rounded-[1rem] hover:bg-surface-container-high transition-colors duration-200 mb-2">
             <div className="flex items-center gap-4">
@@ -194,14 +174,17 @@ const Settings = () => {
               chevron_right
             </span>
           </button>
-        </div>
+        </div>*/}
 
         {/* Log Out Button */}
         <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 p-5 bg-surface-container-highest/50 rounded-2xl hover:bg-error-container/10 transition-colors duration-200 mt-8 group"
         >
-          <span className="material-symbols-outlined text-error" data-icon="logout">
+          <span
+            className="material-symbols-outlined text-error"
+            data-icon="logout"
+          >
             logout
           </span>
           <span className="font-label font-bold text-error uppercase tracking-widest text-[11px]">
@@ -217,7 +200,15 @@ const Settings = () => {
       </div>
 
       {/* Edit Profile Modal */}
-      <EditProfileModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+      />
     </main>
   );
 };

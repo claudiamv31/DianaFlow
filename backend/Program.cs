@@ -74,9 +74,6 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Static files for avatars
-app.UseStaticFiles();
-
 app.MapControllers();
 
 app.Run();

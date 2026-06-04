@@ -30,11 +30,11 @@ namespace backend.Modulos.Users.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized(new { message = "No autorizado" });
+                return Unauthorized(new { message = "Not authorized" });
 
             var user = await _profileService.GetUserByIdAsync(userId);
             if (user == null)
-                return NotFound(new { message = "Usuario no encontrado" });
+                return NotFound(new { message = "User not found" });
 
             return Ok(new
             {
@@ -57,26 +57,26 @@ namespace backend.Modulos.Users.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized(new { message = "No autorizado" });
+                return Unauthorized(new { message = "Not authorized" });
 
             // Validate input
             if (string.IsNullOrWhiteSpace(dto.Name))
-                return BadRequest(new { message = "El nombre es requerido" });
+                return BadRequest(new { message = "The name is required" });
 
             if (string.IsNullOrWhiteSpace(dto.Email))
-                return BadRequest(new { message = "El correo es requerido" });
+                return BadRequest(new { message = "The email is required" });
 
             if (!IsValidEmail(dto.Email))
-                return BadRequest(new { message = "El formato del correo no es válido" });
+                return BadRequest(new { message = "The email format is invalid" });
 
             try
             {
-                await _profileService.UpdateProfileAsync(userId, dto.Name, dto.LastName, dto.Email);
+                await _profileService.UpdateProfileAsync(userId, dto.Name, dto.LastName, dto.Email, dto.AvatarUrl);
 
                 var user = await _profileService.GetUserByIdAsync(userId);
                 return Ok(new
                 {
-                    message = "Perfil actualizado correctamente",
+                    message = "Profile updated successfully",
                     data = new
                     {
                         id = user!.Id,
@@ -93,7 +93,7 @@ namespace backend.Modulos.Users.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error al actualizar el perfil", error = ex.Message });
+                return StatusCode(500, new { message = "Error updating profile", error = ex.Message });
             }
         }
 
@@ -105,10 +105,10 @@ namespace backend.Modulos.Users.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized(new { message = "No autorizado" });
+                return Unauthorized(new { message = "Not authorized" });
 
             if (file == null || file.Length == 0)
-                return BadRequest(new { message = "Por favor selecciona una imagen" });
+                return BadRequest(new { message = "Please select an image" });
 
             try
             {
@@ -117,7 +117,7 @@ namespace backend.Modulos.Users.Controllers
                 return Ok(new AvatarResponseDto
                 {
                     AvatarUrl = avatarUrl,
-                    Message = "Avatar subido correctamente"
+                    Message = "Avatar uploaded successfully"
                 });
             }
             catch (ArgumentException ex)
@@ -130,7 +130,7 @@ namespace backend.Modulos.Users.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error al subir el avatar", error = ex.Message });
+                return StatusCode(500, new { message = "Error uploading avatar", error = ex.Message });
             }
         }
 
@@ -142,26 +142,26 @@ namespace backend.Modulos.Users.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized(new { message = "No autorizado" });
+                return Unauthorized(new { message = "Not authorized" });
 
             // Validate input
             if (string.IsNullOrWhiteSpace(dto.CurrentPassword))
-                return BadRequest(new { message = "La contraseña actual es requerida" });
+                return BadRequest(new { message = "The current password is required" });
 
             if (string.IsNullOrWhiteSpace(dto.NewPassword))
-                return BadRequest(new { message = "La nueva contraseña es requerida" });
+                return BadRequest(new { message = "The new password is required" });
 
             if (dto.NewPassword.Length < 8)
-                return BadRequest(new { message = "La nueva contraseña debe tener al menos 8 caracteres" });
+                return BadRequest(new { message = "The new password must be at least 8 characters long" });
 
             if (dto.CurrentPassword == dto.NewPassword)
-                return BadRequest(new { message = "La nueva contraseña debe ser diferente a la actual" });
+                return BadRequest(new { message = "The new password must be different from the current password" });
 
             try
             {
                 await _profileService.ChangePasswordAsync(userId, dto.CurrentPassword, dto.NewPassword);
 
-                return Ok(new { message = "Contraseña actualizada correctamente" });
+                return Ok(new { message = "Password updated successfully" });
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -169,7 +169,7 @@ namespace backend.Modulos.Users.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error al cambiar la contraseña", error = ex.Message });
+                return StatusCode(500, new { message = "Error changing password", error = ex.Message });
             }
         }
 
