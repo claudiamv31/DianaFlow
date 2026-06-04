@@ -22,7 +22,7 @@ apiClient.interceptors.response.use(
 
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('jwtToken');
-  console.log("Axios Interceptor Token:", token ? "Exists" : "EMPTY");
+  console.log('Axios Interceptor Token:', token ? 'Exists' : 'EMPTY');
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -47,15 +47,43 @@ apiClient.checkUser = async () => {
 
 apiClient.logout = async () => {
   localStorage.removeItem('jwtToken');
-};  
+};
 
 apiClient.login = async (email, password) => {
   const response = await apiClient.post('/users/login', { email, password });
   if (response.status === 200) {
     localStorage.setItem('jwtToken', response.data.token);
-  }else{
+  } else {
     throw new Error('❌ Error al iniciar sesión');
   }
+  return response.data;
+};
+
+// Profile API methods
+apiClient.getProfile = async () => {
+  const response = await apiClient.get('/profile');
+  return response.data;
+};
+
+apiClient.updateProfile = async (updateData) => {
+  const response = await apiClient.put('/profile', updateData);
+  return response.data;
+};
+
+apiClient.uploadAvatar = async (formData) => {
+  const response = await apiClient.post('/profile/upload-avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+  return response.data;
+};
+
+apiClient.changePassword = async (passwordData) => {
+  const response = await apiClient.post(
+    '/profile/change-password',
+    passwordData
+  );
   return response.data;
 };
 
