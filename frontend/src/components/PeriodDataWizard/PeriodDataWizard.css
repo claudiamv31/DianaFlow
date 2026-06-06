@@ -1,0 +1,60 @@
+/* Style date input calendar to match app aesthetic */
+
+/* Date input styling */
+input[type='date'] {
+  color-scheme: light;
+}
+
+/* Chrome/Edge calendar popup */
+input[type='date']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 0.5rem;
+  margin-right: 8px;
+  filter: invert(0.7) sepia(0.3) hue-rotate(330deg);
+}
+
+/* Firefox calendar popup */
+input[type='date']::-moz-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 0.5rem;
+  margin-right: 0;
+}
+
+/* Style the calendar popup that appears */
+/* This applies to the system date picker */
+::-webkit-calendar-picker-indicator {
+  filter: invert(0.8) sepia(0.5) hue-rotate(330deg) saturate(1.5);
+}
+
+/* Custom date input appearance */
+input[type='date'] {
+  accent-color: #904958;
+}
+
+/* Webkit-based browsers (Chrome, Safari, Edge) */
+input[type='date']::-webkit-outer-spin-button,
+input[type='date']::-webkit-inner-spin-button {
+  display: none;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Focus state styling */
+input[type='date']:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px #904958;
+}
+
+/* Placeholder styling */
+input[type='date']:invalid {
+  color: #b5b1ad;
+}
+
+input[type='date']::placeholder {
+  color: #b5b1ad;
+}
+
+/* Style for when value is set */
+input[type='date']:valid {
+  color: #34322f;
+}

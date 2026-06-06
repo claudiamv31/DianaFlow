@@ -34,8 +34,8 @@ const SignUp = () => {
         const errorText = await res.text();
         throw new Error(errorText || 'Error creating account');
       }
-      // After successful sign‑up, redirect to login or welcome page
-      navigate('/login');
+      // After successful sign‑up, redirect to period setup wizard
+      navigate('/period-setup');
     } catch (error) {
       console.error('Error in sign‑up:', error.message);
     }

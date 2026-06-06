@@ -5,6 +5,7 @@ import Login from './pages//Login/Login.jsx';
 import SignUp from './pages//SignUp/SignUp.jsx';
 import Home from './pages//Home/Home.jsx';
 import PeriodDataForm from './pages/PeriodDataForm/PeriodDataForm.jsx';
+import PeriodSetup from './pages/PeriodSetup/PeriodSetup.jsx';
 import Header from './components/Header/Header.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import HeaderNotLogged from './components/Header/HeaderNotLogged.jsx';
@@ -34,6 +35,16 @@ function App() {
               <>
                 <SignUp />
               </>
+            }
+          />
+
+          {/* Period Setup Wizard Route */}
+          <Route
+            path="/period-setup"
+            element={
+              <PrivateRoute>
+                <PeriodSetup />
+              </PrivateRoute>
             }
           />
 

@@ -15,7 +15,7 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
-      alert('Por favor ingresa correo y contraseña');
+      alert('Please enter email and password');
       return;
     }
 
@@ -26,13 +26,12 @@ function Login() {
       if (user) {
         navigate('/');
       } else {
-        alert('No se pudo verificar el usuario después de iniciar sesión.');
+        alert('It was not possible to verify the user after logging in.');
       }
     } catch (error) {
-      console.error('❌ Error al iniciar sesión:', error);
+      console.error('❌ Error logging in:', error);
       alert(
-        error.message ||
-          'Error al iniciar sesión. Por favor verifica tus credenciales.'
+        error.message || 'Error logging in. Please verify your credentials.'
       );
     } finally {
       setLoading(false);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import Button from '../Button';
+import CustomDatePicker from '../PeriodDataWizard/CustomDatePicker';
 
 const PeriodEditModal = ({ period, onClose, onSave }) => {
   useEffect(() => {
@@ -100,19 +101,11 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
               >
                 Start Date
               </label>
-              <div className="relative">
-                <input
-                  className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface/100 font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
-                  id="modal-start-date"
-                  type="date"
-                  value={startDate}
-                  min={minStartDate || ''}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-                <span className="material-symbols-outlined absolute right-6 top-1/2 -translate-y-1/2 text-primary/100 pointer-events-none">
-                  calendar_today
-                </span>
-              </div>
+              <CustomDatePicker
+                value={startDate}
+                onChange={setStartDate}
+                maxDate={new Date().toISOString().split('T')[0]}
+              />
             </div>
 
             {/* Días de sangrado */}

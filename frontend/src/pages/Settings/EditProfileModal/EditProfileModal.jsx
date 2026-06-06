@@ -5,7 +5,8 @@ import {
 } from '../../../hooks/useProfileHooks';
 import Button from '../../../components/Button';
 
-const DEFAULT_AVATAR = 'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
+const DEFAULT_AVATAR =
+  'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
 
 const EditProfileModal = ({ isOpen, onClose }) => {
   const { data: profileData, isLoading: profileLoading } = useGetProfile();
@@ -13,7 +14,11 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
   const fileInputRef = useRef(null);
 
-  const [profileDetails, setProfileDetails] = useState({ name: '', lastName: '', email: '' });
+  const [profileDetails, setProfileDetails] = useState({
+    name: '',
+    lastName: '',
+    email: ''
+  });
   // avatarPreview is always a displayable string (data URL or http URL or default)
   const [avatarPreview, setAvatarPreview] = useState(DEFAULT_AVATAR);
   // avatarBase64 is only set when the user picks a NEW image — it's the raw data URL to send to the API
@@ -42,13 +47,15 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : 'unset';
-    return () => { document.body.style.overflow = 'unset'; };
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
   }, [isOpen]);
 
   const handleFieldChange = (e) => {
     const { name, value } = e.target;
-    setProfileDetails(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    setProfileDetails((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
   const handleFileSelect = (e) => {
@@ -58,8 +65,8 @@ const EditProfileModal = ({ isOpen, onClose }) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const dataUrl = event.target.result;
-      setAvatarPreview(dataUrl);   // show immediately in preview
-      setAvatarBase64(dataUrl);    // remember to send on save
+      setAvatarPreview(dataUrl); // show immediately in preview
+      setAvatarBase64(dataUrl); // remember to send on save
     };
     reader.readAsDataURL(file);
   };
@@ -67,8 +74,10 @@ const EditProfileModal = ({ isOpen, onClose }) => {
   const validate = () => {
     const newErrors = {};
     if (!profileDetails.name.trim()) newErrors.name = 'El nombre es requerido';
-    if (!profileDetails.email.trim()) newErrors.email = 'El correo es requerido';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileDetails.email)) newErrors.email = 'El formato del correo no es válido';
+    if (!profileDetails.email.trim())
+      newErrors.email = 'El correo es requerido';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileDetails.email))
+      newErrors.email = 'El formato del correo no es válido';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -88,7 +97,9 @@ const EditProfileModal = ({ isOpen, onClose }) => {
       setAvatarBase64(null);
       onClose();
     } catch (error) {
-      setErrors({ submit: error.response?.data?.message || 'Error al actualizar el perfil' });
+      setErrors({
+        submit: error.response?.data?.message || 'Error al actualizar el perfil'
+      });
     }
   };
 
@@ -245,10 +256,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   name="email"
                   value={profileDetails.email}
                   onChange={handleFieldChange}
-                  disabled={
-                    profileLoading ||
-                    updateProfileMutation.isPending
-                  }
+                  disabled={profileLoading || updateProfileMutation.isPending}
                   required
                   placeholder="your@email.com"
                 />
@@ -268,9 +276,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 type="button"
                 className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
                 onClick={onClose}
-                disabled={
-                  updateProfileMutation.isPending
-                }
+                disabled={updateProfileMutation.isPending}
               >
                 Cancel
               </button>
