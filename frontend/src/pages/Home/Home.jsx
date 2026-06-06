@@ -150,20 +150,23 @@ function Home() {
           </Button>
         </section>
 
-        {/* ── Info cards side by side ── */}
+        {/* ── Responsive Info Cards ── */}
         {safeStatus.previousCycle && (
-          <>
-            <div className="homepage-info">
+          <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
+            {/* Top Row: Stacks vertically on mobile (flex-col), side-by-side on desktop (md:flex-row) */}
+            <div className="flex flex-col md:flex-row gap-6 mt-8">
               <CurrentCycleCard
                 periodDuration={safeStatus?.cycleStatus?.periodDuration}
                 cycleDay={safeStatus?.cycleStatus?.cycleDay}
               />
               <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
             </div>
-            <div className="homepage-phase">
+
+            {/* Bottom Row: Full width */}
+            <div className="mt-6 mb-8">
               <YourPeriodCard period={safeStatus} />
             </div>
-          </>
+          </div>
         )}
       </div>
 

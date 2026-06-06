@@ -4,18 +4,21 @@ p {
 
 .homepage {
   min-height: calc(100vh - 140px);
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 /* ── Hero ─────────────────────────────────────────── */
 .home-hero {
   position: relative;
   width: 100%;
-  min-height: 60vh;
+  min-height: 50vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2.5rem;
+  gap: 2rem;
   overflow: hidden;
   padding: 3rem 1rem 4rem;
 }
@@ -39,8 +42,8 @@ p {
 
 /* Orb */
 .home-orb {
-  width: 280px;
-  height: 280px;
+  width: min(80vw, 280px);
+  height: min(80vw, 280px);
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(24px);
@@ -57,7 +60,7 @@ p {
 }
 
 .home-orb .text-phase {
-  font-size: 0.75rem;
+  font-size: clamp(0.65rem, 2vw, 0.75rem);
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -66,7 +69,7 @@ p {
 }
 
 .home-orb .text-status {
-  font-size: 1.75rem;
+  font-size: clamp(1.25rem, 5vw, 1.75rem);
   font-weight: 800;
   color: var(--on-surface, #34322f);
   line-height: 1.2;
@@ -74,41 +77,4 @@ p {
 
 .home-orb .text-status .days {
   color: var(--primary-color, #904958);
-}
-
-.home-orb .text-cycle {
-  font-size: 0.875rem;
-  color: var(--label-color, #7a4f5a);
-  opacity: 0.6;
-  font-style: italic;
-}
-
-/* Hero button */
-.home-hero-btn {
-  padding: 1rem 2.5rem !important;
-  font-size: 1.05rem !important;
-  border-radius: 999px !important;
-}
-
-/* ── Info cards side-by-side ─────────────────────── */
-.homepage-info {
-  display: flex;
-  flex-direction: row;
-  gap: 1.5rem;
-  margin: 2rem 1.5rem 0;
-}
-
-.homepage-info > * {
-  flex: 1;
-  min-width: 0;
-}
-
-/* ── Phase card full width below ─────────────────── */
-.homepage-phase {
-  margin: 0 1.5rem 2rem;
-}
-
-.homepage-phase .your-period-card {
-  width: 100%;
-  margin: 0;
 }
