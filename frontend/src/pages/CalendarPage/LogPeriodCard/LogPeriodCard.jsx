@@ -14,7 +14,7 @@ const LogPeriodCard = ({ isEditingPeriod, setIsEditingPeriod }) => {
   const handleClose = () => {
     setIsEditingPeriod(false);
   };
-  
+
   const handleSave = () => {
     // Save logic here
     setIsEditingPeriod(false);
@@ -29,14 +29,14 @@ const LogPeriodCard = ({ isEditingPeriod, setIsEditingPeriod }) => {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      <div
-        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
-        style={{ maxHeight: '90vh', borderRadius: '3rem' }}
-      >
-        {/* Header */}
-        <div className="px-8 pt-10 pb-4 flex items-center justify-between">
-          <h2 className="font-headline font-bold text-2xl text-on-surface flex items-center gap-2">
-            <FontAwesomeIcon icon={faCalendarDays} className="text-primary/80" />
+      <div className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative max-h-[90vh] rounded-[2rem] md:rounded-[3rem]">
+        {/* Header - Adjusted mobile padding */}
+        <div className="px-5 md:px-8 pt-8 md:pt-10 pb-4 flex items-center justify-between">
+          <h2 className="font-headline font-bold text-xl md:text-2xl text-on-surface flex items-center gap-2">
+            <FontAwesomeIcon
+              icon={faCalendarDays}
+              className="text-primary/80"
+            />
             Logging a period?
           </h2>
           <button
@@ -49,16 +49,17 @@ const LogPeriodCard = ({ isEditingPeriod, setIsEditingPeriod }) => {
           </button>
         </div>
 
-        {/* Content */}
-        <div className="px-8 pb-4 overflow-y-auto flex-1">
-          <p className="text-on-surface-variant text-sm mb-8 px-2">
-            Keeping your data updated helps us refine your future predictions and cycle insights.
+        {/* Content - Adjusted mobile padding */}
+        <div className="px-5 md:px-8 pb-4 overflow-y-auto flex-1">
+          <p className="text-on-surface-variant text-sm mb-8">
+            Keeping your data updated helps us refine your future predictions
+            and cycle insights.
           </p>
         </div>
 
-        {/* Action Buttons (Fixed at bottom) */}
-        <div className="px-8 pb-8 pt-4 bg-surface-container-lowest mt-auto">
-          <div className="grid grid-cols-2 gap-4 px-2">
+        {/* Action Buttons - Fixed at bottom */}
+        <div className="px-5 md:px-8 pb-6 md:pb-8 pt-4 bg-surface-container-lowest mt-auto">
+          <div className="grid grid-cols-2 gap-4">
             <button
               className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
               onClick={handleClose}

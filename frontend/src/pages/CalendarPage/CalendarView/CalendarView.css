@@ -1,138 +1,61 @@
-.calendar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-grow: 1;
-}
-
-.calendar .react-calendar{
+/* 1. Make the calendar container take up the right amount of space */
+.calendar-view .react-calendar {
   background-color: theme('colors.surface-container-lowest');
-  padding: 1rem;
+  padding: 2rem; /* More breathing room on desktop */
+  width: 100%; /* Forces it to fill the 65% desktop container we set earlier */
+  border-radius: 1.5rem; /* Softens the edges of the whole calendar */
+  margin: 0 auto;
 }
 
-.calendar--full {
-  width: 100%;
-  max-width: 100%;
-}
-
-.calendar--compact {
-  width: min(30vw, 300px);
-  max-width: 300px;
-  margin-left: auto;
-  padding: 8px;
-}
-
-.calendar--compact .react-calendar__month-view__weekdays__weekday abbr,
-.calendar--compact .react-calendar__tile {
-  font-size: 0.9rem;
-  color: theme('colors.on-surface');
-  font-weight: 600;
-}
-
-.calendar--compact .react-calendar__tile {
-  padding: 6px;
-}
-
-.calendar--active {
-  width: 100%;
-}
-
-.calendar--inactive {
-  width: 80%;
-}
-
-.period-day {
-  background: var(--secundary-color) !important;
-  color: white !important;
-  border-radius: 10px;
-}
-
-.calendar.react-calendar {
-  margin: 20px auto;
-}
-
-.calendar .react-calendar__month-view__weekdays {
-  display: flex;
-  justify-content: space-between;
+/* 2. Fix the misalignment by letting React-Calendar handle the column widths natively */
+.calendar-view .react-calendar__month-view__weekdays {
   text-align: center;
+  margin-bottom: 1rem; /* Adds a nice gap between the days of the week and the dates */
 }
 
-.calendar .react-calendar__month-view__weekdays__weekday {
-  flex: 1;
-  text-align: center;
-}
-
-.calendar .react-calendar__month-view__weekdays__weekday abbr {
+.calendar-view .react-calendar__month-view__weekdays__weekday abbr {
   text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: bold;
 }
 
-.calendar .react-calendar__month-view__days__day--neighboringMonth {
-  color: theme('colors.outline') !important;
-  opacity: 0.5;
-}
-
-/* Responsive global para CalendarView */
-.calendar {
-  width: 100%;
-  max-width: 100%;
-}
-
-.calendar .react-calendar__month-view__weekdays__weekday abbr {
-  font-size: 0.75rem;
-}
-
-.calendar .react-calendar__tile {
+/* 3. Scale up the bubbles for desktop and keep them perfectly centered */
+.calendar-view .react-calendar__tile {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.calendar .react-calendar__tile {
-  padding: 1rem;
-  border-radius: 8px;
+  aspect-ratio: 1 / 1;
+  padding: 0;
   text-align: center;
-  font-size: 1rem;
-  margin-top: 0.5rem;
+  font-size: 1.1rem; /* Slightly larger text for desktop readability */
+  max-width: 4.5rem; /* Increased from 3rem so they fill out the desktop screen better */
+  margin: 0.2rem auto; /* The 'auto' left/right margin keeps them perfectly aligned under their weekday headers */
 }
 
-.period-selected {
-  background-color: #d62828 !important;
-  color: white !important;
-  border-radius: 50%;
-}
-
-.react-calendar__tile {
-  cursor: pointer;
-}
-
-.calendar .react-calendar__tile--now:not(.react-calendar__tile--active) {
-  background-color: transparent !important;
-  border: 2px solid theme('colors.secondary') !important;
-}
-
+/* Keep your mobile responsive rules at the bottom */
 @media (max-width: 1000px) {
-  .calendar {
-    margin: 10px auto;
-    padding: 8px;
+  .calendar-view .react-calendar {
+    padding: 1rem; /* Tighter padding for tablets/phones */
   }
-  .calendar .react-calendar__month-view__weekdays__weekday abbr {
+  .calendar-view .react-calendar__month-view__weekdays__weekday abbr {
     font-size: 0.72rem;
   }
-  .calendar .react-calendar__tile {
-    padding: 6px;
-    font-size: 0.82rem;
+  .calendar-view .react-calendar__tile {
+    padding: 0;
+    font-size: 0.9rem;
+    max-width: 3rem; /* Shrinks the bubbles back down for smaller screens */
   }
 }
 
 @media (max-width: 700px) {
-  .calendar {
+  .calendar-view {
     padding: 4px;
   }
-  .calendar .react-calendar__month-view__weekdays__weekday abbr {
+  .calendar-view .react-calendar__month-view__weekdays__weekday abbr {
     font-size: 0.64rem;
   }
-  .calendar .react-calendar__tile {
-    padding: 4px;
-    font-size: 0.7rem;
+  .calendar-view .react-calendar__tile {
+    font-size: 0.8rem;
+    max-width: 2.5rem; /* Perfect bubble size for narrow phone screens */
   }
 }

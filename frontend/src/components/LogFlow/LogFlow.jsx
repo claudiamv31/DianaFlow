@@ -90,8 +90,15 @@ function LogFlow({
     const isSelected = range.includes(dateString);
 
     let classes = [];
-    if (isSelected) classes.push('period-tile', 'period-middle');
-    if (dateString === today) classes.push('period-today');
+
+    if (isSelected) {
+      classes.push('period-tile', 'period-middle');
+    } else if (dateString === today) {
+      // Added "else if" and "!bg-transparent" to match CalendarView
+      classes.push(
+        '!bg-transparent !border !border-solid !border-secondary !text-on-surface !rounded-full'
+      );
+    }
 
     return classes.length ? classes.join(' ') : null;
   };

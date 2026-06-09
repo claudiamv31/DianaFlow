@@ -24,11 +24,14 @@ const CalendarView = ({
 
     let classes = [];
 
-    const isNeighboringMonth = activeStartDate && date.getMonth() !== activeStartDate.getMonth();
+    const isNeighboringMonth =
+      activeStartDate && date.getMonth() !== activeStartDate.getMonth();
 
     const isToday = dateString === today && !isNeighboringMonth;
     const isSelected =
-      selectedDate && dateString === formatDateLocal(selectedDate) && !isNeighboringMonth;
+      selectedDate &&
+      dateString === formatDateLocal(selectedDate) &&
+      !isNeighboringMonth;
     const isPeriodDay =
       periodDays.includes(dateString) ||
       dayInfo?.isPeriod ||
@@ -52,7 +55,9 @@ const CalendarView = ({
       classes.push('!bg-primary/20 !border !border-primary/70 !rounded-full');
     } else if (isPredictedPeriodDay) {
       // Predicted period days: dashed border
-      classes.push('!border-2 !border-dashed !border-primary/40 !rounded-full !bg-transparent');
+      classes.push(
+        '!border-2 !border-dashed !border-primary/40 !rounded-full !bg-transparent'
+      );
     }
 
     return classes.length ? classes.join(' ') : null;
@@ -84,7 +89,7 @@ const CalendarView = ({
   };
 
   return (
-    <div className={`calendar`}>
+    <div className={`calendar-view`}>
       <Calendar
         value={selectedDate}
         activeStartDate={activeMonthDate}
