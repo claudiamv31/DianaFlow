@@ -168,12 +168,11 @@ const CalendarPage = () => {
           cycleInfo={cycleInfo}
         />
       )}
-      
+
       {isEditingPeriod && (
         <LogFlow
           onClose={() => setIsEditingPeriod(false)}
           onSave={(data) => {
-            console.log(data);
             setIsEditingPeriod(false);
           }}
         />

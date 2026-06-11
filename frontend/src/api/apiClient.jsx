@@ -10,11 +10,11 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.code === 'ECONNABORTED') {
       return Promise.reject(
-        new Error('⏱ Tiempo de espera agotado. La API no respondió.')
+        new Error('⏱ Timeout error. The API did not respond.')
       );
     }
     if (!error.response) {
-      return Promise.reject(new Error('❌ No hay conexión con el servidor.'));
+      return Promise.reject(new Error('No connection with the server.'));
     }
     return Promise.reject(error);
   }
@@ -54,7 +54,7 @@ apiClient.login = async (email, password) => {
   if (response.status === 200) {
     localStorage.setItem('jwtToken', response.data.token);
   } else {
-    throw new Error('❌ Error al iniciar sesión');
+    throw new Error('Error logging in');
   }
   return response.data;
 };

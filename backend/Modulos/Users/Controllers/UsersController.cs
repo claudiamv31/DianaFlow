@@ -51,9 +51,14 @@ namespace backend.Modulos.Users.Controllers
         {
             var user = _context.UserProfiles.FirstOrDefault(u => u.Email == dto.Email);
             
-            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            if (user == null)
             {
-                return Unauthorized(new { message = "Credenciales inválidas" });
+                return NotFound(new { field = "email", message = "This email is not registered." });
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+            {
+                return Unauthorized(new { field = "password", message = "The password does not match this account." });
             }
 
             var token = GenerateJwtToken(user);

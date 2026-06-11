@@ -9,13 +9,24 @@ import Button from '../../components/Button';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      alert('Please enter email and password');
+    setFieldErrors({});
+
+    const validationErrors = {};
+    if (!email.trim()) {
+      validationErrors.email = 'Please enter your email address.';
+    }
+    if (!password) {
+      validationErrors.password = 'Please enter your password.';
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
       return;
     }
 
@@ -30,12 +41,40 @@ function Login() {
       }
     } catch (error) {
       console.error('❌ Error logging in:', error);
-      alert(
-        error.message || 'Error logging in. Please verify your credentials.'
-      );
+      const errorData = error.response?.data;
+      const status = error.response?.status;
+      const responseMessage = errorData?.message || '';
+      const isInvalidCredentials =
+        status === 401 ||
+        responseMessage.toLowerCase().includes('credenciales inválidas') ||
+        responseMessage.toLowerCase().includes('invalid credentials');
+
+      const field =
+        errorData?.field || (isInvalidCredentials ? 'password' : 'form');
+      const message = isInvalidCredentials
+        ? 'The password does not match this account.'
+        : responseMessage ||
+          error.message ||
+          'Error logging in. Please verify your credentials.';
+
+      setFieldErrors({ [field]: message });
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearFieldError = (field) => {
+    setFieldErrors((currentErrors) => {
+      const nextErrors = { ...currentErrors };
+      delete nextErrors[field];
+      delete nextErrors.form;
+      return nextErrors;
+    });
+  };
+
+  const getMissingLabel = (field) => {
+    const message = fieldErrors[field];
+    return message?.startsWith('Please enter') ? 'Required' : null;
   };
 
   return (
@@ -70,20 +109,49 @@ function Login() {
 
         {/* Form Card */}
         <div className="w-full bg-[#FCF8F5]/80 backdrop-blur-md rounded-[3rem] shadow-[0_16px_48px_rgba(109,59,71,0.06)] border border-white/40 p-8 md:p-10 flex flex-col">
-          <form onSubmit={handleLogin} className="flex flex-col gap-6">
+          <form
+            onSubmit={handleLogin}
+            noValidate
+            className="flex flex-col gap-6"
+          >
             {/* Email Field */}
             <div className="flex flex-col gap-2">
               <label className="text-xs font-semibold text-[#6D3B47] uppercase tracking-wider px-1">
                 Email address
               </label>
-              <input
-                type="email"
-                placeholder="name@sanctuary.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full bg-[#ECE7E3]/60 border-none outline-none focus:outline-none focus:ring-2 focus:ring-[#B97A89]/30 rounded-full py-4 px-6 text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all"
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="name@sanctuary.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    clearFieldError('email');
+                  }}
+                  aria-invalid={Boolean(fieldErrors.email)}
+                  aria-describedby={
+                    fieldErrors.email ? 'email-login-error' : undefined
+                  }
+                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 pr-28 text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                    fieldErrors.email
+                      ? 'auth-input-error'
+                      : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
+                  }`}
+                />
+                {getMissingLabel('email') && (
+                  <span className="auth-input-message">
+                    {getMissingLabel('email')}
+                  </span>
+                )}
+              </div>
+              {fieldErrors.email && !getMissingLabel('email') && (
+                <p
+                  id="email-login-error"
+                  className="px-1 text-xs font-semibold text-[#B33F4A] "
+                >
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
 
             {/* Password Field */}
@@ -99,15 +167,46 @@ function Login() {
                   Forgot?
                 </a>
               </div>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full bg-[#ECE7E3]/60 border-none outline-none focus:outline-none focus:ring-2 focus:ring-[#B97A89]/30 rounded-full py-4 px-6 text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all"
-              />
+              <div className="relative">
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    clearFieldError('password');
+                  }}
+                  aria-invalid={Boolean(fieldErrors.password)}
+                  aria-describedby={
+                    fieldErrors.password ? 'password-login-error' : undefined
+                  }
+                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 pr-28 text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                    fieldErrors.password
+                      ? 'auth-input-error'
+                      : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
+                  }`}
+                />
+                {getMissingLabel('password') && (
+                  <span className="auth-input-message">
+                    {getMissingLabel('password')}
+                  </span>
+                )}
+              </div>
+              {fieldErrors.password && !getMissingLabel('password') && (
+                <p
+                  id="password-login-error"
+                  className="px-1 text-xs font-semibold text-[#B33F4A]"
+                >
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
+
+            {fieldErrors.form && (
+              <p className="w-fit mx-auto rounded-2xl border border-[#F0B9BE] bg-[#FFF6F5] px-4 py-3 text-center text-xs font-semibold text-[#B33F4A]">
+                {fieldErrors.form}
+              </p>
+            )}
 
             {/* Submit Button */}
             <Button type="submit" disabled={loading} variant="primary">
