@@ -22,32 +22,6 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
     }
   }, [period]);
 
-  // Compute the earliest selectable start date: three days before the end of the previous period.
-  // `period.previousEndDate` should be provided by the parent when there is a preceding period.
-  // If not available, allow any date.
-  const minStartDate = useMemo(() => {
-    if (!period?.previousEndDate) return '';
-    const end = new Date(period.previousEndDate);
-    end.setDate(end.getDate() - 3);
-    // Return in YYYY-MM-DD format for the input's `min` attribute.
-    return end.toISOString().split('T')[0];
-  }, [period]);
-  // Update selectedDates whenever startDate or bleedingDays change
-  useEffect(() => {
-    if (!startDate) {
-      setSelectedDates([]);
-      return;
-    }
-    const dates = [];
-    for (let i = 0; i < bleedingDays; i++) {
-      const d = new Date(startDate);
-      d.setDate(d.getDate() + i);
-      dates.push(d.toISOString().split('T')[0]);
-    }
-    setSelectedDates(dates);
-  }, [startDate, bleedingDays]);
-  if (!period) return null;
-
   const handleSave = () => {
     onSave({
       PeriodId: period.id,

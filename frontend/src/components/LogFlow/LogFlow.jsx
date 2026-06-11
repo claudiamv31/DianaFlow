@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from 'react';
-import { FaTint, FaRegSmileBeam, FaTimes } from 'react-icons/fa';
 import Button from '../Button';
 import Calendar from 'react-calendar';
 import { formatDateLocal, parseLocalDate } from '../../utils/calendarUtils';
