@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { logout } from '../../database/authService';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { FaMoon } from 'react-icons/fa';

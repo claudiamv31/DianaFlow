@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { checkUser } from '../../database/authService';
 import apiClient from '../../api/apiClient';
@@ -53,7 +53,7 @@ function Home() {
   const getCycleMessage = (status) => {
     switch (status?.status) {
       case 'active_period':
-        if (status?.daysLeftInPeriod == 0) {
+        if (status?.daysLeftInPeriod === 0) {
           return 'Last day of your period';
         }
         return (

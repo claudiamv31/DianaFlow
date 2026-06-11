@@ -10,7 +10,7 @@ const Settings = () => {
   const [user, setUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const { data: profileData, isLoading: profileLoading } = useGetProfile();
+  const { data: profileData } = useGetProfile();
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser) => {
@@ -26,7 +26,7 @@ const Settings = () => {
         name: profileData.name,
         email: profileData.email,
         lastName: profileData.lastName,
-        avatarUrl: profileData.avatarUrl,
+        avatarUrl: profileData.avatarUrl
       });
     }
   }, [profileData]);
@@ -41,7 +41,9 @@ const Settings = () => {
 
   const rawAvatarUrl = profileData?.avatarUrl || user?.avatarUrl;
   const avatarUrl = rawAvatarUrl
-    ? (rawAvatarUrl.startsWith('data:') ? rawAvatarUrl : `http://localhost:5039${rawAvatarUrl}`)
+    ? rawAvatarUrl.startsWith('data:')
+      ? rawAvatarUrl
+      : `http://localhost:5039${rawAvatarUrl}`
     : 'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
 
   return (
