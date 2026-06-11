@@ -73,11 +73,10 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!profileDetails.name.trim()) newErrors.name = 'El nombre es requerido';
-    if (!profileDetails.email.trim())
-      newErrors.email = 'El correo es requerido';
+    if (!profileDetails.name.trim()) newErrors.name = 'The name is required';
+    if (!profileDetails.email.trim()) newErrors.email = 'The email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileDetails.email))
-      newErrors.email = 'El formato del correo no es válido';
+      newErrors.email = 'The email format is invalid';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -98,7 +97,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
       onClose();
     } catch (error) {
       setErrors({
-        submit: error.response?.data?.message || 'Error al actualizar el perfil'
+        submit: error.response?.data?.message || 'Error updating profile'
       });
     }
   };
@@ -184,7 +183,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 </button>
                 {avatarBase64 && (
                   <span className="text-[11px] text-on-surface-variant mt-1">
-                    ✓ Nueva foto seleccionada
+                    ✓ New photo selected
                   </span>
                 )}
               </div>
@@ -286,7 +285,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 className="w-full h-14"
                 disabled={updateProfileMutation.isPending || profileLoading}
               >
-                {updateProfileMutation.isPending ? 'Guardando...' : 'Guardar'}
+                {updateProfileMutation.isPending ? 'Saving...' : 'Save'}
               </Button>
             </div>
           </div>

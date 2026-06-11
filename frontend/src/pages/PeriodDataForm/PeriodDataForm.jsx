@@ -25,7 +25,7 @@ const PeriodDataForm = () => {
     e.preventDefault();
 
     if (!user) {
-      console.error('No hay usuario logeado');
+      console.error('There is not user');
       return;
     }
 
@@ -41,15 +41,15 @@ const PeriodDataForm = () => {
 
       navigate('/');
     } catch (error) {
-      console.error('❌ Error al guardar el ciclo:', error);
+      console.error('❌ Error saving cycle:', error);
     }
   };
 
-  if (loading) return <p>Cargando usuario...</p>;
+  if (loading) return <p>Loading user...</p>;
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>Cuántos días suele durar tu periodo</label>
+      <label>How many days does your period usually last?</label>
       <input
         type="number"
         min={1}
@@ -58,7 +58,7 @@ const PeriodDataForm = () => {
         onChange={(e) => setDaysPeriod(e.target.value)}
       />
 
-      <label>Cuántos días suele durar tu ciclo</label>
+      <label>How many days does your cycle usually last?</label>
       <input
         type="number"
         min={15}
@@ -67,7 +67,7 @@ const PeriodDataForm = () => {
         onChange={(e) => setDaysCycle(e.target.value)}
       />
 
-      <label>Cuál es la fecha de tu último periodo</label>
+      <label>What is the date of your last period?</label>
       <input
         type="date"
         value={lastDayPeriod}
@@ -75,7 +75,7 @@ const PeriodDataForm = () => {
         onChange={(e) => setLastDayPeriod(e.target.value)}
       />
 
-      <button type="submit">Aceptar</button>
+      <button type="submit">Accept</button>
     </form>
   );
 };

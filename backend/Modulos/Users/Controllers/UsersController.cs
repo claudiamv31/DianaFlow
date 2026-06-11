@@ -29,7 +29,7 @@ namespace backend.Modulos.Users.Controllers
             // Basic validation
             if (_context.UserProfiles.Any(u => u.Email == dto.Email))
             {
-                return BadRequest(new { message = "El correo ya está registrado." });
+                return BadRequest(new { message = "The email is alredy in use." });
             }
 
             var userProfile = new UserProfile
@@ -43,7 +43,7 @@ namespace backend.Modulos.Users.Controllers
             _context.UserProfiles.Add(userProfile);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Usuario registrado exitosamente" });
+            return Ok(new { message = "User registered successfully" });
         }
 
         [HttpPost("login")]
