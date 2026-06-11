@@ -25,7 +25,6 @@ function LogFlow({
   const [activeMonth, setActiveMonth] = useState(
     () => new Date(initialStartDate)
   );
-  const [selectedFlow, setSelectedFlow] = useState('Medium');
   const [range, setRange] = useState(() => {
     const start = new Date(initialStartDate);
     const dates = [];

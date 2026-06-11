@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '../Button';
 import CustomDatePicker from '../PeriodDataWizard/CustomDatePicker';
 

@@ -29,7 +29,7 @@ const Settings = () => {
         avatarUrl: profileData.avatarUrl
       });
     }
-  }, [profileData]);
+  }, [profileData, user]);
 
   const handleLogout = async () => {
     await logout();

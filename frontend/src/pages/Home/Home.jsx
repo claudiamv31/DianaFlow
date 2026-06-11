@@ -122,8 +122,6 @@ function Home() {
       ? 'Edit Cycle'
       : 'Start period';
 
-  console.log(safeStatus);
-
   return (
     <>
       <div className="homepage">

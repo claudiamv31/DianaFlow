@@ -1,33 +1,29 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { FaMoon } from 'react-icons/fa';
 
 import './Header.css';
 import ErrorScreen from '../ErrorScreen';
 
 const Header = () => {
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const navigate = useNavigate();
-  const menuRef = useRef();
-  const [error, setError] = useState(false);
+  const [error] = useState(false);
 
   document.querySelectorAll('nav a').forEach((link) => {
     if (link.href === window.location.href) {
       link.classList.add('active');
-      console.log('Active link:', link.href);
     }
   });
 
   // Cierra si haces click fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setUserMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (menuRef.current && !menuRef.current.contains(event.target)) {
+  //       setUserMenuOpen(false);
+  //     }
+  //   };
+  //   document.addEventListener('mousedown', handleClickOutside);
+  //   return () => document.removeEventListener('mousedown', handleClickOutside);
+  // }, []);
 
   // const handleLogout = async () => {
   //   try {

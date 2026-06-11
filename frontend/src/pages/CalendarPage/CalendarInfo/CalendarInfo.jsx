@@ -102,7 +102,6 @@ const CalendarInfo = ({
           <PrimaryButton
             onClick={(e) => {
               e.preventDefault();
-              console.log('🔥 EDIT MODE ON');
               setIsEditingPeriod(true);
             }}
           >
@@ -113,7 +112,6 @@ const CalendarInfo = ({
             <PrimaryButton onClick={handleSavePeriod}>Save</PrimaryButton>
             <PrimaryButton
               onClick={() => {
-                console.log('❌ CANCELLED');
                 setPeriodDays([]);
                 setIsEditingPeriod(false);
               }}

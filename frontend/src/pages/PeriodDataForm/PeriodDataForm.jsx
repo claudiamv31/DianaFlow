@@ -25,7 +25,7 @@ const PeriodDataForm = () => {
     e.preventDefault();
 
     if (!user) {
-      alert('No hay usuario logeado');
+      console.error('No hay usuario logeado');
       return;
     }
 
@@ -37,16 +37,11 @@ const PeriodDataForm = () => {
         userUid: user.id
       };
 
-      const res = await apiClient.post(`/profiles/${user.id}/cycles`, payload);
+      await apiClient.post(`/profiles/${user.id}/cycles`, payload);
 
-      const data = res.data;
-      console.log('✅ Respuesta del backend:', data);
-      alert('Ciclo guardado correctamente');
-
-      navigate('/'); // Redirige a home o a donde quieras
+      navigate('/');
     } catch (error) {
       console.error('❌ Error al guardar el ciclo:', error);
-      alert('Error al guardar el ciclo');
     }
   };
 

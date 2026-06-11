@@ -8,7 +8,6 @@ import PeriodDataForm from './pages/PeriodDataForm/PeriodDataForm.jsx';
 import PeriodSetup from './pages/PeriodSetup/PeriodSetup.jsx';
 import Header from './components/Header/Header.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
-import HeaderNotLogged from './components/Header/HeaderNotLogged.jsx';
 import CalendarPage from './pages/CalendarPage/CalendarPage.jsx';
 import StatsPage from './pages/Stats/Stats.jsx';
 import Menu from './components/Menu/Menu.jsx';

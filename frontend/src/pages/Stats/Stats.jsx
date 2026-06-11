@@ -44,8 +44,6 @@ const StatsPage = () => {
       />
     );
 
-  console.log('Summary: ', summary);
-
   return (
     <div className="mx-5 my-10">
       <p className="text-primary/100 font-headline font-bold tracking-tight text-lg pt-4">
