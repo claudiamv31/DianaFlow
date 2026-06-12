@@ -4,6 +4,7 @@ import { logout, checkUser } from '../../database/authService';
 import EditProfileModal from './EditProfileModal/EditProfileModal';
 import ChangePasswordModal from './ChangePasswordModal/ChangePasswordModal';
 import { useGetProfile } from '../../hooks/useProfileHooks';
+import { API_URL } from '../../config';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const Settings = () => {
   const avatarUrl = rawAvatarUrl
     ? rawAvatarUrl.startsWith('data:')
       ? rawAvatarUrl
-      : `http://localhost:5039${rawAvatarUrl}`
+      : `${API_URL}${rawAvatarUrl}`
     : 'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
 
   return (

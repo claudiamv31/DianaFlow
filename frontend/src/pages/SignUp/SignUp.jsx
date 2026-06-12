@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../Login/Login.css';
+import { API_URL } from '../../config';
 
 import leftCardImg from '../../assets/login-left-card.png';
 import rightCardImg from '../../assets/login-right-card.png';
@@ -39,7 +40,7 @@ const SignUp = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:5039/api/users/sign-up', {
+      const res = await fetch(`${API_URL}/api/users/sign-up`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

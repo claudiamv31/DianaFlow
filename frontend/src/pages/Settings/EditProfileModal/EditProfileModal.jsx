@@ -4,6 +4,7 @@ import {
   useGetProfile
 } from '../../../hooks/useProfileHooks';
 import Button from '../../../components/Button';
+import { API_URL } from '../../../config';
 
 const DEFAULT_AVATAR =
   'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
@@ -37,7 +38,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         setAvatarPreview(
           profileData.avatarUrl.startsWith('data:')
             ? profileData.avatarUrl
-            : `http://localhost:5039${profileData.avatarUrl}`
+            : `${API_URL}${profileData.avatarUrl}`
         );
       } else {
         setAvatarPreview(DEFAULT_AVATAR);

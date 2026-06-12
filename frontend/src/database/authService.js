@@ -1,7 +1,8 @@
 import apiClient from '../api/apiClient';
+import { API_URL } from '../config';
 
 export const login = async (email, password) => {
-  const res = await fetch('http://localhost:5039/api/users/login', {
+  const res = await fetch(`${API_URL}/api/users/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })

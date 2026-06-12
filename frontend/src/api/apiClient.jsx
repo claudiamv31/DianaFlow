@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { API_URL } from '../config';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5039/api/',
+  baseURL: API_URL,
   timeout: 30000
 });
 
@@ -26,6 +27,12 @@ apiClient.interceptors.request.use((config) => {
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  // Prepend /api if not already present and not an absolute URL
+  if (config.url && !config.url.startsWith('/api') && !config.url.startsWith('api') && !config.url.startsWith('http')) {
+    const separator = config.url.startsWith('/') ? '' : '/';
+    config.url = `/api${separator}${config.url}`;
   }
 
   return config;
