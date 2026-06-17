@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import apiClient from '../../api/apiClient';
 import PeriodEditModal from '../../components/PeriodEditModal/PeriodEditModal';
+import toast from 'react-hot-toast';
 
 const ArchivePage = () => {
   const [periods, setPeriods] = useState([]);
@@ -10,9 +11,32 @@ const ArchivePage = () => {
   const [selectedPeriod, setSelectedPeriod] = useState(null);
   const isFetching = useRef(false);
 
-  const handleSave = ({ id, startDate, bleedingDays }) => {
-    // TODO: conectar al endpoint de edición del backend
-    console.log('Guardar período:', { id, startDate, bleedingDays });
+  const handleSave = async (payload) => {
+    try {
+      await apiClient.put('/periods', payload);
+      toast.success('Period updated successfully', { icon: '🌸' });
+
+      if (!payload.SelectedDays || payload.SelectedDays.length === 0) {
+        setPeriods((prev) => prev.filter((p) => p.id !== payload.PeriodId));
+      } else {
+        const sortedDays = payload.SelectedDays.map((d) => d.date).sort();
+        const startDate = sortedDays[0];
+        const endDate = sortedDays[sortedDays.length - 1];
+        const duration = sortedDays.length;
+
+        setPeriods((prev) =>
+          prev.map((p) =>
+            p.id === payload.PeriodId
+              ? { ...p, startDate, endDate, duration }
+              : p
+          )
+        );
+      }
+      setSelectedPeriod(null);
+    } catch (err) {
+      console.error('Error updating period:', err);
+      toast.error('Could not update period. Please try again.', { icon: '⚠️' });
+    }
   };
 
   const fetchPeriods = async (pageToFetch) => {

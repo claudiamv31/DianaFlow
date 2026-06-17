@@ -22,15 +22,15 @@ const Settings = () => {
 
   useEffect(() => {
     if (profileData?.name && profileData?.email) {
-      setUser({
-        ...user,
+      setUser((prev) => ({
+        ...prev,
         name: profileData.name,
         email: profileData.email,
         lastName: profileData.lastName,
         avatarUrl: profileData.avatarUrl
-      });
+      }));
     }
-  }, [profileData, user]);
+  }, [profileData]);
 
   const handleLogout = async () => {
     await logout();

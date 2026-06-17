@@ -31,7 +31,7 @@ const HistoryPeriod = ({ latestPeriods }) => {
           <h3 className="font-headline font-bold text-xl md:text-2xl text-on-surface">
             Past Journeys
           </h3>
-          <Link to="/archive" className="text-primary font-bold text-sm">
+          <Link to="/archive" className="text-primary/100 font-bold text-sm">
             View Archive
           </Link>
         </div>

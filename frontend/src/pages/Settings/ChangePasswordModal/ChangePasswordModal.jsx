@@ -79,7 +79,6 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
         newPassword: '',
         confirmPassword: ''
       });
-      console.log('Password changed successfully');
       onClose();
     } catch (error) {
       setErrors({
