@@ -5,6 +5,7 @@ import EditProfileModal from './EditProfileModal/EditProfileModal';
 import ChangePasswordModal from './ChangePasswordModal/ChangePasswordModal';
 import { useGetProfile } from '../../hooks/useProfileHooks';
 import { API_URL } from '../../config';
+import defaultProfilePic from '../../assets/default-profile-pic.png';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const Settings = () => {
     ? rawAvatarUrl.startsWith('data:')
       ? rawAvatarUrl
       : `${API_URL}${rawAvatarUrl}`
-    : 'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
+    : defaultProfilePic;
 
   return (
     <main className="pt-24 pb-32 px-6 max-w-md mx-auto min-h-screen">
