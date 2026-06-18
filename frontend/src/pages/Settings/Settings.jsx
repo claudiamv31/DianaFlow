@@ -114,7 +114,7 @@ const Settings = () => {
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center">
                 <span
-                  className="material-symbols-outlined text-primary"
+                  className="material-symbols-outlined text-primary/100"
                   data-icon="lock_reset"
                 >
                   lock_reset
