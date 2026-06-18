@@ -18,9 +18,28 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
     if (period) {
       setStartDate(period.startDate || '');
       setBleedingDays(period.duration || 1);
-      setSelectedDates(period.selectedDays || []);
     }
   }, [period]);
+
+  useEffect(() => {
+    if (startDate && bleedingDays > 0) {
+      const parts = startDate.split('-');
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        const dates = [];
+        for (let i = 0; i < bleedingDays; i++) {
+          const d = new Date(year, month, day + i);
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          dates.push(`${yyyy}-${mm}-${dd}`);
+        }
+        setSelectedDates(dates);
+      }
+    }
+  }, [startDate, bleedingDays]);
 
   const handleSave = () => {
     onSave({

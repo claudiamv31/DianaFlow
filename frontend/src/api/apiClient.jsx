@@ -23,14 +23,18 @@ apiClient.interceptors.response.use(
 
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('jwtToken');
-  console.log('Axios Interceptor Token:', token ? 'Exists' : 'EMPTY');
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
   // Prepend /api if not already present and not an absolute URL
-  if (config.url && !config.url.startsWith('/api') && !config.url.startsWith('api') && !config.url.startsWith('http')) {
+  if (
+    config.url &&
+    !config.url.startsWith('/api') &&
+    !config.url.startsWith('api') &&
+    !config.url.startsWith('http')
+  ) {
     const separator = config.url.startsWith('/') ? '' : '/';
     config.url = `/api${separator}${config.url}`;
   }

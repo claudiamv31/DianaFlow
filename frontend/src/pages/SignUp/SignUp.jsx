@@ -60,7 +60,25 @@ const SignUp = () => {
         });
         return;
       }
-      // After successful sign‑up, redirect to period setup wizard
+
+      // Auto-login: sign-up doesn't return a token, so we log in immediately
+      // so that PrivateRoute lets the user through to the period setup wizard.
+      const loginRes = await fetch(`${API_URL}/api/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!loginRes.ok) {
+        // Account was created but auto-login failed — send to login page
+        navigate('/login');
+        return;
+      }
+
+      const loginData = await loginRes.json();
+      localStorage.setItem('jwtToken', loginData.token);
+
+      // Redirect to period setup wizard
       navigate('/period-setup');
     } catch (error) {
       console.error('Error in sign‑up:', error.message);

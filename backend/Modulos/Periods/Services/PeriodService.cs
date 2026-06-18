@@ -26,7 +26,7 @@ namespace backend.Modulos.Periods.Services
             _usersService = usersService;
         }
 
-        public async Task<List<PeriodDto>> GetLast6PeriodsByUser(Guid userId)
+        public virtual async Task<List<PeriodDto>> GetLast6PeriodsByUser(Guid userId)
         {
             var periods = await _context.Periods
                 .Where(p => p.UserId == userId)
@@ -42,7 +42,7 @@ namespace backend.Modulos.Periods.Services
             return periods.Select(p => MapToDto(p, days.Where(d => d.PeriodId == p.Id).ToList())).ToList();
         }
 
-        public async Task<List<PeriodDto>> GetPeriodsByYearAsync(Guid userId, int year)
+        public virtual async Task<List<PeriodDto>> GetPeriodsByYearAsync(Guid userId, int year)
         {
             var startYear = new DateOnly(year, 1, 1);
             var endYear = new DateOnly(year, 12, 31);
@@ -60,7 +60,7 @@ namespace backend.Modulos.Periods.Services
             return periods.Select(p => MapToDto(p, days.Where(d => d.PeriodId == p.Id).ToList())).ToList();
         }
 
-        public async Task<List<PeriodDto>> GetPeriodsByMonthAsync(Guid userId, int year, int month)
+        public virtual async Task<List<PeriodDto>> GetPeriodsByMonthAsync(Guid userId, int year, int month)
         {
             var startMonth = new DateOnly(year, month, 1);
             var endMonth = startMonth.AddMonths(1).AddDays(-1);
@@ -78,7 +78,7 @@ namespace backend.Modulos.Periods.Services
             return periods.Select(p => MapToDto(p, days.Where(d => d.PeriodId == p.Id).ToList())).ToList();
         }
 
-        public async Task<List<PeriodDto>> GetPeriodsPagination(Guid userId, int page, int pageSize)
+        public virtual async Task<List<PeriodDto>> GetPeriodsPagination(Guid userId, int page, int pageSize)
         {
             var periods = await _context.Periods
                 .Where(p => p.UserId == userId)
@@ -95,7 +95,7 @@ namespace backend.Modulos.Periods.Services
             return periods.Select(p => MapToDto(p, days.Where(d => d.PeriodId == p.Id).ToList())).ToList();
         }
 
-        public async Task<PeriodDto?> GetLatestPeriodAsync(Guid userId)
+        public virtual async Task<PeriodDto?> GetLatestPeriodAsync(Guid userId)
         {
             var period = await _context.Periods
                 .Where(p => p.UserId == userId)
@@ -111,7 +111,7 @@ namespace backend.Modulos.Periods.Services
             return MapToDto(period, days);
         }
 
-        public async Task<PeriodHomeDto?> GetLatestForHomeAsync(Guid userId)
+        public virtual async Task<PeriodHomeDto?> GetLatestForHomeAsync(Guid userId)
         {
 
             var userTimeZoneId = _usersService.GetUserTimeZone(userId) ?? "UTC";
@@ -183,7 +183,7 @@ namespace backend.Modulos.Periods.Services
             };
         }
 
-        public async Task<PeriodDto?> GetPeriodById(int id, string userTimeZoneId)
+        public virtual async Task<PeriodDto?> GetPeriodById(int id, string userTimeZoneId)
         {
             var period = await _context.Periods.FindAsync(id);
             if (period == null) return null;
@@ -206,7 +206,7 @@ namespace backend.Modulos.Periods.Services
             };
         }
 
-        public async Task<List<backend.Modulos.Periods.Models.PeriodDays>> GetPeriodsDaysByUserId(Guid userId)
+        public virtual async Task<List<backend.Modulos.Periods.Models.PeriodDays>> GetPeriodsDaysByUserId(Guid userId)
         {
             return await _context.PeriodDays
                 .Include(pd => pd.Periods)
@@ -214,7 +214,7 @@ namespace backend.Modulos.Periods.Services
                 .ToListAsync();
         }
 
-        public async Task AddPeriodAsync(Guid userId, PeriodInputDto dto)
+        public virtual async Task AddPeriodAsync(Guid userId, PeriodInputDto dto)
         {
             var timeZoneId = _usersService.GetUserTimeZone(userId);
             var today = _usersService.GetUserToday(timeZoneId);
@@ -253,7 +253,7 @@ namespace backend.Modulos.Periods.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdatePeriod(Guid userId, PeriodInputDto dto)
+        public virtual async Task<bool> UpdatePeriod(Guid userId, PeriodInputDto dto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -299,7 +299,7 @@ namespace backend.Modulos.Periods.Services
             }
         }
 
-        public async Task<bool> UpdatePeriodDayAsync(Guid userId, DailyRecordInput dto)
+        public virtual async Task<bool> UpdatePeriodDayAsync(Guid userId, DailyRecordInput dto)
         {
             var periodDay = await _context.PeriodDays
                 .Include(pd => pd.Periods)
@@ -344,7 +344,7 @@ namespace backend.Modulos.Periods.Services
             }
         }
 
-        public async Task<bool> DeletePeriodAsync(Guid userId, string periodId)
+        public virtual async Task<bool> DeletePeriodAsync(Guid userId, string periodId)
         {
             if (!int.TryParse(periodId, out int id)) return false;
 
@@ -419,7 +419,7 @@ namespace backend.Modulos.Periods.Services
             };
         }
 
-        public async Task<PeriodPredictionDto?> GetNextPeriodPredictionAsync(Guid userId)
+        public virtual async Task<PeriodPredictionDto?> GetNextPeriodPredictionAsync(Guid userId)
         {
             var periods = await GetLast6PeriodsByUser(userId);
 
