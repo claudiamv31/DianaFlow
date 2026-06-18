@@ -4,12 +4,53 @@ import Calendar from 'react-calendar';
 import { formatDateLocal, parseLocalDate } from '../../utils/calendarUtils';
 import './LogFlow.css';
 
+const DEFAULT_PERIOD_DURATION = 5;
+const SAME_PERIOD_GAP_BUFFER_DAYS = 2;
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
+
+const normalizeDuration = (duration) => {
+  const parsed = Number(duration);
+  return Number.isFinite(parsed) && parsed > 0
+    ? Math.round(parsed)
+    : DEFAULT_PERIOD_DURATION;
+};
+
+const buildDateRange = (startDate, duration) => {
+  const start = new Date(startDate);
+  const dates = [];
+
+  for (let i = 0; i < duration; i++) {
+    const date = new Date(start);
+    date.setDate(start.getDate() + i);
+    dates.push(formatDateLocal(date));
+  }
+
+  return dates;
+};
+
+const daysBetween = (left, right) => {
+  const leftDate = parseLocalDate(left) || new Date(left);
+  const rightDate = parseLocalDate(right) || new Date(right);
+
+  return Math.abs(
+    Math.round(
+      (leftDate.setHours(0, 0, 0, 0) - rightDate.setHours(0, 0, 0, 0)) /
+        DAY_IN_MS
+    )
+  );
+};
+
+const normalizeSelectedDay = (day) => {
+  if (typeof day === 'string') return day;
+  return day?.date;
+};
+
 function LogFlow({
   onClose,
   onSave,
   initialDate,
-  previousCycle,
   endDate,
+  initialSelectedDays = [],
   isInActivePeriod,
   durationDays
 }) {
@@ -20,41 +61,40 @@ function LogFlow({
     };
   }, []);
 
-  const initialStartDate = parseLocalDate(initialDate) || new Date();
-  const initialDuration = previousCycle?.duration || durationDays || 5;
+  const isEditingPeriod = isInActivePeriod && initialDate;
+  const suggestedDuration = normalizeDuration(durationDays);
+  const maxSamePeriodGap = suggestedDuration + SAME_PERIOD_GAP_BUFFER_DAYS;
+  const savedPeriodDays = initialSelectedDays
+    .map(normalizeSelectedDay)
+    .filter(Boolean)
+    .sort();
+  const initialStartDate = isEditingPeriod
+    ? parseLocalDate(initialDate)
+    : new Date();
   const [activeMonth, setActiveMonth] = useState(
     () => new Date(initialStartDate)
   );
-  const [range, setRange] = useState(() => {
-    const start = new Date(initialStartDate);
-    const dates = [];
+  const [hasAdjustedNewRange, setHasAdjustedNewRange] = useState(false);
+  const [shouldCreateNewPeriod, setShouldCreateNewPeriod] = useState(false);
 
-    // If in active period with both start and end dates, use them
-    if (isInActivePeriod && endDate && initialDate) {
+  const [range, setRange] = useState(() => {
+    if (isEditingPeriod && savedPeriodDays.length > 0) {
+      return savedPeriodDays;
+    }
+
+    if (isEditingPeriod && endDate) {
       const sDate = parseLocalDate(initialDate);
       const eDate = parseLocalDate(endDate);
+      const dates = [];
+
       for (let i = sDate; i <= eDate; i.setDate(i.getDate() + 1)) {
         dates.push(formatDateLocal(i));
       }
+
+      return dates;
     }
-    // If NOT in active period, pre-select from today + duration
-    else if (!isInActivePeriod) {
-      const today = new Date();
-      for (let i = 0; i < initialDuration; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-        dates.push(formatDateLocal(date));
-      }
-    }
-    // Otherwise use the initial duration from the provided date
-    else {
-      for (let i = 0; i < initialDuration; i++) {
-        const date = new Date(start);
-        date.setDate(start.getDate() + i);
-        dates.push(formatDateLocal(date));
-      }
-    }
-    return dates;
+
+    return buildDateRange(initialStartDate, suggestedDuration);
   });
 
   const selectedDays = useMemo(() => {
@@ -64,10 +104,38 @@ function LogFlow({
   const handleDayClick = (day) => {
     const clickedString = formatDateLocal(day);
 
+    const isSeparatePeriodDate =
+      isEditingPeriod &&
+      range.length > 0 &&
+      Math.min(...range.map((date) => daysBetween(clickedString, date))) >
+        maxSamePeriodGap;
+
+    if (isSeparatePeriodDate) {
+      setShouldCreateNewPeriod(true);
+      setHasAdjustedNewRange(true);
+      setRange(buildDateRange(day, suggestedDuration));
+      setActiveMonth(new Date(day));
+      return;
+    }
+
+    if ((!isEditingPeriod || shouldCreateNewPeriod) && !hasAdjustedNewRange) {
+      setHasAdjustedNewRange(true);
+      setRange(buildDateRange(day, suggestedDuration));
+      return;
+    }
+
     setRange((prev) => {
+      if (
+        (!isEditingPeriod || shouldCreateNewPeriod) &&
+        !prev.includes(clickedString)
+      ) {
+        return buildDateRange(day, suggestedDuration);
+      }
+
       if (prev.includes(clickedString)) {
         return prev.filter((d) => d !== clickedString);
       }
+
       return [...prev, clickedString];
     });
   };
@@ -78,7 +146,8 @@ function LogFlow({
 
   const handleSave = () => {
     onSave({
-      SelectedDays: selectedDays
+      SelectedDays: selectedDays,
+      shouldCreateNewPeriod
     });
   };
 

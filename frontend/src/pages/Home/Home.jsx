@@ -170,7 +170,6 @@ function Home() {
 
       {isLogging && (
         <LogFlow
-          previousCycle={safeStatus.previousCycle}
           onClose={() => setIsLogging(false)}
           onSave={(data) => {
             saveCycle.mutate({
@@ -178,14 +177,18 @@ function Home() {
                 date: d,
                 flow: 2
               })),
-              periodId: safeStatus.isActive ? safeStatus.periodId : null
+              periodId:
+                safeStatus.isActive && !data.shouldCreateNewPeriod
+                  ? safeStatus.periodId
+                  : null
             });
             setIsLogging(false);
           }}
           initialDate={safeStatus.startDate}
           endDate={safeStatus.endDate}
+          initialSelectedDays={safeStatus.selectedDays}
           isInActivePeriod={safeStatus.cycleStatus?.status === 'active_period'}
-          durationDays={safeStatus.DurationDays}
+          durationDays={safeStatus.durationDays}
         />
       )}
     </>

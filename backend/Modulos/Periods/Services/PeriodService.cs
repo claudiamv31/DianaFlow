@@ -179,7 +179,8 @@ namespace backend.Modulos.Periods.Services
                 CurrentPhase = currentPhase,
                 PreviousCycle = previousCycleStatus,
                 CycleStatus = actualCycleStatus,
-                DailyFocus = dailyFocus
+                DailyFocus = dailyFocus,
+                SelectedDays = latest.SelectedDays
             };
         }
 
@@ -202,7 +203,11 @@ namespace backend.Modulos.Periods.Services
                 Duration = period.EndDate.HasValue 
                         ? (period.EndDate.Value.DayNumber - period.StartDate.DayNumber) + 1 
                         : null,
-                PredominantFlow = MapToDto(period, days).PredominantFlow
+                PredominantFlow = MapToDto(period, days).PredominantFlow,
+                SelectedDays = days
+                    .OrderBy(d => d.Date)
+                    .Select(d => new DailyRecordInput { Date = d.Date, Flow = d.Flow })
+                    .ToList()
             };
         }
 
@@ -415,7 +420,11 @@ namespace backend.Modulos.Periods.Services
                 Duration = entity.EndDate.HasValue 
                         ? (entity.EndDate.Value.DayNumber - entity.StartDate.DayNumber) + 1 
                         : null,
-                PredominantFlow = predominantFlow
+                PredominantFlow = predominantFlow,
+                SelectedDays = days?
+                    .OrderBy(d => d.Date)
+                    .Select(d => new DailyRecordInput { Date = d.Date, Flow = d.Flow })
+                    .ToList() ?? new List<DailyRecordInput>()
             };
         }
 

@@ -5,9 +5,9 @@ import {
 } from '../../../hooks/useProfileHooks';
 import Button from '../../../components/Button';
 import { API_URL } from '../../../config';
+import defaultProfilePic from '../../../assets/default-profile-pic.png';
 
-const DEFAULT_AVATAR =
-  'https://api.dicebear.com/7.x/lorelei/svg?backgroundType=linearGradient&backgroundColor=fce8e6,ffd5c6&seed=Diana';
+const DEFAULT_AVATAR = defaultProfilePic;
 
 const EditProfileModal = ({ isOpen, onClose }) => {
   const { data: profileData, isLoading: profileLoading } = useGetProfile();
