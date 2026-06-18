@@ -33,8 +33,7 @@ const PeriodSetup = () => {
         userUid: user.id
       };
 
-      const res = await apiClient.post(`/profiles/${user.id}/cycles`, payload);
-      const data = res.data;
+      await apiClient.post(`/profiles/${user.id}/cycles`, payload);
       toast.success('Cycle saved successfully!');
 
       // Redirect to home
