@@ -14,6 +14,7 @@ namespace backend.Modulos.Periods.DTOs
         public bool IsActive { get; set; }
         public int? Duration { get; set; }
         public string? PredominantFlow { get; set; }
+        public List<DailyRecordInput> SelectedDays { get; set; } = new();
     }
 
     public class PeriodPredictionDto
@@ -49,6 +50,7 @@ namespace backend.Modulos.Periods.DTOs
         public CycleStatus? PreviousCycle { get; set; }
         public CycleStatus CycleStatus { get; set; } = new();
         public string? DailyFocus { get; set; }
+        public List<DailyRecordInput> SelectedDays { get; set; } = new();
     }
 
     public enum CycleRegularityLevel
