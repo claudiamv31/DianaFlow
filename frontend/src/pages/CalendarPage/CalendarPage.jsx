@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { checkUser } from '../../database/authService';
 import apiClient from '../../api/apiClient';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ErrorScreen from '../../components/ErrorScreen';
+import toast from 'react-hot-toast';
 import './CalendarPage.css';
 import LegendCard from './LegendCard/LegendCard';
 import CalendarView from './CalendarView/CalendarView';
@@ -13,6 +14,7 @@ import DailyInsigths from './DailyInsights/DailyInsights';
 import EditLog from '../../components/EditLog/EditLog';
 
 const CalendarPage = () => {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
   const [date, setDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -38,7 +40,7 @@ const CalendarPage = () => {
     isLoading,
     refetch
   } = useQuery({
-    queryKey: ['calendar', user?.uid, visibleMonth.year, visibleMonth.month],
+    queryKey: ['calendar', user?.id, visibleMonth.year, visibleMonth.month],
     queryFn: async () => {
       const res = await apiClient.get(
         `/calendar?year=${visibleMonth.year}&month=${visibleMonth.month}`
@@ -50,7 +52,7 @@ const CalendarPage = () => {
 
   // 🔹 Periods (solo para pintar / seleccionar)
   const { data: periods } = useQuery({
-    queryKey: ['periods', user?.uid, visibleMonth.year, visibleMonth.month],
+    queryKey: ['periods', user?.id, visibleMonth.year, visibleMonth.month],
     queryFn: async () => {
       const res = await apiClient.get(
         `/periods?year=${visibleMonth.year}&month=${visibleMonth.month}`
@@ -68,7 +70,10 @@ const CalendarPage = () => {
       Array.isArray(periods) &&
       periods.length > 0
     ) {
-      setCurrentPeriod(periods[0]);
+      // Find period that covers selectedDate
+      const dateStr = formatDateLocal(selectedDate);
+      const period = periods.find((p) => dateStr >= p.startDate && dateStr <= p.endDate);
+      setCurrentPeriod(period || periods[0]);
       return;
     }
 
@@ -84,7 +89,7 @@ const CalendarPage = () => {
     }
 
     setPeriodDays(days);
-  }, [currentPeriod, periods]);
+  }, [currentPeriod, periods, selectedDate]);
 
   // 🔹 Limpiar al salir de edición
   useEffect(() => {
@@ -103,7 +108,7 @@ const CalendarPage = () => {
 
   // 🔹 Info del día
   const { data: cycleInfo } = useQuery({
-    queryKey: ['calendar-day', user?.uid, selectedDate],
+    queryKey: ['calendar-day', user?.id, selectedDate],
     queryFn: async () => {
       if (!selectedDate) return null;
       const formatted = formatDateLocal(selectedDate);
@@ -114,7 +119,7 @@ const CalendarPage = () => {
   });
 
   const { data: nextPeriod } = useQuery({
-    queryKey: ['next-cycle', user?.uid],
+    queryKey: ['next-cycle', user?.id],
     queryFn: async () => {
       const res = await apiClient.get(`/periods/next`);
       return res.data;
@@ -122,8 +127,35 @@ const CalendarPage = () => {
     enabled: !!user
   });
 
+  const saveCycle = useMutation({
+    mutationFn: async (payload) => {
+      let res;
+      if (payload.periodId != null) {
+        res = await apiClient.put(`/periods`, payload);
+      } else {
+        res = await apiClient.post(`/periods`, payload);
+      }
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['calendar']);
+      queryClient.invalidateQueries(['periods']);
+      queryClient.invalidateQueries(['calendar-day']);
+      queryClient.invalidateQueries(['next-cycle']);
+      toast.success('Cycle saved correctly', {
+        icon: '🌸'
+      });
+    },
+    onError: (err) => {
+      toast.error('There was a problem saving your cycle, retry later', {
+        icon: '⚠️'
+      });
+    }
+  });
+
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorScreen onRetry={() => refetch()} />;
+
 
   return (
     <>
@@ -173,8 +205,23 @@ const CalendarPage = () => {
         <LogFlow
           onClose={() => setIsEditingPeriod(false)}
           onSave={(data) => {
+            saveCycle.mutate({
+              selectedDays: data.SelectedDays.map((d) => ({
+                date: d,
+                flow: 2
+              })),
+              periodId:
+                currentPeriod && !data.shouldCreateNewPeriod
+                  ? Number(currentPeriod.id)
+                  : null
+            });
             setIsEditingPeriod(false);
           }}
+          initialDate={currentPeriod ? currentPeriod.startDate : formatDateLocal(selectedDate)}
+          endDate={currentPeriod ? currentPeriod.endDate : formatDateLocal(selectedDate)}
+          initialSelectedDays={currentPeriod ? currentPeriod.selectedDays : []}
+          isInActivePeriod={!!currentPeriod}
+          durationDays={currentPeriod ? (currentPeriod.duration || 5) : 5}
         />
       )}
     </>

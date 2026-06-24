@@ -1,5 +1,5 @@
 import apiClient from '../../api/apiClient';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { formatDateLocal } from '../../utils/calendarUtils';
 import Button from '../Button';
@@ -12,6 +12,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
     };
   }, []);
 
+  const queryClient = useQueryClient();
   const [currentFlowIntensity, setCurrentFlowIntensity] = useState(
     cycleInfo?.flow || 0
   );
@@ -22,6 +23,9 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
       return res.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(['calendar']);
+      queryClient.invalidateQueries(['periods']);
+      queryClient.invalidateQueries(['calendar-day']);
       if (onClose) onClose();
     },
     onError: (err) => {

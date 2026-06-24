@@ -68,7 +68,7 @@ function LogFlow({
     .map(normalizeSelectedDay)
     .filter(Boolean)
     .sort();
-  const initialStartDate = isEditingPeriod
+  const initialStartDate = initialDate
     ? parseLocalDate(initialDate)
     : new Date();
   const [activeMonth, setActiveMonth] = useState(
