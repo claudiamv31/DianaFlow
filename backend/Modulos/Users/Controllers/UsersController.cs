@@ -114,5 +114,40 @@ namespace backend.Modulos.Users.Controllers
             });
         }
 
+        /// <summary>
+        /// Initial cycle setup after registration. Creates the first period record
+        /// from the wizard data (lastDayPeriod, daysDurationOfCycle, duration).
+        /// </summary>
+        [HttpPost("setup")]
+        [Authorize]
+        public async Task<IActionResult> Setup([FromBody] SetupDto dto)
+        {
+            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(userIdString, out Guid userId))
+                return Unauthorized(new { message = "Not authorized" });
+
+            if (string.IsNullOrWhiteSpace(dto.LastDayPeriod))
+                return BadRequest(new { message = "lastDayPeriod is required." });
+
+            if (!DateOnly.TryParse(dto.LastDayPeriod, out DateOnly startDate))
+                return BadRequest(new { message = "lastDayPeriod must be a valid date (yyyy-MM-dd)." });
+
+            int duration = dto.Duration > 0 ? dto.Duration : 5;
+            var endDate = startDate.AddDays(duration - 1);
+
+            var period = new backend.Modulos.Periods.Models.Periods
+            {
+                UserId = userId,
+                StartDate = startDate,
+                EndDate = endDate,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateOnly.FromDateTime(DateTime.UtcNow)
+            };
+
+            _context.Periods.Add(period);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Setup completed successfully", periodId = period.Id });
+        }
     }
 }

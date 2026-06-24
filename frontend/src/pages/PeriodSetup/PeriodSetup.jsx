@@ -29,11 +29,10 @@ const PeriodSetup = () => {
       const payload = {
         lastDayPeriod: formData.lastDayPeriod,
         daysDurationOfCycle: parseInt(formData.daysOfCycle),
-        duration: parseInt(formData.daysOfPeriod),
-        userUid: user.id
+        duration: parseInt(formData.daysOfPeriod)
       };
 
-      await apiClient.post(`/profiles/${user.id}/cycles`, payload);
+      await apiClient.post('/users/setup', payload);
       toast.success('Cycle saved successfully!');
 
       // Redirect to home

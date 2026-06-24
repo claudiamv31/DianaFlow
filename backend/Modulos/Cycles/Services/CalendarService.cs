@@ -20,7 +20,7 @@ namespace backend.Modulos.Cycles.Services
             _periodService = periodService;
         }
 
-        public async Task<List<CalendarDayDto>> GetCalendarAsync(Guid userId, int year, int month)
+        public virtual async Task<List<CalendarDayDto>> GetCalendarAsync(Guid userId, int year, int month)
         {
             var periods = await _periodService.GetLast6PeriodsByUser(userId);
             var periodsDays = await _periodService.GetPeriodsDaysByUserId(userId);
@@ -66,7 +66,7 @@ namespace backend.Modulos.Cycles.Services
             return calendar;
         }
 
-        public async Task<CalendarDayDto> GetCalendarDayAsync(Guid userId, DateOnly date)
+        public virtual async Task<CalendarDayDto> GetCalendarDayAsync(Guid userId, DateOnly date)
         {
             var periods = await _periodService.GetLast6PeriodsByUser(userId);
             var periodsDays = await _periodService.GetPeriodsDaysByUserId(userId);
@@ -102,7 +102,7 @@ namespace backend.Modulos.Cycles.Services
             };
         }
 
-        public async Task<string> UpdateCalendar(Guid userId, PeriodInputDto dto)
+        public virtual async Task<string> UpdateCalendar(Guid userId, PeriodInputDto dto)
         {
             var periods = await _periodService.GetLast6PeriodsByUser(userId);
             

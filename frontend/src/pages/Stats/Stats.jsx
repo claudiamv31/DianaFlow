@@ -25,7 +25,7 @@ const StatsPage = () => {
     isLoading,
     refetch: refetchSummary
   } = useQuery({
-    queryKey: ['summary', user?.uid],
+    queryKey: ['summary', user?.id],
     queryFn: async () => {
       if (!user) return null;
       const res = await apiClient.get(`stats/summary`);
@@ -43,6 +43,22 @@ const StatsPage = () => {
         }}
       />
     );
+
+  const getEmpatheticInsight = (summaryData) => {
+    if (!summaryData || !summaryData.periods || summaryData.periods.length < 2) {
+      return "Welcome! Once you log at least two cycles, we will begin analyzing your trends and consistency here.";
+    }
+
+    const regularity = summaryData.regularity;
+
+    if (regularity >= 85) {
+      return `Your cycle regularity is excellent (${regularity}% consistency). This month, consider prioritizing iron-rich foods as your luteal phase approaches.`;
+    } else if (regularity >= 70) {
+      return `Your cycle is moderately consistent (${regularity}% regularity). Minor variations are completely normal and can be influenced by stress, sleep, or travel.`;
+    } else {
+      return `Your cycle is showing some variations (${regularity}% regularity). Tracking daily energy levels and flow can help you understand your unique biological rhythm.`;
+    }
+  };
 
   return (
     <div className="mx-5 my-10">
@@ -65,7 +81,7 @@ const StatsPage = () => {
           <div className="w-full md:w-[20%]">
             <Card
               title="Empathetic Insight"
-              description="Your cycle has been highly consistent. This month, consider prioritizing iron-rich foods as your luteal phase approaches."
+              description={getEmpatheticInsight(summary)}
               icon={true}
             />
           </div>

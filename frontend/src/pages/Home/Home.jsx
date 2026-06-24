@@ -9,12 +9,20 @@ import ErrorScreen from '../../components/ErrorScreen';
 import CycleInsightsCard from './CycleInsightsCard/CycleInsigthCard';
 import YourPeriodCard from './YourPeriod/YourPeriodCard';
 import CurrentCycleCard from './CurrentCycleCard/CurrentCycleCard';
-import LogFlow from '../../components/LogFlow/LogFlow';
+import LogTodayModal from '../../components/LogTodayModal/LogTodayModal';
 import Button from '../../components/Button';
+import { formatDateLocal } from '../../utils/calendarUtils';
+
+const PHASE_MESSAGES = {
+  Menstruation: "Listen to your body's need for rest. Energy is drawing inward for renewal.",
+  Follicular: "A time of rising energy and fresh perspectives. Ideal for starting new projects.",
+  Ovulation: "Your energy and communication are at their peak. Great for collaboration and sharing ideas.",
+  Luteal: "Slow down and wrap up details. Focus on finishing tasks and self-care."
+};
 
 function Home() {
   const [user, setUser] = useState(null);
-  const [isLogging, setIsLogging] = useState(false);
+  const [isLoggingToday, setIsLoggingToday] = useState(false);
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser) => {
@@ -50,6 +58,40 @@ function Home() {
     }
   });
 
+  const logTodayMutation = useMutation({
+    mutationFn: async (flowIntensity) => {
+      const todayStr = formatDateLocal(new Date());
+      if (statusOfPeriod && statusOfPeriod.isActive) {
+        // Today is within an active period, update day flow
+        return await apiClient.put(`/periods/day`, {
+          date: todayStr,
+          flow: flowIntensity
+        });
+      } else if (flowIntensity > 0) {
+        // Today is not in a period, start a new period today
+        return await apiClient.post(`/periods`, {
+          selectedDays: [
+            {
+              date: todayStr,
+              flow: flowIntensity
+            }
+          ]
+        });
+      }
+    },
+    onSuccess: () => {
+      refetch();
+      toast.success('Log saved successfully', {
+        icon: '🌸'
+      });
+    },
+    onError: (err) => {
+      toast.error('Could not save log. Please try again.', {
+        icon: '⚠️'
+      });
+    }
+  });
+
   const getCycleMessage = (status) => {
     switch (status?.status) {
       case 'active_period':
@@ -59,7 +101,7 @@ function Home() {
         return (
           <>
             You have <span className="days">{status?.daysLeftInPeriod} </span>
-            days left
+            days left of your period
           </>
         );
       case 'next_period':
@@ -85,28 +127,12 @@ function Home() {
     }
   };
 
-  const saveCycle = useMutation({
-    mutationFn: async (payload) => {
-      let res;
-      if (payload.periodId != null) {
-        res = await apiClient.put(`/periods`, payload);
-      } else {
-        res = await apiClient.post(`/periods`, payload);
-      }
-      return res.data;
-    },
-    onSuccess: () => {
-      refetch();
-      toast.success('Cycle saved correctly', {
-        icon: '🌸'
-      });
-    },
-    onError: (err) => {
-      toast.error(`There was a problem saving your cycle, retry later`, {
-        icon: '⚠️'
-      });
+  const handleSaveToday = (flowIntensity) => {
+    if (statusOfPeriod?.isActive || flowIntensity > 0) {
+      logTodayMutation.mutate(flowIntensity);
     }
-  });
+    setIsLoggingToday(false);
+  };
 
   if (isLoading || statusOfPeriod === undefined) return <LoadingSpinner />;
   if (error) return <ErrorScreen onRetry={() => refetch()} />;
@@ -116,11 +142,9 @@ function Home() {
     previousCycle: null
   };
 
-  const periodButtonText = isLogging
-    ? 'Close calendar'
-    : safeStatus?.cycleStatus?.status === 'active_period'
-      ? 'Edit Cycle'
-      : 'Start period';
+  const todayStr = formatDateLocal(new Date());
+  const todayRecord = safeStatus.selectedDays?.find((d) => d.date === todayStr);
+  const todayFlow = todayRecord ? todayRecord.flow : 0;
 
   return (
     <>
@@ -138,29 +162,39 @@ function Home() {
               {getCycleMessage(safeStatus.cycleStatus)}
             </p>
           </div>
+
+          {/* Dynamic Phase Message */}
+          {safeStatus.currentPhase && PHASE_MESSAGES[safeStatus.currentPhase] && (
+            <p className="text-sm italic text-gray-600 max-w-md text-center mt-2 px-4 animate-fade-in">
+              "{PHASE_MESSAGES[safeStatus.currentPhase]}"
+            </p>
+          )}
+
           {/* Action button */}
           <Button
             variant="primary"
-            className="w-48"
-            onClick={() => setIsLogging(true)}
+            className="w-48 mt-2"
+            onClick={() => setIsLoggingToday(true)}
           >
-            {periodButtonText}
+            Log Today
           </Button>
         </section>
 
         {/* ── Responsive Info Cards ── */}
-        {safeStatus.previousCycle && (
+        {statusOfPeriod && (
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
-            {/* Top Row: Stacks vertically on mobile (flex-col), side-by-side on desktop (md:flex-row) */}
+            {/* Top Row */}
             <div className="flex flex-col md:flex-row gap-6 mt-8">
               <CurrentCycleCard
                 periodDuration={safeStatus?.cycleStatus?.periodDuration}
                 cycleDay={safeStatus?.cycleStatus?.cycleDay}
               />
-              <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
+              {safeStatus.previousCycle && (
+                <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
+              )}
             </div>
 
-            {/* Bottom Row: Full width */}
+            {/* Bottom Row */}
             <div className="mt-6 mb-8">
               <YourPeriodCard period={safeStatus} />
             </div>
@@ -168,27 +202,11 @@ function Home() {
         )}
       </div>
 
-      {isLogging && (
-        <LogFlow
-          onClose={() => setIsLogging(false)}
-          onSave={(data) => {
-            saveCycle.mutate({
-              selectedDays: data.SelectedDays.map((d) => ({
-                date: d,
-                flow: 2
-              })),
-              periodId:
-                safeStatus.isActive && !data.shouldCreateNewPeriod
-                  ? safeStatus.periodId
-                  : null
-            });
-            setIsLogging(false);
-          }}
-          initialDate={safeStatus.startDate}
-          endDate={safeStatus.endDate}
-          initialSelectedDays={safeStatus.selectedDays}
-          isInActivePeriod={safeStatus.cycleStatus?.status === 'active_period'}
-          durationDays={safeStatus.durationDays}
+      {isLoggingToday && (
+        <LogTodayModal
+          onClose={() => setIsLoggingToday(false)}
+          onSave={handleSaveToday}
+          initialFlow={todayFlow}
         />
       )}
     </>
