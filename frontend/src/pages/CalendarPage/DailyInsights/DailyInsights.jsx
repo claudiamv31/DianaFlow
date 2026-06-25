@@ -44,7 +44,7 @@ const DailyInsigths = ({
               <span className="material-symbols-outlined text-xl">
                 <FaEdit />
               </span>
-              Edit Log
+              Log Today
             </button>
           )}
           <button
