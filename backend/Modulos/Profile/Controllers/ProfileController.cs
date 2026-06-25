@@ -1,25 +1,25 @@
 using backend.Data;
-using backend.Modulos.Users.DTOs;
-using backend.Modulos.Users.Models;
-using backend.Modulos.Users.Services;
+using backend.Modulos.User.DTOs;
+using backend.Modulos.User.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using backend.Modulos.Profile.Services;
+using backend.Modulos.Profile.DTOs;
 
-namespace backend.Modulos.Users.Controllers
+namespace backend.Modulos.Profile.Controllers
 {
     [ApiController]
     [Route("api/profile")]
     [Authorize]
     public class ProfileController : ControllerBase
     {
-        private readonly IProfileService _profileService;
-        private readonly AppDbContext _context;
 
-        public ProfileController(IProfileService profileService, AppDbContext context)
+        private readonly IProfileService _profileService;
+
+        public ProfileController(IProfileService profileService)
         {
             _profileService = profileService;
-            _context = context;
         }
 
         /// <summary>
@@ -32,20 +32,20 @@ namespace backend.Modulos.Users.Controllers
             if (userId == Guid.Empty)
                 return Unauthorized(new { message = "Not authorized" });
 
-            var user = await _profileService.GetUserByIdAsync(userId);
-            if (user == null)
+            var profile = await _profileService.GetProfileByUserIdAsync(userId);
+            if (profile == null)
                 return NotFound(new { message = "User not found" });
 
             return Ok(new
             {
-                id = user.Id,
-                name = user.Name,
-                lastName = user.LastName,
-                email = user.Email,
-                avatarUrl = user.AvatarUrl,
-                timeZone = user.TimeZone,
-                createdAt = user.CreatedAt,
-                updatedAt = user.UpdatedAt
+                id = profile.Id,
+                name = profile.Name,
+                lastName = profile.LastName,
+                email = profile.User.Email,
+                avatarUrl = profile.AvatarUrl,
+                timeZone = profile.TimeZone,
+                createdAt = profile.CreatedAt,
+                updatedAt = profile.UpdatedAt
             });
         }
 
@@ -73,17 +73,17 @@ namespace backend.Modulos.Users.Controllers
             {
                 await _profileService.UpdateProfileAsync(userId, dto.Name, dto.LastName, dto.Email, dto.AvatarUrl);
 
-                var user = await _profileService.GetUserByIdAsync(userId);
+                var profile = await _profileService.GetProfileByUserIdAsync(userId);
                 return Ok(new
                 {
                     message = "Profile updated successfully",
                     data = new
                     {
-                        id = user!.Id,
-                        name = user.Name,
-                        lastName = user.LastName,
-                        email = user.Email,
-                        avatarUrl = user.AvatarUrl
+                        id = profile!.Id,
+                        name = profile.Name,
+                        lastName = profile.LastName,
+                        email = profile.User.Email,
+                        avatarUrl = profile.AvatarUrl
                     }
                 });
             }
@@ -135,57 +135,6 @@ namespace backend.Modulos.Users.Controllers
         }
 
         /// <summary>
-        /// Change user's password
-        /// </summary>
-        [HttpPost("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
-        {
-            var userId = GetCurrentUserId();
-            if (userId == Guid.Empty)
-                return Unauthorized(new { message = "Not authorized" });
-
-            // Validate input
-            if (string.IsNullOrWhiteSpace(dto.CurrentPassword))
-                return BadRequest(new { message = "The current password is required" });
-
-            if (string.IsNullOrWhiteSpace(dto.NewPassword))
-                return BadRequest(new { message = "The new password is required" });
-
-            if (dto.NewPassword.Length < 8)
-                return BadRequest(new { message = "The new password must be at least 8 characters long" });
-
-            if (dto.CurrentPassword == dto.NewPassword)
-                return BadRequest(new { message = "The new password must be different from the current password" });
-
-            try
-            {
-                await _profileService.ChangePasswordAsync(userId, dto.CurrentPassword, dto.NewPassword);
-
-                return Ok(new { message = "Password updated successfully" });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error changing password", error = ex.Message });
-            }
-        }
-
-        /// <summary>
-        /// Helper method to extract user ID from JWT claims
-        /// </summary>
-        private Guid GetCurrentUserId()
-        {
-            var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (Guid.TryParse(userIdString, out var userId))
-                return userId;
-
-            return Guid.Empty;
-        }
-
-        /// <summary>
         /// Simple email validation
         /// </summary>
         private bool IsValidEmail(string email)
@@ -200,5 +149,14 @@ namespace backend.Modulos.Users.Controllers
                 return false;
             }
         }
+
+        private Guid GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            return Guid.TryParse(userIdClaim, out var userId)
+                ? userId
+                : Guid.Empty;
+        }   
     }
 }

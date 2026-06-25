@@ -1,4 +1,4 @@
-namespace backend.Modulos.Users.Models;
+namespace backend.Modulos.User.Models;
 
 public class UserProfile
 {

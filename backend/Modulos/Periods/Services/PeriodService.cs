@@ -8,8 +8,8 @@ using backend.Modulos.Periods.Models;
 using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Cycles.Services;
 using backend.Modulos.Cycles.DTOs;
-using backend.Modulos.Users.Services;
 using backend.Modulos.Cycles.Enums;
+using backend.Modulos.Profile.Services;
 
 namespace backend.Modulos.Periods.Services
 {
@@ -17,13 +17,13 @@ namespace backend.Modulos.Periods.Services
     {
         private readonly AppDbContext _context;
         private readonly CycleService _cycleService;
-        private readonly UsersService _usersService;
+        private readonly TimeZoneService _timeZoneService;
 
-        public PeriodService(AppDbContext context, CycleService cycleService, UsersService usersService)
+        public PeriodService(AppDbContext context, CycleService cycleService, TimeZoneService timeZoneService)
         {
             _context = context;
             _cycleService = cycleService;
-            _usersService = usersService;
+            _timeZoneService = timeZoneService;
         }
 
         public virtual async Task<List<PeriodDto>> GetLast6PeriodsByUser(Guid userId)
@@ -114,8 +114,8 @@ namespace backend.Modulos.Periods.Services
         public virtual async Task<PeriodHomeDto?> GetLatestForHomeAsync(Guid userId)
         {
 
-            var userTimeZoneId = _usersService.GetUserTimeZone(userId) ?? "UTC";
-            var today = _usersService.GetUserToday(userTimeZoneId);
+            var userTimeZoneId = _timeZoneService.GetUserTimeZone(userId) ?? "UTC";
+            var today = _timeZoneService.GetProfileToday(userTimeZoneId);
 
             var periods = await GetLast6PeriodsByUser(userId);
             if (!periods.Any()) return null;
@@ -189,7 +189,7 @@ namespace backend.Modulos.Periods.Services
             var period = await _context.Periods.FindAsync(id);
             if (period == null) return null;
             
-            var today = _usersService.GetUserToday(userTimeZoneId);
+            var today = _timeZoneService.GetProfileToday(userTimeZoneId);
             var days = await _context.PeriodDays
                 .Where(pd => pd.PeriodId == period.Id)
                 .ToListAsync();
@@ -221,8 +221,8 @@ namespace backend.Modulos.Periods.Services
 
         public virtual async Task AddPeriodAsync(Guid userId, PeriodInputDto dto)
         {
-            var timeZoneId = _usersService.GetUserTimeZone(userId);
-            var today = _usersService.GetUserToday(timeZoneId);
+            var timeZoneId = _timeZoneService.GetUserTimeZone(userId);
+            var today = _timeZoneService.GetProfileToday(timeZoneId);
 
             var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
             var startDate = sortedDays.First().Date;
@@ -263,8 +263,8 @@ namespace backend.Modulos.Periods.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var timeZoneId = _usersService.GetUserTimeZone(userId);
-                var today = _usersService.GetUserToday(timeZoneId);
+                var timeZoneId = _timeZoneService.GetUserTimeZone(userId);
+                var today = _timeZoneService.GetProfileToday(timeZoneId);
 
                 var period = await _context.Periods.FirstOrDefaultAsync(p => p.Id == dto.PeriodId && p.UserId == userId);
                 if (period == null) return false;
