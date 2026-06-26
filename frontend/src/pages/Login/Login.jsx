@@ -37,7 +37,9 @@ function Login() {
       if (user) {
         navigate('/');
       } else {
-        alert('It was not possible to verify the user after logging in.');
+        console.error(
+          'It was not possible to verify the user after logging in.'
+        );
       }
     } catch (error) {
       console.error('❌ Error logging in:', error);
