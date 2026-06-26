@@ -12,7 +12,6 @@ namespace backend.Data
         {
         }
 
-        public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<Periods> Periods { get; set; }
         public DbSet<PeriodDays> PeriodDays { get; set; }
         public DbSet<PhaseMessages> PhaseMessages { get; set; }
@@ -22,10 +21,6 @@ namespace backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
-            modelBuilder.Entity<UserProfile>()
-                .Property(u => u.Id)
-                .HasValueGenerator<Microsoft.EntityFrameworkCore.ValueGeneration.SequentialGuidValueGenerator>();
             
             modelBuilder.Entity<User>()
                 .Property(u => u.Id)
@@ -49,9 +44,13 @@ namespace backend.Data
             
             modelBuilder.Entity<Profile>()
                 .HasOne(p => p.User)
-                .WithOne()
+                .WithOne(u => u.Profile)
                 .HasForeignKey<Profile>(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
         }
     }
 }
