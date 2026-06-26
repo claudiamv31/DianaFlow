@@ -48,9 +48,14 @@ describe('SignUp', () => {
   });
 
   test('submits the expected payload and navigates to period setup', async () => {
-    global.fetch.mockResolvedValue({
-      ok: true
-    });
+    global.fetch
+      .mockResolvedValueOnce({
+        ok: true
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ token: 'jwt-token' })
+      });
     renderSignUp();
 
     await userEvent.type(screen.getByPlaceholderText('Jane'), 'Jane');
@@ -83,6 +88,19 @@ describe('SignUp', () => {
           LastName: 'Doe',
           Email: 'jane@example.com',
           Password: 'secure-password'
+        })
+      })
+    );
+    expect(global.fetch).toHaveBeenCalledWith(
+      'http://localhost:5039/api/users/login',
+      expect.objectContaining({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: 'jane@example.com',
+          password: 'secure-password'
         })
       })
     );

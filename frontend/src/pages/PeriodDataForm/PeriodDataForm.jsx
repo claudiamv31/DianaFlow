@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { checkUser } from '../../database/authService';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
+import { buildPeriodPayload } from '../../utils/periodPayload';
 
 const PeriodDataForm = () => {
   const [daysOfPeriod, setDaysPeriod] = useState(5);
@@ -30,14 +31,9 @@ const PeriodDataForm = () => {
     }
 
     try {
-      const payload = {
-        lastDayPeriod,
-        daysDurationOfCycle: parseInt(daysOfCycle),
-        duration: parseInt(daysOfPeriod),
-        userUid: user.id
-      };
+      const payload = buildPeriodPayload(lastDayPeriod, daysOfPeriod);
 
-      await apiClient.post(`/profiles/${user.id}/cycles`, payload);
+      await apiClient.post('/periods', payload);
 
       navigate('/');
     } catch (error) {
