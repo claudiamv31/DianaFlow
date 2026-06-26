@@ -12,10 +12,10 @@ namespace backend.Modulos.Profile.Services
             _context = context;
         }
 
-        public string GetUserTimeZone(Guid  profileId)
+        public string GetUserTimeZone(Guid userId)
         {
-            var user = _context.UserProfiles.Find(userId);
-            if (!string.IsNullOrEmpty(user?.TimeZone))
+            var profile = _context.Profiles.FirstOrDefault(p => p.UserId == userId);
+            if (!string.IsNullOrEmpty(profile?.TimeZone))
             {
                 return profile.TimeZone;
             }

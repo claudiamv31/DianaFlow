@@ -57,7 +57,7 @@ namespace backend.Tests
         [Fact]
         public void CalculatePhaseInfo_ForMenstruation_ReturnsMenstruationDay()
         {
-            var service = new CycleService(null!, null!, null!);
+            var service = new CycleService(null!, null!);
 
             var phase = service.CalculatePhaseInfo(
                 new DateOnly(2026, 6, 1),
@@ -74,7 +74,7 @@ namespace backend.Tests
         [Fact]
         public void CalculatePhaseInfo_ForOvulation_ReturnsOvulationWindowDay()
         {
-            var service = new CycleService(null!, null!, null!);
+            var service = new CycleService(null!, null!);
 
             var phase = service.CalculatePhaseInfo(
                 new DateOnly(2026, 6, 1),

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
 import PeriodDataWizard from '../../components/PeriodDataWizard/PeriodDataWizard';
 import toast from 'react-hot-toast';
+import { buildPeriodPayload } from '../../utils/periodPayload';
 
 const PeriodSetup = () => {
   const [user, setUser] = useState(null);
@@ -26,13 +27,12 @@ const PeriodSetup = () => {
     }
 
     try {
-      const payload = {
-        lastDayPeriod: formData.lastDayPeriod,
-        daysDurationOfCycle: parseInt(formData.daysOfCycle),
-        duration: parseInt(formData.daysOfPeriod)
-      };
+      const payload = buildPeriodPayload(
+        formData.lastDayPeriod,
+        formData.daysOfPeriod
+      );
 
-      await apiClient.post('/users/setup', payload);
+      await apiClient.post('/periods', payload);
       toast.success('Cycle saved successfully!');
 
       // Redirect to home
