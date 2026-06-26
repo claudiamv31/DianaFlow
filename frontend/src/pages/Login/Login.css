@@ -35,16 +35,6 @@
 
 .auth-input {
   border: 1px solid transparent;
-  height: 58px;
-  min-height: 58px;
-  line-height: 1.25rem;
-  font-size: 0.875rem;
-  box-sizing: border-box;
-}
-
-.auth-input:-webkit-autofill {
-  -webkit-text-fill-color: #34322f;
-  box-shadow: 0 0 0 1000px #e8f1ff inset;
 }
 
 .auth-input-error {
