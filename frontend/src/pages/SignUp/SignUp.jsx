@@ -154,7 +154,9 @@ const SignUp = () => {
                   aria-describedby={
                     fieldErrors.name ? 'signup-name-error' : undefined
                   }
-                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 pr-28 text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
+                    getMissingLabel('name') ? 'pr-28' : 'pr-6'
+                  } text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
                     fieldErrors.name
                       ? 'auth-input-error'
                       : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
@@ -192,7 +194,9 @@ const SignUp = () => {
                   aria-describedby={
                     fieldErrors.lastName ? 'signup-last-name-error' : undefined
                   }
-                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 pr-28 text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
+                    getMissingLabel('lastName') ? 'pr-28' : 'pr-6'
+                  } text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
                     fieldErrors.lastName
                       ? 'auth-input-error'
                       : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
@@ -230,7 +234,9 @@ const SignUp = () => {
                   aria-describedby={
                     fieldErrors.email ? 'signup-email-error' : undefined
                   }
-                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 pr-28 text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
+                    getMissingLabel('email') ? 'pr-28' : 'pr-6'
+                  } text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
                     fieldErrors.email
                       ? 'auth-input-error'
                       : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
@@ -268,7 +274,9 @@ const SignUp = () => {
                   aria-describedby={
                     fieldErrors.password ? 'signup-password-error' : undefined
                   }
-                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 pr-28 text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
+                    getMissingLabel('password') ? 'pr-28' : 'pr-6'
+                  } text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
                     fieldErrors.password
                       ? 'auth-input-error'
                       : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'

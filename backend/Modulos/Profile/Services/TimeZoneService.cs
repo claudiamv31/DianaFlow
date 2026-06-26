@@ -14,8 +14,8 @@ namespace backend.Modulos.Profile.Services
 
         public string GetUserTimeZone(Guid  profileId)
         {
-            var profile = _context.Profiles.Find(profileId);
-            if (!string.IsNullOrEmpty(profile?.TimeZone))
+            var user = _context.UserProfiles.Find(userId);
+            if (!string.IsNullOrEmpty(user?.TimeZone))
             {
                 return profile.TimeZone;
             }
