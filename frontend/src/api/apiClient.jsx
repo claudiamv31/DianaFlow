@@ -70,7 +70,14 @@ apiClient.login = async (email, password) => {
   return response.data;
 };
 
-// Profile API methods
+apiClient.signUp = async (userData) => {
+  const response = await apiClient.post('/users/sign-up', userData);
+  if (!response.ok) {
+    throw new Error('Error signing up');
+  }
+  return response.data;
+};
+
 apiClient.getProfile = async () => {
   const response = await apiClient.get('/profile');
   return response.data;
