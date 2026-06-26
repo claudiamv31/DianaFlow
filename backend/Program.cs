@@ -5,8 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using backend.Modulos.Periods.Services;
 using backend.Modulos.Cycles.Services;
-using backend.Modulos.Users.Services;
 using backend.Modulos.Stats.Services;
+using backend.Modulos.Profile.Services;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -81,10 +81,11 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<PeriodService>();
 builder.Services.AddScoped<CycleService>();
 builder.Services.AddScoped<CalendarService>();
-builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<StatsService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<TimeZoneService>();
 
 builder.Services.AddMemoryCache();
 var app = builder.Build();
@@ -107,6 +108,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseStaticFiles();
 
 app.MapControllers();
 

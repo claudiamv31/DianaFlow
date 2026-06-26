@@ -1,6 +1,26 @@
 import { FaEdit } from 'react-icons/fa';
 import { formatMonthDay, formatDateLocal } from '../../../utils/calendarUtils';
 
+const phaseDayLabels = {
+  Menstruation: 'Menstruation day',
+  Follicular: 'Follicular phase day',
+  Ovulation: 'Ovulation window day',
+  Luteal: 'Luteal phase day'
+};
+
+const formatPhaseDay = (cycleInfo) => {
+  if (!cycleInfo?.phaseDay || cycleInfo.phaseDay <= 0) {
+    return 'Not enough data';
+  }
+
+  const hasPhaseLength =
+    cycleInfo.phaseLength && cycleInfo.phaseDay <= cycleInfo.phaseLength;
+
+  return hasPhaseLength
+    ? `Day ${cycleInfo.phaseDay} of ${cycleInfo.phaseLength}`
+    : `Day ${cycleInfo.phaseDay}`;
+};
+
 const DailyInsigths = ({
   cycleInfo,
   setIsEditingPeriod,
@@ -8,6 +28,10 @@ const DailyInsigths = ({
   isPeriod
 }) => {
   const isToday = cycleInfo?.date === formatDateLocal(new Date());
+  const hasCycleDay = cycleInfo?.cycleDay && cycleInfo.cycleDay > 0;
+  const phaseName = cycleInfo?.phase || 'Cycle';
+  const phaseDayLabel = phaseDayLabels[cycleInfo?.phase] || 'Phase day';
+
   return (
     <div className="md:col-span-4 flex flex-col gap-6">
       <div className="bg-surface-container-highest/50 border border-outline-variant/30 p-6 rounded-lg animate-slide-in shadow-lg">
@@ -17,7 +41,8 @@ const DailyInsigths = ({
               {cycleInfo?.date && formatMonthDay(cycleInfo.date)}
             </p>
             <h3 className="font-headline font-bold text-2xl text-on-surface">
-              Day {cycleInfo?.day}: {cycleInfo?.phase}
+              {hasCycleDay ? `Cycle day ${cycleInfo.cycleDay}` : 'Cycle day'}
+              {phaseName && `: ${phaseName}`}
             </h3>
           </div>
           {isToday && (
@@ -26,6 +51,31 @@ const DailyInsigths = ({
             </span>
           )}
         </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 py-4 border-y border-outline-variant/30">
+          <div>
+            <p className="text-xs font-label font-semibold uppercase tracking-widest text-on-surface-variant">
+              Cycle day
+            </p>
+            <p className="font-headline font-bold text-xl text-on-surface">
+              {hasCycleDay ? cycleInfo.cycleDay : '--'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs font-label font-semibold uppercase tracking-widest text-on-surface-variant">
+              {phaseDayLabel}
+            </p>
+            <p className="font-headline font-bold text-xl text-on-surface">
+              {formatPhaseDay(cycleInfo)}
+            </p>
+            {cycleInfo?.isOvulation && (
+              <p className="text-xs font-semibold !text-secondary mt-1">
+                Estimated ovulation day
+              </p>
+            )}
+          </div>
+        </div>
+
         <div className="mb-6 p-4 bg-white/60 rounded-lg border-l-4 !border-secondary">
           <p className="text-sm font-semibold !text-secondary mb-1 uppercase tracking-tight">
             Daily Insight

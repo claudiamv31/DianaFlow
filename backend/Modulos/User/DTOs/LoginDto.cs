@@ -1,4 +1,4 @@
-namespace backend.Modulos.Users.DTOs
+namespace backend.Modulos.User.DTOs
 {
     public class LoginDto
     {

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using backend.Modulos.User.Models;
 
 namespace backend.Modulos.Periods.Models
 {
@@ -14,5 +15,7 @@ namespace backend.Modulos.Periods.Models
         public int? Duration => EndDate.HasValue ? (EndDate.Value.DayNumber - StartDate.DayNumber) + 1 : null;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateOnly UpdatedAt { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        public Modulos.User.Models.User User { get; set; } = null!;
     }
 }
