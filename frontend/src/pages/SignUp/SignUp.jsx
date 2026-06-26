@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../Login/Login.css';
-import { API_URL } from '../../config';
+import apiClient from '../../api/apiClient';
 
 import leftCardImg from '../../assets/login-left-card.png';
 import rightCardImg from '../../assets/login-right-card.png';
@@ -21,18 +21,12 @@ const SignUp = () => {
     setFieldErrors({});
 
     const validationErrors = {};
-    if (!name.trim()) {
-      validationErrors.name = 'Please enter your name.';
-    }
-    if (!lastName.trim()) {
+    if (!name.trim()) validationErrors.name = 'Please enter your name.';
+    if (!lastName.trim())
       validationErrors.lastName = 'Please enter your last name.';
-    }
-    if (!email.trim()) {
+    if (!email.trim())
       validationErrors.email = 'Please enter your email address.';
-    }
-    if (!password) {
-      validationErrors.password = 'Please enter your password.';
-    }
+    if (!password) validationErrors.password = 'Please enter your password.';
 
     if (Object.keys(validationErrors).length > 0) {
       setFieldErrors(validationErrors);
@@ -40,50 +34,25 @@ const SignUp = () => {
     }
 
     try {
-      const res = await fetch(`${API_URL}/api/users/sign-up`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          Name: name,
-          LastName: lastName,
-          Email: email,
-          Password: password
-        })
+      await apiClient.post('/users/sign-up', {
+        Name: name,
+        LastName: lastName,
+        Email: email,
+        Password: password
       });
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        setFieldErrors({
-          form: errorData?.message || 'Error creating account'
-        });
-        return;
-      }
+      await apiClient.login(email, password);
 
-      // Auto-login: sign-up doesn't return a token, so we log in immediately
-      // so that PrivateRoute lets the user through to the period setup wizard.
-      const loginRes = await fetch(`${API_URL}/api/users/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      if (!loginRes.ok) {
-        // Account was created but auto-login failed — send to login page
-        navigate('/login');
-        return;
-      }
-
-      const loginData = await loginRes.json();
-      localStorage.setItem('jwtToken', loginData.token);
-
-      // Redirect to period setup wizard
       navigate('/period-setup');
     } catch (error) {
-      console.error('Error in sign‑up:', error.message);
+      console.error('Error in sign‑up:', error);
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        'Error creating account';
       setFieldErrors({
-        form: error.message || 'Error creating account'
+        form: errorMessage
       });
     }
   };
