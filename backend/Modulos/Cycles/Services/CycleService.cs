@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Cycles.DTOs;
-using backend.Modulos.Users.Services;
 using backend.Data;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.EntityFrameworkCore;
@@ -13,13 +12,11 @@ namespace backend.Modulos.Cycles.Services
 {
     public class CycleService
     {
-        private readonly UsersService _usersService;
         private readonly AppDbContext _context;
         private readonly IMemoryCache _cache;
 
-        public CycleService(UsersService usersService, AppDbContext context, IMemoryCache cache)
+        public CycleService(AppDbContext context, IMemoryCache cache)
         {
-            _usersService = usersService;
             _context = context;
             _cache = cache;
         }
@@ -33,10 +30,13 @@ namespace backend.Modulos.Cycles.Services
             for (int i = 0; i < ordered.Count - 1; i++)
             {
                 var cycleLength = ordered[i].StartDate.DayNumber - ordered[i + 1].StartDate.DayNumber;
-                diffs.Add(cycleLength);
+                if (cycleLength > 0)
+                {
+                    diffs.Add(cycleLength);
+                }
             }
             
-            return (int)Math.Round(diffs.Average());
+            return diffs.Any() ? (int)Math.Round(diffs.Average()) : 28;
         }
 
         public int CalculateCycleLength(PeriodDto current, PeriodDto previous)
@@ -91,13 +91,14 @@ namespace backend.Modulos.Cycles.Services
         public CycleInfo CalculateCycleInfo(PeriodDto latest, DateOnly date, int avgCycleLength)
         {
             int cycleDay = date.DayNumber - latest.StartDate.DayNumber + 1;
-            int estimatedOvulationDay = avgCycleLength - 14; 
+            var cycleLength = avgCycleLength > 0 ? avgCycleLength : 28;
+            int estimatedOvulationDay = Math.Clamp(cycleLength - 14, 1, cycleLength);
             
             int fertileWindowStart = estimatedOvulationDay - 5;
             int fertileWindowEnd = estimatedOvulationDay;
             
             bool isOvulation = cycleDay == estimatedOvulationDay;
-            bool isFertile = cycleDay >= fertileWindowStart && cycleDay <= fertileWindowEnd;
+            bool isFertile = cycleDay > 0 && cycleDay >= fertileWindowStart && cycleDay <= fertileWindowEnd;
             
             string fertilityLevel = "low";
             if (isOvulation) fertilityLevel = "high";
@@ -114,27 +115,75 @@ namespace backend.Modulos.Cycles.Services
 
         public ECyclePhase GetCyclePhase(DateOnly periodStartDate, int cycleLength, DateOnly date)
         {
+            return CalculatePhaseInfo(periodStartDate, cycleLength, date).Phase;
+        }
+
+        public CyclePhaseInfo CalculatePhaseInfo(DateOnly periodStartDate, int cycleLength, DateOnly date, int periodLength = 5)
+        {
             var cycleDay = date.DayNumber - periodStartDate.DayNumber + 1;
-            var avgCycleLength = cycleLength > 0 ? cycleLength : 28;
+            var normalizedCycleLength = cycleLength > 0 ? cycleLength : 28;
+            var normalizedPeriodLength = Math.Clamp(periodLength > 0 ? periodLength : 5, 1, normalizedCycleLength);
+            var ovulationMinDay = Math.Min(normalizedPeriodLength + 1, normalizedCycleLength);
+            var ovulationDay = Math.Clamp(normalizedCycleLength - 14, ovulationMinDay, normalizedCycleLength);
+            var ovulationStart = Math.Min(normalizedCycleLength, Math.Max(normalizedPeriodLength + 1, ovulationDay - 1));
+            var ovulationEnd = Math.Max(ovulationStart, Math.Min(normalizedCycleLength, ovulationDay + 1));
 
-            if (cycleDay >= 1 && cycleDay <= 5) 
+            if (cycleDay <= 0)
             {
-                return ECyclePhase.Menstruation;
+                return new CyclePhaseInfo
+                {
+                    Phase = ECyclePhase.Menstruation,
+                    CycleDay = cycleDay,
+                    PhaseDay = 0,
+                    PhaseLength = normalizedPeriodLength,
+                    OvulationDay = ovulationDay
+                };
             }
 
-            var ovulationDay = avgCycleLength - 14;
-
-            if (cycleDay >= ovulationDay - 1 && cycleDay <= ovulationDay + 1)
+            if (cycleDay <= normalizedPeriodLength)
             {
-                return ECyclePhase.Ovulation;
+                return new CyclePhaseInfo
+                {
+                    Phase = ECyclePhase.Menstruation,
+                    CycleDay = cycleDay,
+                    PhaseDay = cycleDay,
+                    PhaseLength = normalizedPeriodLength,
+                    OvulationDay = ovulationDay
+                };
             }
 
-            if (cycleDay < ovulationDay)
+            if (cycleDay >= ovulationStart && cycleDay <= ovulationEnd)
             {
-                return ECyclePhase.Follicular;
+                return new CyclePhaseInfo
+                {
+                    Phase = ECyclePhase.Ovulation,
+                    CycleDay = cycleDay,
+                    PhaseDay = cycleDay - ovulationStart + 1,
+                    PhaseLength = ovulationEnd - ovulationStart + 1,
+                    OvulationDay = ovulationDay
+                };
             }
 
-            return ECyclePhase.Luteal;
+            if (cycleDay < ovulationStart)
+            {
+                return new CyclePhaseInfo
+                {
+                    Phase = ECyclePhase.Follicular,
+                    CycleDay = cycleDay,
+                    PhaseDay = cycleDay - normalizedPeriodLength,
+                    PhaseLength = Math.Max(1, ovulationStart - normalizedPeriodLength - 1),
+                    OvulationDay = ovulationDay
+                };
+            }
+
+            return new CyclePhaseInfo
+            {
+                Phase = ECyclePhase.Luteal,
+                CycleDay = cycleDay,
+                PhaseDay = cycleDay - ovulationEnd,
+                PhaseLength = Math.Max(1, normalizedCycleLength - ovulationEnd),
+                OvulationDay = ovulationDay
+            };
         }
 
         public async Task<string> GetCachedDailyInsightAsync(Guid userId, ECyclePhase phase, DateOnly requestedDate, EPhaseMessageType messageType = EPhaseMessageType.Short)
@@ -164,4 +213,3 @@ namespace backend.Modulos.Cycles.Services
         }       
     }
 }
-

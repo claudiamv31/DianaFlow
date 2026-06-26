@@ -19,7 +19,14 @@ namespace backend.Modulos.Cycles.DTOs
         public string FertilityLevel { get; set; } = "low";
     }
 
-    
+    public class CyclePhaseInfo
+    {
+        public ECyclePhase Phase { get; set; }
+        public int CycleDay { get; set; }
+        public int PhaseDay { get; set; }
+        public int PhaseLength { get; set; }
+        public int OvulationDay { get; set; }
+    }
 
     public class CycleStatus
     {

@@ -9,6 +9,12 @@ namespace backend.Modulos.Stats.Services
 {
     public class StatsService
     {
+        private const int MinRegularCycleLength = 21;
+        private const int MaxRegularCycleLength = 35;
+        private const int MaxRegularCycleVariation = 7;
+        private const int IrregularScoreCap = 84;
+        private const int PenaltyPerIrregularDay = 8;
+
         private readonly PeriodService _periodService;
         private readonly CycleService _cycleService;
 
@@ -38,10 +44,15 @@ namespace backend.Modulos.Stats.Services
 
         private int CalculateAveragePeriodLength(List<PeriodDto> periods)
         {
-            var completedPeriods = periods.Where(p => p.EndDate.HasValue).ToList();
-            if (!completedPeriods.Any()) return 5;
+            var durations = periods
+                .Where(p => p.EndDate.HasValue && p.EndDate.Value >= p.StartDate)
+                .Select(p => p.EndDate!.Value.DayNumber - p.StartDate.DayNumber + 1)
+                .Where(d => d > 0)
+                .ToList();
 
-            return (int)Math.Round(completedPeriods.Average(p => p.EndDate!.Value.DayNumber - p.StartDate.DayNumber + 1));
+            if (!durations.Any()) return 5;
+
+            return (int)Math.Round(durations.Average());
         }
 
         public int CalculateRegularity(List<PeriodDto> periods)
@@ -53,19 +64,58 @@ namespace backend.Modulos.Stats.Services
             
             for (int i = 0; i < ordered.Count - 1; i++)
             {
-                cycleLengths.Add(ordered[i].StartDate.DayNumber - ordered[i + 1].StartDate.DayNumber);
+                var cycleLength = ordered[i].StartDate.DayNumber - ordered[i + 1].StartDate.DayNumber;
+                if (cycleLength > 0)
+                {
+                    cycleLengths.Add(cycleLength);
+                }
             }
 
             if (!cycleLengths.Any()) return 100;
 
-            double avgCycle = cycleLengths.Average();
-            if (avgCycle == 0) return 0;
-
-            double avgDeviation = cycleLengths.Average(c => Math.Abs(c - avgCycle));
-            int regularity = (int)Math.Round((1 - (avgDeviation / avgCycle)) * 100);
+            var cycleLengthScore = cycleLengths.Average(GetCycleLengthScore);
+            var variationScore = GetCycleVariationScore(cycleLengths);
+            int regularity = (int)Math.Round(Math.Min(cycleLengthScore, variationScore));
 
             return Math.Clamp(regularity, 0, 100);
         }
 
+        private static int GetCycleLengthScore(int cycleLength)
+        {
+            if (cycleLength >= MinRegularCycleLength && cycleLength <= MaxRegularCycleLength)
+            {
+                return 100;
+            }
+
+            var daysOutsideRange = cycleLength < MinRegularCycleLength
+                ? MinRegularCycleLength - cycleLength
+                : cycleLength - MaxRegularCycleLength;
+
+            return Math.Clamp(
+                IrregularScoreCap - ((daysOutsideRange - 1) * PenaltyPerIrregularDay),
+                0,
+                IrregularScoreCap);
+        }
+
+        private static int GetCycleVariationScore(List<int> cycleLengths)
+        {
+            if (cycleLengths.Count < 2)
+            {
+                return 100;
+            }
+
+            var variation = cycleLengths.Max() - cycleLengths.Min();
+            if (variation <= MaxRegularCycleVariation)
+            {
+                return 100;
+            }
+
+            var daysOverVariation = variation - MaxRegularCycleVariation;
+
+            return Math.Clamp(
+                IrregularScoreCap - ((daysOverVariation - 1) * PenaltyPerIrregularDay),
+                0,
+                IrregularScoreCap);
+        }
     }
 }

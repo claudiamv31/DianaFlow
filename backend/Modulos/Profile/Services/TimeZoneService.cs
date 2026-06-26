@@ -1,28 +1,28 @@
 using System;
 using backend.Data;
 
-namespace backend.Modulos.Users.Services
+namespace backend.Modulos.Profile.Services
 {
-    public class UsersService
+    public class TimeZoneService
     {
         private readonly AppDbContext _context;
 
-        public UsersService(AppDbContext context)
+        public TimeZoneService(AppDbContext context)
         {
             _context = context;
         }
 
-        public string GetUserTimeZone(Guid  userId)
+        public string GetUserTimeZone(Guid  profileId)
         {
-            var user = _context.UserProfiles.Find(userId);
-            if (!string.IsNullOrEmpty(user?.TimeZone))
+            var profile = _context.Profiles.Find(profileId);
+            if (!string.IsNullOrEmpty(profile?.TimeZone))
             {
-                return user.TimeZone;
+                return profile.TimeZone;
             }
             return "UTC";
         }
 
-        public DateOnly GetUserToday(string timeZoneId)
+        public DateOnly GetProfileToday(string timeZoneId)
         {
             try 
             {

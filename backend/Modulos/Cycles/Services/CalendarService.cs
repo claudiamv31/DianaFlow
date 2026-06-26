@@ -30,36 +30,52 @@ namespace backend.Modulos.Cycles.Services
 
             var calendar = new List<CalendarDayDto>();
 
-            var latestPeriod = periods.OrderByDescending(p => p.StartDate).FirstOrDefault();
-
             var averageCycleLength = _cycleService.CalculateAverageCycleLength(periods);
+            var averagePeriodLength = CalculateAveragePeriodLength(periods);
 
             for (var day = startMonth; day <= endMonth; day = day.AddDays(1))
             {
-                var isPeriod = false;
+                var periodForDay = FindPeriodForDate(periods, day);
+                var cycleStartPeriod = FindCycleStartPeriod(periods, day);
+                var periodDay = periodsDays.FirstOrDefault(pd => pd.Date == day);
 
-                if (periods.Any(p => day >= p.StartDate && day <= p.EndDate))
+                if (cycleStartPeriod == null)
                 {
-                    isPeriod = true;
+                    calendar.Add(new CalendarDayDto
+                    {
+                        PeriodId = periodForDay?.Id,
+                        Date = day,
+                        IsPeriod = periodForDay != null,
+                        FertilityLevel = "low",
+                        Flow = periodDay?.Flow,
+                        PeriodDaysId = periodDay?.Id
+                    });
+                    continue;
                 }
 
-                var cycleInfo = latestPeriod != null ? _cycleService.CalculateCycleInfo(latestPeriod, day, averageCycleLength) : new CycleInfo();
-                var cyclePhase = latestPeriod != null ? _cycleService.GetCyclePhase(latestPeriod.StartDate, averageCycleLength, day) : ECyclePhase.Menstruation;
-                var message = await _cycleService.GetCachedDailyInsightAsync(userId, cyclePhase, day);
+                var cycleInfo = _cycleService.CalculateCycleInfo(cycleStartPeriod, day, averageCycleLength);
+                var phaseInfo = _cycleService.CalculatePhaseInfo(
+                    cycleStartPeriod.StartDate,
+                    averageCycleLength,
+                    day,
+                    GetPeriodLength(cycleStartPeriod, averagePeriodLength));
+                var message = await _cycleService.GetCachedDailyInsightAsync(userId, phaseInfo.Phase, day);
 
                 calendar.Add(new CalendarDayDto
                 {
-                    PeriodId = isPeriod ? latestPeriod?.Id : null,   
+                    PeriodId = periodForDay?.Id,
                     Date = day,
-                    CycleDay = cycleInfo.CycleDay,
-                    IsPeriod = isPeriod,
+                    CycleDay = phaseInfo.CycleDay,
+                    IsPeriod = periodForDay != null,
                     IsFertile = cycleInfo.IsFertile,
                     IsOvulation = cycleInfo.IsOvulation,
-                    FertilityLevel = cycleInfo.FertilityLevel,
-                    Phase = cyclePhase.ToString(),
+                    FertilityLevel = cycleInfo.FertilityLevel?.ToLower() ?? "low",
+                    Phase = phaseInfo.Phase.ToString(),
+                    PhaseDay = phaseInfo.PhaseDay,
+                    PhaseLength = phaseInfo.PhaseLength,
                     DailyInsight = message,
-                    Flow = periodsDays.FirstOrDefault(pd => pd.Date == day)?.Flow,
-                    PeriodDaysId = periodsDays.FirstOrDefault(pd => pd.Date == day)?.Id
+                    Flow = periodDay?.Flow,
+                    PeriodDaysId = periodDay?.Id
                 });
             }
 
@@ -75,30 +91,48 @@ namespace backend.Modulos.Cycles.Services
                 .Where(p => p.StartDate <= date)
                 .OrderByDescending(p => p.StartDate)
                 .FirstOrDefault();
+            var periodForDay = FindPeriodForDate(periods, date);
+            var periodDay = periodsDays.FirstOrDefault(pd => pd.Date == date);
 
             if (latestPeriod == null)
             {
-                return new CalendarDayDto();
+                return new CalendarDayDto
+                {
+                    PeriodId = periodForDay?.Id,
+                    Date = date,
+                    IsPeriod = periodForDay != null,
+                    FertilityLevel = "low",
+                    Flow = periodDay?.Flow,
+                    PeriodDaysId = periodDay?.Id
+                };
             }
 
             var averageCycleLength = _cycleService.CalculateAverageCycleLength(periods);
-            var cyclePhase = _cycleService.GetCyclePhase(latestPeriod.StartDate, averageCycleLength, date);
-            var message = await _cycleService.GetCachedDailyInsightAsync(userId, cyclePhase, date);
+            var averagePeriodLength = CalculateAveragePeriodLength(periods);
+            var phaseInfo = _cycleService.CalculatePhaseInfo(
+                latestPeriod.StartDate,
+                averageCycleLength,
+                date,
+                GetPeriodLength(latestPeriod, averagePeriodLength));
+            var message = await _cycleService.GetCachedDailyInsightAsync(userId, phaseInfo.Phase, date);
 
             var cycleInfo = _cycleService.CalculateCycleInfo(latestPeriod, date, averageCycleLength);
 
             return new CalendarDayDto
             {
+                PeriodId = periodForDay?.Id,
                 Date = date,
-                CycleDay = cycleInfo.CycleDay,
-                IsPeriod = date >= latestPeriod.StartDate && date <= latestPeriod.EndDate,
+                CycleDay = phaseInfo.CycleDay,
+                IsPeriod = periodForDay != null,
                 IsOvulation = cycleInfo.IsOvulation,
                 IsFertile = cycleInfo.IsFertile,
                 FertilityLevel = cycleInfo.FertilityLevel?.ToLower() ?? "low",
-                Phase = cyclePhase.ToString(),
+                Phase = phaseInfo.Phase.ToString(),
+                PhaseDay = phaseInfo.PhaseDay,
+                PhaseLength = phaseInfo.PhaseLength,
                 DailyInsight = message,
-                Flow = periodsDays.FirstOrDefault(pd => pd.Date == date)?.Flow,
-                PeriodDaysId = periodsDays.FirstOrDefault(pd => pd.Date == date)?.Id
+                Flow = periodDay?.Flow,
+                PeriodDaysId = periodDay?.Id
             };
         }
 
@@ -137,6 +171,43 @@ namespace backend.Modulos.Cycles.Services
             }
 
             return "no_action";
+        }
+
+        private static PeriodDto? FindPeriodForDate(List<PeriodDto> periods, DateOnly date)
+        {
+            return periods
+                .Where(p => p.StartDate <= date && (!p.EndDate.HasValue || p.EndDate.Value >= date))
+                .OrderByDescending(p => p.StartDate)
+                .FirstOrDefault();
+        }
+
+        private static PeriodDto? FindCycleStartPeriod(List<PeriodDto> periods, DateOnly date)
+        {
+            return periods
+                .Where(p => p.StartDate <= date)
+                .OrderByDescending(p => p.StartDate)
+                .FirstOrDefault();
+        }
+
+        private static int CalculateAveragePeriodLength(List<PeriodDto> periods)
+        {
+            var durations = periods
+                .Where(p => p.EndDate.HasValue && p.EndDate.Value >= p.StartDate)
+                .Select(p => p.EndDate!.Value.DayNumber - p.StartDate.DayNumber + 1)
+                .Where(d => d > 0)
+                .ToList();
+
+            return durations.Any() ? (int)Math.Round(durations.Average()) : 5;
+        }
+
+        private static int GetPeriodLength(PeriodDto period, int fallbackLength)
+        {
+            if (period.EndDate.HasValue && period.EndDate.Value >= period.StartDate)
+            {
+                return period.EndDate.Value.DayNumber - period.StartDate.DayNumber + 1;
+            }
+
+            return fallbackLength > 0 ? fallbackLength : 5;
         }
     }
 }
