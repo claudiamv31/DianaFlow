@@ -159,12 +159,9 @@ function LogFlow({
     let classes = [];
 
     if (isSelected) {
-      classes.push('period-tile', 'period-middle');
+      classes.push('log-flow-day-selected');
     } else if (dateString === today) {
-      // Added "else if" and "!bg-transparent" to match CalendarView
-      classes.push(
-        '!bg-transparent !border !border-solid !border-secondary !text-on-surface !rounded-full'
-      );
+      classes.push('log-flow-day-today');
     }
 
     return classes.length ? classes.join(' ') : null;
@@ -172,17 +169,16 @@ function LogFlow({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
+      className="log-flow-modal fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div
-        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
-        style={{ maxHeight: '90vh', borderRadius: '3rem' }}
+        className="log-flow-dialog bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
       >
         {/* Header */}
-        <div className="px-8 pt-10 pb-4 flex items-center justify-between">
+        <div className="px-5 sm:px-8 pt-6 sm:pt-10 pb-4 flex items-center justify-between">
           <h2 className="font-headline font-bold text-2xl text-on-surface">
             Log your flow
           </h2>
@@ -197,17 +193,19 @@ function LogFlow({
         </div>
 
         {/* Scrollable Content */}
-        <div className="px-8 pb-4 overflow-y-auto flex-1">
+        <div className="log-flow-content px-5 sm:px-8 pb-4 overflow-y-auto flex-1">
           <p className="text-on-surface-variant text-sm mb-6 px-2">
             Select your period dates
           </p>
 
-          <div className="mb-4 flex justify-center">
+          <div className="log-flow-calendar-wrap mb-4 flex justify-center">
             <Calendar
+              className="log-flow-calendar"
               key={range.join(',')}
               onClickDay={handleDayClick}
               activeStartDate={activeMonth}
               onActiveStartDateChange={onMonthChange}
+              calendarType="gregory"
               showNeighboringMonth={false}
               locale="en-US"
               formatShortWeekday={(locale, date) =>
@@ -224,8 +222,8 @@ function LogFlow({
         </div>
 
         {/* Action Buttons (Fixed at bottom) */}
-        <div className="px-8 pb-8 pt-4 bg-surface-container-lowest mt-auto">
-          <div className="grid grid-cols-2 gap-4 px-2">
+        <div className="px-5 sm:px-8 pb-6 sm:pb-8 pt-4 bg-surface-container-lowest mt-auto">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 px-0 sm:px-2">
             <button
               className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
               onClick={onClose}
