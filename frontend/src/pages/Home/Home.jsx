@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { checkUser } from '../../database/authService';
 import apiClient from '../../api/apiClient';
 import './Home.css';
@@ -12,6 +12,7 @@ import CurrentCycleCard from './CurrentCycleCard/CurrentCycleCard';
 import LogTodayModal from '../../components/LogTodayModal/LogTodayModal';
 import Button from '../../components/Button';
 import { formatDateLocal } from '../../utils/calendarUtils';
+import { refreshCycleQueries } from '../../utils/queryInvalidation';
 
 const PHASE_MESSAGES = {
   Menstruation: "Listen to your body's need for rest. Energy is drawing inward for renewal.",
@@ -21,6 +22,7 @@ const PHASE_MESSAGES = {
 };
 
 function Home() {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
   const [isLoggingToday, setIsLoggingToday] = useState(false);
 
@@ -60,7 +62,7 @@ function Home() {
 
   const logTodayMutation = useMutation({
     mutationFn: async (flowIntensity) => {
-      const todayStr = formatDateLocal(new Date());
+      const todayStr = statusOfPeriod?.today || formatDateLocal(new Date());
       if (statusOfPeriod && statusOfPeriod.isActive) {
         // Today is within an active period, update day flow
         return await apiClient.put(`/periods/day`, {
@@ -79,8 +81,8 @@ function Home() {
         });
       }
     },
-    onSuccess: () => {
-      refetch();
+    onSuccess: async () => {
+      await refreshCycleQueries(queryClient);
       toast.success('Log saved successfully', {
         icon: '🌸'
       });
@@ -142,7 +144,7 @@ function Home() {
     previousCycle: null
   };
 
-  const todayStr = formatDateLocal(new Date());
+  const todayStr = safeStatus.today || formatDateLocal(new Date());
   const todayRecord = safeStatus.selectedDays?.find((d) => d.date === todayStr);
   const todayFlow = todayRecord ? todayRecord.flow : 0;
 
@@ -207,6 +209,7 @@ function Home() {
           onClose={() => setIsLoggingToday(false)}
           onSave={handleSaveToday}
           initialFlow={todayFlow}
+          todayDate={todayStr}
         />
       )}
     </>

@@ -43,21 +43,13 @@ const CalendarView = ({
       dateString <= nextPeriod.endDate;
 
     if (isSelected) {
-      // Selected date: Solid lilac
-      classes.push('!bg-secondary !text-white !rounded-full !border-none');
+      classes.push('calendar-day-selected');
     } else if (isToday) {
-      // Today (not selected): only borders
-      classes.push(
-        '!bg-transparent !border !border-solid !border-secondary !text-on-surface !rounded-full'
-      );
+      classes.push('calendar-day-today');
     } else if (isPeriodDay) {
-      // Period days: light pink background
-      classes.push('!bg-primary/20 !border !border-primary/70 !rounded-full');
+      classes.push('calendar-day-period');
     } else if (isPredictedPeriodDay) {
-      // Predicted period days: dashed border with soft background
-      classes.push(
-        '!border-2 !border-dashed !border-primary/50 !bg-primary/5 !text-on-surface !rounded-full'
-      );
+      classes.push('calendar-day-predicted');
     }
 
     return classes.length ? classes.join(' ') : null;
@@ -95,6 +87,7 @@ const CalendarView = ({
         activeStartDate={activeMonthDate}
         onClickDay={handleDayClick}
         onActiveStartDateChange={onMonthChange}
+        calendarType="gregory"
         showNeighboringMonth={true}
         locale="en-US"
         formatShortWeekday={(locale, date) =>

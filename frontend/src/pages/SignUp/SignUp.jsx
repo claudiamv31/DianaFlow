@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../Login/Login.css';
 import apiClient from '../../api/apiClient';
+import { getClientTimeZone } from '../../utils/timeZone';
 
 import leftCardImg from '../../assets/login-left-card.png';
 import rightCardImg from '../../assets/login-right-card.png';
@@ -38,7 +39,8 @@ const SignUp = () => {
         Name: name,
         LastName: lastName,
         Email: email,
-        Password: password
+        Password: password,
+        TimeZone: getClientTimeZone()
       });
 
       await apiClient.login(email, password);

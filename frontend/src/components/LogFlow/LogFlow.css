@@ -1,327 +1,199 @@
-.log-flow-overlay {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 1rem;
-  overflow: auto;
+.log-flow-dialog {
+  max-height: min(90vh, 48rem);
+  border-radius: 3rem;
 }
 
-.log-flow-overlay .log-flow-container {
-  width: min(100%, 760px);
-  max-width: 760px;
-  max-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-main-content);
-  border-radius: 28px;
-  overflow: hidden;
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.17);
+.log-flow-content {
+  overflow-x: hidden;
 }
 
-.log-header {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 1rem 1.25rem;
-  background: var(--bg-main-content);
-  border-bottom: 1px solid #ececec;
-}
-
-.close-btn {
-  background: transparent;
-  border: none;
-  color: #333;
-  font-size: 1rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.log-scroll-content {
-  padding: 1.5rem 1.25rem;
-  overflow-y: auto;
-}
-
-.log-scroll-content h2 {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 600;
-}
-
-.log-scroll-content h2 {
-  margin: 0 0 0.5rem;
-  font-size: 1.75rem;
-}
-
-.log-scroll-content h3 {
-  margin: 0 0 1.25rem;
-  font-size: 0.9rem;
-  color: var(--label-color);
-}
-
-.calendar-section,
-.input-group {
-  margin-bottom: 1.5rem;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.options-grid {
-  display: flex;
-  flex-direction: column;
-}
-
-.input-group h3 {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-}
-
-.calendar-instructions {
-  margin: 0 0 0.75rem;
-  color: #555;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.period-summary {
-  margin: 0 0 1rem;
-  font-weight: 600;
-}
-
-.options-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.option-btn {
-  background: #f0f0f0;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.option-btn.active {
-  background: var(--primary-color);
-  color: white;
-}
-
-.symptoms-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.symptom-card {
-  background: #fff;
-  border: 1px solid #eee;
-  padding: 15px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.symptom-card.active {
-  background: #fde2e6;
-  border-color: #f5c4cb;
-}
-
-.period-tile {
-  background: #fde2e6;
-  color: #811f41;
-  border-radius: 10px;
-}
-
-.period-edge {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--secondary-color)
-  );
-  color: white;
-}
-
-.log-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.25rem 1.25rem;
-  background: var(--bg-main-content);
-  border-top: 1px solid #ececec;
-}
-
-.btn-cancel {
-  background: transparent;
-  border: 1px solid #ccc;
-  border-radius: 999px;
-  padding: 0.85rem 1.2rem;
-  cursor: pointer;
-}
-
-.log-scroll-content .react-calendar {
-  background: var(--accent-color);
-  padding: 1rem;
-}
-
-.react-calendar {
-  box-shadow: 0 20px 50px rgba(117, 63, 96, 0.08);
+.log-flow-calendar-wrap {
   width: 100%;
+}
+
+.log-flow-calendar.react-calendar {
+  --log-flow-day-size: clamp(2.25rem, 10vw, 3.15rem);
+  width: 100%;
+  max-width: 28rem;
+  padding: 1rem;
   border: none;
   border-radius: 1.25rem;
+  background: var(--accent-color);
+  box-shadow: 0 20px 50px rgba(117, 63, 96, 0.08);
+  line-height: 1;
 }
 
-.react-calendar__navigation {
+.log-flow-calendar,
+.log-flow-calendar *,
+.log-flow-calendar *::before,
+.log-flow-calendar *::after {
+  box-sizing: border-box;
+}
+
+.log-flow-calendar button {
+  margin: 0;
+  border: 0;
+  outline: none;
+  font: inherit;
+}
+
+.log-flow-calendar button:enabled:hover {
+  cursor: pointer;
+}
+
+.log-flow-calendar .react-calendar__navigation {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  background: transparent;
-  padding: 0;
+  gap: 0.25rem;
+  margin-bottom: 0.9rem;
 }
 
-.react-calendar__navigation button {
-  border: none;
-  font-weight: 600;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+.log-flow-calendar .react-calendar__navigation button {
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  border-radius: 999px;
+  background: transparent;
+  color: #3d2740;
+  font-weight: 700;
   transition: background 0.2s ease;
 }
 
-.react-calendar__navigation button:disabled {
+.log-flow-calendar .react-calendar__navigation button:enabled:hover,
+.log-flow-calendar .react-calendar__navigation button:enabled:focus {
+  background: rgba(144, 73, 88, 0.1);
+}
+
+.log-flow-calendar .react-calendar__navigation button:disabled {
   opacity: 0.35;
   cursor: default;
 }
 
-.react-calendar__navigation__label {
-  font-weight: 700;
-  background-color: transparent;
-  font-size: 1rem;
+.log-flow-calendar .react-calendar__navigation__label {
+  flex: 1 1 auto;
+  min-width: 0;
   color: #3d2740;
+  font-size: 1rem;
+  font-weight: 800;
 }
 
-.react-calendar__navigation__arrow {
-  background-color: transparent;
-}
-
-.react-calendar__month-view__weekdays {
-  text-transform: uppercase;
-  font-size: 0.75rem;
+.log-flow-calendar .react-calendar__month-view__weekdays {
+  margin-bottom: 0.45rem;
   color: #9c88a1;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
 }
 
-.react-calendar__month-view__weekdays__weekday abbr {
-  text-decoration: none;
-}
-
-.react-calendar__tile {
-  /* CSS to force a perfect square/circle */
+.log-flow-calendar .react-calendar__month-view__weekdays__weekday {
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 1 / 1;
+  min-width: 0;
   padding: 0;
-  text-align: center;
-  font-size: 1rem;
-  margin-top: 0.2rem;
-  max-width: 3rem;
-  margin-left: auto;
-  margin-right: auto;
+}
 
-  /* Retained original styles */
-  border: none;
+.log-flow-calendar .react-calendar__month-view__weekdays__weekday abbr,
+.log-flow-calendar .react-calendar__tile abbr {
+  text-decoration: none;
+}
+
+.log-flow-calendar .react-calendar__month-view__days {
+  row-gap: 0.2rem;
+}
+
+.log-flow-calendar .react-calendar__tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: var(--log-flow-day-size);
+  padding: 0;
   background: transparent;
-  font-weight: 600;
   color: #4d3b4d;
+  font-size: clamp(0.82rem, 2.6vw, 1rem);
+  font-weight: 700;
+  text-align: center;
+}
+
+.log-flow-calendar .react-calendar__tile::before {
+  position: absolute;
+  width: min(var(--log-flow-day-size), calc(100% - 0.2rem));
+  height: min(var(--log-flow-day-size), calc(100% - 0.2rem));
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  content: '';
   transition:
-    transform 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
-.react-calendar__tile:enabled:hover,
-.react-calendar__tile:enabled:focus {
-  @apply !border !border-secondary/70;
-  transform: none;
+.log-flow-calendar .react-calendar__tile abbr {
+  position: relative;
+  z-index: 1;
 }
 
-.react-calendar__tile--active {
+.log-flow-calendar .react-calendar__tile:enabled:hover::before,
+.log-flow-calendar .react-calendar__tile:enabled:focus::before {
+  border-color: rgba(101, 88, 132, 0.7);
+}
+
+.log-flow-calendar .react-calendar__tile--active,
+.log-flow-calendar .react-calendar__tile--now {
   background: transparent;
 }
 
-.react-calendar__tile.period-middle {
-  @apply !bg-primary/20 !border !border-primary/70 !rounded-full !text-on-surface;
+.log-flow-calendar .react-calendar__tile.log-flow-day-selected {
+  color: var(--text-color);
 }
 
-.react-calendar__tile.period-edge {
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--secondary-color)
-  ) !important;
-  color: white !important;
+.log-flow-calendar .react-calendar__tile.log-flow-day-selected::before {
+  border-color: rgba(144, 73, 88, 0.7);
+  background: rgba(144, 73, 88, 0.2);
 }
 
-.react-calendar__tile.period-middle:hover,
-.react-calendar__tile.period-middle:focus,
-.react-calendar__tile.period-edge:hover,
-.react-calendar__tile.period-edge:focus {
-  transform: none;
+.log-flow-calendar .react-calendar__tile.log-flow-day-today {
+  color: var(--text-color);
 }
 
-.period-start,
-.period-end {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+.log-flow-calendar .react-calendar__tile.log-flow-day-today::before {
+  border-color: #655884;
 }
 
-.react-calendar__tile.period-tile:hover,
-.react-calendar__tile.period-tile:focus,
-.react-calendar__tile.period-edge:hover,
-.react-calendar__tile.period-edge:focus {
-  transform: none;
-}
-
-.react-calendar__month-view__days__day {
-  background: transparent;
-}
-
-.react-calendar__tile--now {
-  background: transparent;
-}
-
-@media (max-width: 640px) {
-  .log-flow-overlay {
-    padding: 0.75rem;
+@media (max-width: 480px) {
+  .log-flow-modal {
+    align-items: flex-start;
+    padding: 0.5rem;
   }
 
-  .log-flow-overlay .log-flow-container {
-    width: 100%;
-    border-radius: 22px;
+  .log-flow-dialog {
+    max-height: calc(100dvh - 1rem);
+    border-radius: 1.5rem;
   }
 
-  .options-grid,
-  .symptoms-grid {
-    grid-template-columns: 1fr;
+  .log-flow-calendar.react-calendar {
+    --log-flow-day-size: clamp(2rem, 10.5vw, 2.45rem);
+    padding: 0.65rem;
+  }
+
+  .log-flow-calendar .react-calendar__navigation {
+    margin-bottom: 0.6rem;
+  }
+
+  .log-flow-calendar .react-calendar__navigation button {
+    width: 2rem;
+    height: 2rem;
+    min-width: 2rem;
+  }
+
+  .log-flow-calendar .react-calendar__navigation__label {
+    font-size: 0.9rem;
+  }
+
+  .log-flow-calendar .react-calendar__month-view__weekdays {
+    font-size: 0.66rem;
   }
 }

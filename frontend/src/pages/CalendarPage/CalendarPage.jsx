@@ -9,9 +9,38 @@ import './CalendarPage.css';
 import LegendCard from './LegendCard/LegendCard';
 import CalendarView from './CalendarView/CalendarView';
 import { parseLocalDate, formatDateLocal } from '../../utils/calendarUtils';
+import { refreshCycleQueries } from '../../utils/queryInvalidation';
 import LogFlow from '../../components/LogFlow/LogFlow';
 import DailyInsigths from './DailyInsights/DailyInsights';
 import EditLog from '../../components/EditLog/EditLog';
+
+const findPeriodByDate = (periods, date) => {
+  if (!date || !Array.isArray(periods)) return null;
+
+  const dateStr = typeof date === 'string' ? date : formatDateLocal(date);
+  return (
+    periods.find(
+      (period) =>
+        dateStr >= period.startDate &&
+        (!period.endDate || dateStr <= period.endDate)
+    ) || null
+  );
+};
+
+const buildPeriodDays = (period) => {
+  if (!period?.startDate) return [];
+
+  const days = [];
+  const current = parseLocalDate(period.startDate);
+  const end = parseLocalDate(period.endDate || period.startDate);
+
+  while (current <= end) {
+    days.push(formatDateLocal(current));
+    current.setDate(current.getDate() + 1);
+  }
+
+  return days;
+};
 
 const CalendarPage = () => {
   const queryClient = useQueryClient();
@@ -62,34 +91,12 @@ const CalendarPage = () => {
     enabled: !!user
   });
 
-  // 🔹 Inicializar el actual periodo
+  // 🔹 Keep the selected date and selected period in sync
   useEffect(() => {
-    if (
-      !currentPeriod &&
-      periods &&
-      Array.isArray(periods) &&
-      periods.length > 0
-    ) {
-      // Find period that covers selectedDate
-      const dateStr = formatDateLocal(selectedDate);
-      const period = periods.find((p) => dateStr >= p.startDate && dateStr <= p.endDate);
-      setCurrentPeriod(period || periods[0]);
-      return;
-    }
-
-    if (!currentPeriod) return;
-
-    const days = [];
-    let current = parseLocalDate(currentPeriod.startDate);
-    const end = parseLocalDate(currentPeriod.endDate);
-
-    while (current <= end) {
-      days.push(formatDateLocal(current));
-      current.setDate(current.getDate() + 1);
-    }
-
-    setPeriodDays(days);
-  }, [currentPeriod, periods, selectedDate]);
+    const selectedPeriod = findPeriodByDate(periods, selectedDate);
+    setCurrentPeriod(selectedPeriod);
+    setPeriodDays(buildPeriodDays(selectedPeriod));
+  }, [periods, selectedDate]);
 
   // 🔹 Limpiar al salir de edición
   useEffect(() => {
@@ -137,11 +144,8 @@ const CalendarPage = () => {
       }
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['calendar']);
-      queryClient.invalidateQueries(['periods']);
-      queryClient.invalidateQueries(['calendar-day']);
-      queryClient.invalidateQueries(['next-cycle']);
+    onSuccess: async () => {
+      await refreshCycleQueries(queryClient);
       toast.success('Cycle saved correctly', {
         icon: '🌸'
       });
@@ -203,6 +207,7 @@ const CalendarPage = () => {
 
       {isEditingPeriod && (
         <LogFlow
+          key={`${currentPeriod?.id || 'new'}-${formatDateLocal(selectedDate)}`}
           onClose={() => setIsEditingPeriod(false)}
           onSave={(data) => {
             saveCycle.mutate({

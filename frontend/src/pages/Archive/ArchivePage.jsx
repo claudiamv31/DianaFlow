@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import apiClient from '../../api/apiClient';
 import PeriodEditModal from '../../components/PeriodEditModal/PeriodEditModal';
 import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
+import { refreshCycleQueries } from '../../utils/queryInvalidation';
 
 const ArchivePage = () => {
+  const queryClient = useQueryClient();
   const [periods, setPeriods] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -32,6 +35,7 @@ const ArchivePage = () => {
           )
         );
       }
+      await refreshCycleQueries(queryClient);
       setSelectedPeriod(null);
     } catch (err) {
       console.error('Error updating period:', err);
