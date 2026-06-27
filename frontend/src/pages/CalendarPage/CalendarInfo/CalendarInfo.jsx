@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../../../api/apiClient';
 import PrimaryButton from '../../../components/PrimaryButton';
+import { refreshCycleQueries } from '../../../utils/queryInvalidation';
 import './CalendarInfo.css';
 
 const CalendarInfo = ({
@@ -69,10 +70,8 @@ const CalendarInfo = ({
     mutationFn: async (payload) => {
       return apiClient.post('/calendar/upsert', payload);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['calendar'] });
-      queryClient.invalidateQueries({ queryKey: ['calendar-day'] });
-
+    onSuccess: async () => {
+      await refreshCycleQueries(queryClient);
       setIsEditingPeriod(false);
       setPeriodDays([]);
     }

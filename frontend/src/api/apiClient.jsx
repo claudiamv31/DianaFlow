@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_URL } from '../config';
+import { getClientTimeZone } from '../utils/timeZone';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -23,6 +24,9 @@ apiClient.interceptors.response.use(
 
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('jwtToken');
+
+  config.headers = config.headers || {};
+  config.headers['X-User-Time-Zone'] = getClientTimeZone();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

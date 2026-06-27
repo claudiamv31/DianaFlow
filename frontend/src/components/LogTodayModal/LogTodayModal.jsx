@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import Button from '../Button';
+import { formatLongDate } from '../../utils/calendarUtils';
 
-const LogTodayModal = ({ onClose, onSave, initialFlow = 0 }) => {
+const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -47,11 +48,7 @@ const LogTodayModal = ({ onClose, onSave, initialFlow = 0 }) => {
               Log Today
             </h2>
             <p className="text-sm font-semibold tracking-widest uppercase text-[var(--primary-color)] mt-1">
-              {new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'short',
-                day: 'numeric'
-              })}
+              {formatLongDate(todayDate || new Date())}
             </p>
           </div>
           <button

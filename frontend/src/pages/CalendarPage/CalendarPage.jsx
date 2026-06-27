@@ -9,6 +9,7 @@ import './CalendarPage.css';
 import LegendCard from './LegendCard/LegendCard';
 import CalendarView from './CalendarView/CalendarView';
 import { parseLocalDate, formatDateLocal } from '../../utils/calendarUtils';
+import { refreshCycleQueries } from '../../utils/queryInvalidation';
 import LogFlow from '../../components/LogFlow/LogFlow';
 import DailyInsigths from './DailyInsights/DailyInsights';
 import EditLog from '../../components/EditLog/EditLog';
@@ -137,11 +138,8 @@ const CalendarPage = () => {
       }
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['calendar']);
-      queryClient.invalidateQueries(['periods']);
-      queryClient.invalidateQueries(['calendar-day']);
-      queryClient.invalidateQueries(['next-cycle']);
+    onSuccess: async () => {
+      await refreshCycleQueries(queryClient);
       toast.success('Cycle saved correctly', {
         icon: '🌸'
       });

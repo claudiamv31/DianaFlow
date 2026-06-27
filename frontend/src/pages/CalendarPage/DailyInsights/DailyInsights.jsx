@@ -41,8 +41,7 @@ const DailyInsigths = ({
               {cycleInfo?.date && formatMonthDay(cycleInfo.date)}
             </p>
             <h3 className="font-headline font-bold text-2xl text-on-surface">
-              {hasCycleDay ? `Cycle day ${cycleInfo.cycleDay}` : 'Cycle day'}
-              {phaseName && `: ${phaseName}`}
+              {phaseName && `Cycle Phase: ${phaseName}`}
             </h3>
           </div>
           {isToday && (

@@ -1,39 +1,110 @@
 using System;
 using backend.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace backend.Modulos.Profile.Services
 {
     public class TimeZoneService
     {
-        private readonly AppDbContext _context;
+        public const string TimeZoneHeaderName = "X-User-Time-Zone";
 
-        public TimeZoneService(AppDbContext context)
+        private readonly AppDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public TimeZoneService(AppDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public string GetUserTimeZone(Guid userId)
         {
-            var profile = _context.Profiles.FirstOrDefault(p => p.UserId == userId);
-            if (!string.IsNullOrEmpty(profile?.TimeZone))
+            var requestTimeZone = GetRequestTimeZone();
+            if (!string.IsNullOrEmpty(requestTimeZone))
             {
-                return profile.TimeZone;
+                return requestTimeZone;
             }
+
+            var profile = _context.Profiles.FirstOrDefault(p => p.UserId == userId);
+            var profileTimeZone = NormalizeTimeZoneId(profile?.TimeZone);
+            if (!string.IsNullOrEmpty(profileTimeZone))
+            {
+                return profileTimeZone;
+            }
+
             return "UTC";
         }
 
-        public DateOnly GetProfileToday(string timeZoneId)
+        public DateOnly GetProfileToday(string? timeZoneId)
         {
-            try 
+            var normalizedTimeZoneId = NormalizeTimeZoneId(timeZoneId) ?? "UTC";
+            if (!TryFindTimeZoneInfo(normalizedTimeZoneId, out var userTz))
             {
-                TimeZoneInfo userTz = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-                DateTime userLocalTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, userTz);
-                return DateOnly.FromDateTime(userLocalTime);
+                userTz = TimeZoneInfo.Utc;
             }
-            catch 
+
+            var userLocalTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, userTz);
+
+            return DateOnly.FromDateTime(userLocalTime);
+        }
+
+        public static string? NormalizeTimeZoneId(string? timeZoneId)
+        {
+            if (string.IsNullOrWhiteSpace(timeZoneId))
             {
-                return DateOnly.FromDateTime(DateTime.UtcNow);
+                return null;
             }
+
+            var trimmedTimeZoneId = timeZoneId.Trim();
+
+            return TryFindTimeZoneInfo(trimmedTimeZoneId, out _)
+                ? trimmedTimeZoneId
+                : null;
+        }
+
+        private static bool TryFindTimeZoneInfo(string timeZoneId, out TimeZoneInfo timeZoneInfo)
+        {
+            try
+            {
+                timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+                return true;
+            }
+            catch
+            {
+            }
+
+            if (TimeZoneInfo.TryConvertIanaIdToWindowsId(timeZoneId, out var windowsTimeZoneId))
+            {
+                try
+                {
+                    timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(windowsTimeZoneId);
+                    return true;
+                }
+                catch
+                {
+                }
+            }
+
+            if (TimeZoneInfo.TryConvertWindowsIdToIanaId(timeZoneId, out var ianaTimeZoneId))
+            {
+                try
+                {
+                    timeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById(ianaTimeZoneId);
+                    return true;
+                }
+                catch
+                {
+                }
+            }
+
+            timeZoneInfo = TimeZoneInfo.Utc;
+            return false;
+        }
+
+        private string? GetRequestTimeZone()
+        {
+            var headerValue = _httpContextAccessor.HttpContext?.Request.Headers[TimeZoneHeaderName].FirstOrDefault();
+            return NormalizeTimeZoneId(headerValue);
         }
     }
 }

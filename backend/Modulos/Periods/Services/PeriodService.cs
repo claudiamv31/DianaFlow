@@ -171,6 +171,7 @@ namespace backend.Modulos.Periods.Services
             return new PeriodHomeDto
             {
                 PeriodId = int.Parse(latest.Id),
+                Today = today,
                 StartDate = latest.StartDate,
                 EndDate = latest.EndDate,
                 DurationDays = periodLength,

@@ -2,10 +2,20 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import SignUp from './SignUp';
+import apiClient from '../../api/apiClient';
+
+jest.mock('../../api/apiClient', () => ({
+  post: jest.fn(),
+  login: jest.fn()
+}));
+
+jest.mock('../../utils/timeZone', () => ({
+  getClientTimeZone: () => 'America/Mazatlan'
+}));
 
 describe('SignUp', () => {
   beforeEach(() => {
-    global.fetch = jest.fn();
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
@@ -44,18 +54,12 @@ describe('SignUp', () => {
       'aria-invalid',
       'true'
     );
-    expect(global.fetch).not.toHaveBeenCalled();
+    expect(apiClient.post).not.toHaveBeenCalled();
   });
 
   test('submits the expected payload and navigates to period setup', async () => {
-    global.fetch
-      .mockResolvedValueOnce({
-        ok: true
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ token: 'jwt-token' })
-      });
+    apiClient.post.mockResolvedValueOnce({});
+    apiClient.login.mockResolvedValueOnce({ token: 'jwt-token' });
     renderSignUp();
 
     await userEvent.type(screen.getByPlaceholderText('Jane'), 'Jane');
@@ -76,40 +80,26 @@ describe('SignUp', () => {
       ).toBeInTheDocument();
     });
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5039/api/users/sign-up',
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          Name: 'Jane',
-          LastName: 'Doe',
-          Email: 'jane@example.com',
-          Password: 'secure-password'
-        })
-      })
-    );
-    expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:5039/api/users/login',
-      expect.objectContaining({
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: 'jane@example.com',
-          password: 'secure-password'
-        })
-      })
+    expect(apiClient.post).toHaveBeenCalledWith('/users/sign-up', {
+      Name: 'Jane',
+      LastName: 'Doe',
+      Email: 'jane@example.com',
+      Password: 'secure-password',
+      TimeZone: 'America/Mazatlan'
+    });
+    expect(apiClient.login).toHaveBeenCalledWith(
+      'jane@example.com',
+      'secure-password'
     );
   });
 
   test('shows the backend error message when sign up fails', async () => {
-    global.fetch.mockResolvedValue({
-      ok: false,
-      json: async () => ({ message: 'The email is alredy in use.' })
+    apiClient.post.mockRejectedValue({
+      response: {
+        data: {
+          message: 'The email is alredy in use.'
+        }
+      }
     });
     renderSignUp();
 

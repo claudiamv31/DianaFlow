@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import apiClient from '../../api/apiClient';
 import { Link } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PeriodEditModal from '../../components/PeriodEditModal/PeriodEditModal';
+import { refreshCycleQueries } from '../../utils/queryInvalidation';
 
 const HistoryPeriod = ({ latestPeriods }) => {
+  const queryClient = useQueryClient();
   const [selectedPeriod, setSelectedPeriod] = useState(null);
 
   const saveLogMutation = useMutation({
@@ -12,7 +14,8 @@ const HistoryPeriod = ({ latestPeriods }) => {
       const res = await apiClient.put(`/periods`, payload);
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await refreshCycleQueries(queryClient);
       setSelectedPeriod(null);
     },
     onError: (err) => {

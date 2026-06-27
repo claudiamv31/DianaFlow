@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using backend.Modulos.User.Models;
 using backend.Modulos.Profile.Models;
+using backend.Modulos.Profile.Services;
 
 public class AuthService : IAuthService
 {
@@ -35,7 +36,8 @@ public class AuthService : IAuthService
         user.Profile = new Profile
         {
             Name = dto.Name,
-            LastName = dto.LastName
+            LastName = dto.LastName,
+            TimeZone = TimeZoneService.NormalizeTimeZoneId(dto.TimeZone) ?? string.Empty
         };
 
         _context.Users.Add(user);

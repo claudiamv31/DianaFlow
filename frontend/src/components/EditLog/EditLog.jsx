@@ -2,6 +2,7 @@ import apiClient from '../../api/apiClient';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { formatDateLocal } from '../../utils/calendarUtils';
+import { refreshCycleQueries } from '../../utils/queryInvalidation';
 import Button from '../Button';
 
 const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
@@ -22,10 +23,8 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
       const res = await apiClient.put(`/periods/day`, payload);
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['calendar']);
-      queryClient.invalidateQueries(['periods']);
-      queryClient.invalidateQueries(['calendar-day']);
+    onSuccess: async () => {
+      await refreshCycleQueries(queryClient);
       if (onClose) onClose();
     },
     onError: (err) => {

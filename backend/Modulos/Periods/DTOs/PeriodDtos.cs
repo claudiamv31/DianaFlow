@@ -38,6 +38,7 @@ namespace backend.Modulos.Periods.DTOs
     public class PeriodHomeDto
     {
         public int? PeriodId { get; set; }
+        public DateOnly Today { get; set; }
         public DateOnly StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
         public int DurationDays { get; set; }
