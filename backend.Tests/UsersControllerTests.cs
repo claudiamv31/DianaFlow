@@ -55,14 +55,20 @@ namespace backend.Tests
                 Email = "jane@example.com",
                 Password = "correct-password"
             };
-            _authService.Setup(s => s.Login(dto)).ReturnsAsync("jwt-token");
+            _authService.Setup(s => s.Login(dto)).ReturnsAsync(new AuthTokensDto
+            {
+                AccessToken = "jwt-token",
+                RefreshToken = "refresh-token"
+            });
             var controller = CreateController();
 
             var result = await controller.Login(dto);
 
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             var token = okResult.Value!.GetType().GetProperty("token")!.GetValue(okResult.Value);
+            var refreshToken = okResult.Value!.GetType().GetProperty("refreshToken")!.GetValue(okResult.Value);
             token.Should().Be("jwt-token");
+            refreshToken.Should().Be("refresh-token");
         }
 
         [Fact]
@@ -73,7 +79,7 @@ namespace backend.Tests
                 Email = "jane@example.com",
                 Password = "wrong-password"
             };
-            _authService.Setup(s => s.Login(dto)).ReturnsAsync((string?)null);
+            _authService.Setup(s => s.Login(dto)).ReturnsAsync((AuthTokensDto?)null);
             var controller = CreateController();
 
             var result = await controller.Login(dto);

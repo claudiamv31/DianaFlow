@@ -8,4 +8,5 @@ public class User
     
     // Explicitly tell the compiler to use the Model, not the namespace folder
     public backend.Modulos.Profile.Models.Profile Profile { get; set; } = null!;
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
 }

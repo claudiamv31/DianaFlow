@@ -45,14 +45,31 @@ public class AuthService : IAuthService
         return null; // Null means success
     }
 
-    public async Task<string?> Login(LoginDto dto)
+    public async Task<AuthTokensDto?> Login(LoginDto dto)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
         
         if (user == null || !_passwordService.VerifyPassword(dto.Password, user.PasswordHash))
             return null; // Return null if auth fails
 
-        return GenerateJwtToken(user);
+        var accessToken = GenerateJwtToken(user);
+        var refreshToken = GenerateRefreshToken();
+
+        // Persist the refresh token to the database
+        _context.RefreshTokens.Add(new RefreshToken
+        {
+            Token = refreshToken,
+            Expires = DateTime.UtcNow.AddDays(7),
+            UserId = user.Id
+        });
+
+        await _context.SaveChangesAsync();
+
+        return new AuthTokensDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
     }
 
     private string GenerateJwtToken(User user)
@@ -71,7 +88,7 @@ public class AuthService : IAuthService
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.Now.AddHours(4),
+            expires: DateTime.UtcNow.AddMinutes(15),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
@@ -96,5 +113,98 @@ public class AuthService : IAuthService
             _passwordService.HashPassword(newPassword);
 
         await _context.SaveChangesAsync();
+    }
+
+    public string GenerateRefreshToken()
+    {
+        var randomBytes = new byte[64];
+        using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
+        return Convert.ToBase64String(randomBytes);
+    }
+
+    public async Task<AuthTokensDto?> RefreshTokenAsync(string oldAccessToken, string refreshToken)
+    {
+
+        // 1. Find the refresh token in the DB
+        var token = await _context.RefreshTokens
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Token == refreshToken);
+
+        // 2. Security Checks
+        // Check if it exists, is not revoked, and is not expired
+        if (token == null || token.IsRevoked || token.Expires <= DateTime.UtcNow)
+            return null;
+
+        // 3. Optional: Validate the user identity from the old Access Token
+        // IMPORTANT: Do NOT check for expiration here, only the signature!
+        if (!IsJwtSignatureValid(oldAccessToken, token.UserId))
+            return null;
+
+        // 4. ROTATE: Generate NEW tokens
+        var newAccessToken = GenerateJwtToken(token.User);
+        var newRefreshToken = GenerateRefreshToken();
+
+        // 5. Revoke the old refresh token
+        token.IsRevoked = true;
+
+        // 6. Create a new refresh token for this session
+        _context.RefreshTokens.Add(new RefreshToken
+        {
+            Token = newRefreshToken,
+            Expires = DateTime.UtcNow.AddDays(7),
+            UserId = token.UserId
+        });
+
+        await _context.SaveChangesAsync();
+
+        return new AuthTokensDto
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
+        };
+    }
+
+    public async Task LogoutAsync(Guid userId)
+    {
+        var refreshTokens = await _context.RefreshTokens
+            .Where(rt => rt.UserId == userId && !rt.IsRevoked)
+            .ToListAsync();
+
+        foreach (var refreshToken in refreshTokens)
+        {
+            refreshToken.IsRevoked = true;
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+    private bool IsJwtSignatureValid(string token, Guid userId)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
+            ValidateIssuer = true,
+            ValidIssuer = _configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = _configuration["Jwt:Audience"],
+            ValidateLifetime = false 
+        };
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+            var sub = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            
+            // Ensure the token actually belongs to the user we found in the DB
+            return sub == userId.ToString();
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

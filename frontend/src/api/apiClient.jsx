@@ -2,14 +2,92 @@ import axios from 'axios';
 import { API_URL } from '../config';
 import { getClientTimeZone } from '../utils/timeZone';
 
+const ACCESS_TOKEN_KEY = 'jwtToken';
+const REFRESH_TOKEN_KEY = 'refreshToken';
+let refreshRequest = null;
+
 const apiClient = axios.create({
   baseURL: API_URL,
   timeout: 30000
 });
 
+const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
+const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
+
+const clearAuthTokens = () => {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+};
+
+const storeAuthTokens = (tokens = {}) => {
+  const accessToken = tokens.accessToken || tokens.token;
+
+  if (accessToken) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  }
+
+  if (tokens.refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
+  }
+};
+
+const shouldSkipRefresh = (config = {}) => {
+  const url = config.url || '';
+  return url.includes('/users/login') || url.includes('/users/refresh');
+};
+
+const refreshAccessToken = async () => {
+  if (!refreshRequest) {
+    const accessToken = getAccessToken();
+    const refreshToken = getRefreshToken();
+
+    if (!accessToken || !refreshToken) {
+      clearAuthTokens();
+      throw new Error('No refresh token available.');
+    }
+
+    refreshRequest = axios
+      .post(
+        `${API_URL}/api/users/refresh`,
+        { accessToken, refreshToken },
+        { timeout: 30000 }
+      )
+      .then((response) => {
+        storeAuthTokens(response.data);
+        return response.data.accessToken || response.data.token;
+      })
+      .finally(() => {
+        refreshRequest = null;
+      });
+  }
+
+  return refreshRequest;
+};
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !shouldSkipRefresh(originalRequest)
+    ) {
+      originalRequest._retry = true;
+
+      try {
+        const accessToken = await refreshAccessToken();
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        clearAuthTokens();
+        return Promise.reject(refreshError);
+      }
+    }
+
     if (error.code === 'ECONNABORTED') {
       return Promise.reject(
         new Error('⏱ Timeout error. The API did not respond.')
@@ -23,7 +101,7 @@ apiClient.interceptors.response.use(
 );
 
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('jwtToken');
+  const token = getAccessToken();
 
   config.headers = config.headers || {};
   config.headers['X-User-Time-Zone'] = getClientTimeZone();
@@ -47,7 +125,7 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.checkUser = async () => {
-  const token = localStorage.getItem('jwtToken');
+  const token = getAccessToken();
   if (!token) {
     return null;
   }
@@ -55,19 +133,25 @@ apiClient.checkUser = async () => {
     const response = await apiClient.get('/users/me');
     return response.data;
   } catch (error) {
-    localStorage.removeItem('jwtToken');
+    clearAuthTokens();
     return null;
   }
 };
 
 apiClient.logout = async () => {
-  localStorage.removeItem('jwtToken');
+  try {
+    if (getAccessToken()) {
+      await apiClient.post('/users/logout');
+    }
+  } finally {
+    clearAuthTokens();
+  }
 };
 
 apiClient.login = async (email, password) => {
   const response = await apiClient.post('/users/login', { email, password });
   if (response.status === 200) {
-    localStorage.setItem('jwtToken', response.data.token);
+    storeAuthTokens(response.data);
   } else {
     throw new Error('Error logging in');
   }

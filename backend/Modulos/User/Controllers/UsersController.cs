@@ -33,12 +33,23 @@ namespace backend.Modulos.User.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var token = await _authService.Login(dto);
+            var tokens = await _authService.Login(dto);
             
-            if (token == null)
+            if (tokens == null)
                 return Unauthorized(new { message = "Invalid email or password." });
 
-            return Ok(new { token });
+            return Ok(ToAuthResponse(tokens));
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = GetCurrentUserId();
+
+            await _authService.LogoutAsync(userId);
+
+            return Ok(new { message = "User logged out successfully" });
         }
 
         [Authorize]
@@ -81,6 +92,28 @@ namespace backend.Modulos.User.Controllers
             {
                 message = "Password updated successfully"
             });
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto)
+        {
+            var tokens = await _authService.RefreshTokenAsync(dto.AccessToken, dto.RefreshToken);
+
+            if (tokens == null)
+                return Unauthorized(new { message = "Invalid refresh token" });
+
+            return Ok(ToAuthResponse(tokens));
+        }
+
+
+        private static object ToAuthResponse(AuthTokensDto tokens)
+        {
+            return new
+            {
+                token = tokens.AccessToken,
+                accessToken = tokens.AccessToken,
+                refreshToken = tokens.RefreshToken
+            };
         }
 
         private Guid GetCurrentUserId()
