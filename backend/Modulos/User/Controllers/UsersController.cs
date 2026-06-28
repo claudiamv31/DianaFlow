@@ -10,13 +10,20 @@ namespace backend.Modulos.User.Controllers
     [Route("api/users")]
     public class UsersController : ControllerBase
     {
+        private const string RefreshTokenCookieName = "refreshToken";
+
         private readonly IAuthService _authService;
         private readonly IProfileService _profileService;
+        private readonly IWebHostEnvironment _environment;
 
-        public UsersController(IAuthService authService, IProfileService profileService)
+        public UsersController(
+            IAuthService authService,
+            IProfileService profileService,
+            IWebHostEnvironment environment)
         {
             _authService = authService;
             _profileService = profileService;
+            _environment = environment;
         }
 
         [HttpPost("sign-up")]
@@ -50,6 +57,7 @@ namespace backend.Modulos.User.Controllers
             var userId = GetCurrentUserId();
 
             await _authService.LogoutAsync(userId);
+            DeleteRefreshTokenCookie();
 
             return Ok(new { message = "User logged out successfully" });
         }
@@ -99,33 +107,24 @@ namespace backend.Modulos.User.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
-            var refreshToken = Request.Cookies["refreshToken"];
+            var refreshToken = Request.Cookies[RefreshTokenCookieName];
 
-            var oldAccessToken = HttpContext.Request.Headers["Authorization"]
-                                        .FirstOrDefault()?.Split(" ").Last();
+            if (string.IsNullOrEmpty(refreshToken))
+                return Unauthorized(new { message = "Refresh token missing" });
 
-            if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(oldAccessToken))
-                return Unauthorized(new { message = "Tokens missing" });
-
-            var tokens = await _authService.RefreshTokenAsync(oldAccessToken, refreshToken);
+            var tokens = await _authService.RefreshTokenAsync(refreshToken);
 
             if (tokens == null)
+            {
+                DeleteRefreshTokenCookie();
                 return Unauthorized(new { message = "Invalid or expired session" });
+            }
 
             SetRefreshTokenCookie(tokens.RefreshToken);
 
             return Ok(new { accessToken = tokens.AccessToken });
         }
 
-
-        private static object ToAuthResponse(AuthTokensDto tokens)
-        {
-            return new
-            {
-                accessToken = tokens.AccessToken,
-                refreshToken = tokens.RefreshToken
-            };
-        }
 
         private Guid GetCurrentUserId()
         {
@@ -140,14 +139,28 @@ namespace backend.Modulos.User.Controllers
 
         private void SetRefreshTokenCookie(string refreshToken)
         {
-            var cookieOptions = new CookieOptions
+            var cookieOptions = BuildRefreshTokenCookieOptions();
+            cookieOptions.Expires = DateTimeOffset.UtcNow.AddDays(7);
+
+            Response.Cookies.Append(RefreshTokenCookieName, refreshToken, cookieOptions);
+        }
+
+        private void DeleteRefreshTokenCookie()
+        {
+            Response.Cookies.Delete(RefreshTokenCookieName, BuildRefreshTokenCookieOptions());
+        }
+
+        private CookieOptions BuildRefreshTokenCookieOptions()
+        {
+            var isDevelopment = _environment.IsDevelopment();
+
+            return new CookieOptions
             {
-                HttpOnly = true,  // Hides cookie from JavaScript
-                Secure = true,    // Requires HTTPS (Set to false ONLY if testing locally without HTTPS)
-                SameSite = SameSiteMode.Strict, // Prevents CSRF attacks
-                Expires = DateTime.UtcNow.AddDays(7)
+                HttpOnly = true,
+                Secure = !isDevelopment,
+                SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
+                Path = "/api/users"
             };
-            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
     }
 }

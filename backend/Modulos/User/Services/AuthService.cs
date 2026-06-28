@@ -123,7 +123,7 @@ public class AuthService : IAuthService
         return Convert.ToBase64String(randomBytes);
     }
 
-    public async Task<AuthTokensDto?> RefreshTokenAsync(string oldAccessToken, string refreshToken)
+    public async Task<AuthTokensDto?> RefreshTokenAsync(string refreshToken)
     {
 
         // 1. Find the refresh token in the DB
@@ -136,19 +136,14 @@ public class AuthService : IAuthService
         if (token == null || token.IsRevoked || token.Expires <= DateTime.UtcNow)
             return null;
 
-        // 3. Optional: Validate the user identity from the old Access Token
-        // IMPORTANT: Do NOT check for expiration here, only the signature!
-        if (!IsJwtSignatureValid(oldAccessToken, token.UserId))
-            return null;
-
-        // 4. ROTATE: Generate NEW tokens
+        // 3. ROTATE: Generate NEW tokens
         var newAccessToken = GenerateJwtToken(token.User);
         var newRefreshToken = GenerateRefreshToken();
 
-        // 5. Revoke the old refresh token
+        // 4. Revoke the old refresh token
         token.IsRevoked = true;
 
-        // 6. Create a new refresh token for this session
+        // 5. Create a new refresh token for this session
         _context.RefreshTokens.Add(new RefreshToken
         {
             Token = newRefreshToken,
@@ -177,34 +172,5 @@ public class AuthService : IAuthService
         }
 
         await _context.SaveChangesAsync();
-    }
-
-    private bool IsJwtSignatureValid(string token, Guid userId)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var validationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
-            ValidateIssuer = true,
-            ValidIssuer = _configuration["Jwt:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = _configuration["Jwt:Audience"],
-            ValidateLifetime = false 
-        };
-
-        try
-        {
-            var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
-            var sub = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
-                ?? principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            
-            // Ensure the token actually belongs to the user we found in the DB
-            return sub == userId.ToString();
-        }
-        catch
-        {
-            return false;
-        }
     }
 }

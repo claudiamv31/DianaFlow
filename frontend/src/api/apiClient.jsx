@@ -111,10 +111,17 @@ apiClient.interceptors.request.use((config) => {
 });
 
 apiClient.checkUser = async () => {
-  const token = getAccessToken();
+  let token = getAccessToken();
+
   if (!token) {
-    return null;
+    try {
+      token = await refreshAccessToken();
+    } catch (error) {
+      clearAuthTokens();
+      return null;
+    }
   }
+
   try {
     const response = await apiClient.get('/users/me');
     return response.data;
@@ -126,9 +133,9 @@ apiClient.checkUser = async () => {
 
 apiClient.logout = async () => {
   try {
-    if (getAccessToken()) {
-      await apiClient.post('/users/logout');
-    }
+    await apiClient.post('/users/logout');
+  } catch {
+    // Local logout should still complete if the server-side session already expired.
   } finally {
     clearAuthTokens();
   }
