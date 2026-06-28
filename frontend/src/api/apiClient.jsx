@@ -3,31 +3,25 @@ import { API_URL } from '../config';
 import { getClientTimeZone } from '../utils/timeZone';
 
 const ACCESS_TOKEN_KEY = 'jwtToken';
-const REFRESH_TOKEN_KEY = 'refreshToken';
 let refreshRequest = null;
 
 const apiClient = axios.create({
   baseURL: API_URL,
-  timeout: 30000
+  timeout: 30000,
+  withCredentials: true
 });
 
 const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
-const getRefreshToken = () => localStorage.getItem(REFRESH_TOKEN_KEY);
 
 const clearAuthTokens = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
 };
 
 const storeAuthTokens = (tokens = {}) => {
-  const accessToken = tokens.accessToken || tokens.token;
+  const accessToken = tokens.accessToken;
 
   if (accessToken) {
     localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  }
-
-  if (tokens.refreshToken) {
-    localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
   }
 };
 
@@ -38,23 +32,15 @@ const shouldSkipRefresh = (config = {}) => {
 
 const refreshAccessToken = async () => {
   if (!refreshRequest) {
-    const accessToken = getAccessToken();
-    const refreshToken = getRefreshToken();
-
-    if (!accessToken || !refreshToken) {
-      clearAuthTokens();
-      throw new Error('No refresh token available.');
-    }
-
     refreshRequest = axios
       .post(
         `${API_URL}/api/users/refresh`,
-        { accessToken, refreshToken },
-        { timeout: 30000 }
+        {},
+        { timeout: 30000, withCredentials: true }
       )
       .then((response) => {
         storeAuthTokens(response.data);
-        return response.data.accessToken || response.data.token;
+        return response.data.accessToken;
       })
       .finally(() => {
         refreshRequest = null;

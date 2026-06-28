@@ -65,9 +65,9 @@ namespace backend.Tests
             var result = await controller.Login(dto);
 
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            var token = okResult.Value!.GetType().GetProperty("token")!.GetValue(okResult.Value);
+            var accessToken = okResult.Value!.GetType().GetProperty("accessToken")!.GetValue(okResult.Value);
             var refreshToken = okResult.Value!.GetType().GetProperty("refreshToken")!.GetValue(okResult.Value);
-            token.Should().Be("jwt-token");
+            accessToken.Should().Be("jwt-token");
             refreshToken.Should().Be("refresh-token");
         }
 

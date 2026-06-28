@@ -37,8 +37,10 @@ namespace backend.Modulos.User.Controllers
             
             if (tokens == null)
                 return Unauthorized(new { message = "Invalid email or password." });
+            
+            SetRefreshTokenCookie(tokens.RefreshToken);
 
-            return Ok(ToAuthResponse(tokens));
+            return Ok(new { accessToken = tokens.AccessToken });
         }
 
         [Authorize]
@@ -95,14 +97,24 @@ namespace backend.Modulos.User.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto)
+        public async Task<IActionResult> Refresh()
         {
-            var tokens = await _authService.RefreshTokenAsync(dto.AccessToken, dto.RefreshToken);
+            var refreshToken = Request.Cookies["refreshToken"];
+
+            var oldAccessToken = HttpContext.Request.Headers["Authorization"]
+                                        .FirstOrDefault()?.Split(" ").Last();
+
+            if (string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(oldAccessToken))
+                return Unauthorized(new { message = "Tokens missing" });
+
+            var tokens = await _authService.RefreshTokenAsync(oldAccessToken, refreshToken);
 
             if (tokens == null)
-                return Unauthorized(new { message = "Invalid refresh token" });
+                return Unauthorized(new { message = "Invalid or expired session" });
 
-            return Ok(ToAuthResponse(tokens));
+            SetRefreshTokenCookie(tokens.RefreshToken);
+
+            return Ok(new { accessToken = tokens.AccessToken });
         }
 
 
@@ -110,7 +122,6 @@ namespace backend.Modulos.User.Controllers
         {
             return new
             {
-                token = tokens.AccessToken,
                 accessToken = tokens.AccessToken,
                 refreshToken = tokens.RefreshToken
             };
@@ -125,6 +136,18 @@ namespace backend.Modulos.User.Controllers
                 return userId;
 
             return Guid.Empty;
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,  // Hides cookie from JavaScript
+                Secure = true,    // Requires HTTPS (Set to false ONLY if testing locally without HTTPS)
+                SameSite = SameSiteMode.Strict, // Prevents CSRF attacks
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
     }
 }
