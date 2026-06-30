@@ -73,7 +73,10 @@ describe('Login', () => {
   });
 
   test('navigates home after a successful login and user check', async () => {
-    apiClient.login.mockResolvedValue({ token: 'token' });
+    apiClient.login.mockResolvedValue({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token'
+    });
     apiClient.checkUser.mockResolvedValue({ id: '1', email: 'jane@example.com' });
     renderLogin();
 

@@ -59,7 +59,10 @@ describe('SignUp', () => {
 
   test('submits the expected payload and navigates to period setup', async () => {
     apiClient.post.mockResolvedValueOnce({});
-    apiClient.login.mockResolvedValueOnce({ token: 'jwt-token' });
+    apiClient.login.mockResolvedValueOnce({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token'
+    });
     renderSignUp();
 
     await userEvent.type(screen.getByPlaceholderText('Jane'), 'Jane');

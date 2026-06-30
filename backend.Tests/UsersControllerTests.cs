@@ -7,8 +7,10 @@ using backend.Modulos.User.Controllers;
 using backend.Modulos.User.DTOs;
 using backend.Modulos.User.Models;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Moq;
 using Xunit;
 
@@ -18,12 +20,15 @@ namespace backend.Tests
     {
         private readonly Mock<IAuthService> _authService;
         private readonly Mock<IProfileService> _profileService;
+        private readonly Mock<IWebHostEnvironment> _environment;
         private readonly Guid _userId;
 
         public UsersControllerTests()
         {
             _authService = new Mock<IAuthService>();
             _profileService = new Mock<IProfileService>();
+            _environment = new Mock<IWebHostEnvironment>();
+            _environment.SetupGet(e => e.EnvironmentName).Returns(Environments.Development);
             _userId = Guid.NewGuid();
         }
 
@@ -35,7 +40,7 @@ namespace backend.Tests
                 claims.Add(new Claim("sub", userIdString));
             }
 
-            return new UsersController(_authService.Object, _profileService.Object)
+            return new UsersController(_authService.Object, _profileService.Object, _environment.Object)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -55,14 +60,20 @@ namespace backend.Tests
                 Email = "jane@example.com",
                 Password = "correct-password"
             };
-            _authService.Setup(s => s.Login(dto)).ReturnsAsync("jwt-token");
+            _authService.Setup(s => s.Login(dto)).ReturnsAsync(new AuthTokensDto
+            {
+                AccessToken = "jwt-token",
+                RefreshToken = "refresh-token"
+            });
             var controller = CreateController();
 
             var result = await controller.Login(dto);
 
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            var token = okResult.Value!.GetType().GetProperty("token")!.GetValue(okResult.Value);
-            token.Should().Be("jwt-token");
+            var accessToken = okResult.Value!.GetType().GetProperty("accessToken")!.GetValue(okResult.Value);
+            accessToken.Should().Be("jwt-token");
+            okResult.Value.GetType().GetProperty("refreshToken").Should().BeNull();
+            controller.Response.Headers.SetCookie.ToString().Should().Contain("refreshToken=refresh-token");
         }
 
         [Fact]
@@ -73,7 +84,7 @@ namespace backend.Tests
                 Email = "jane@example.com",
                 Password = "wrong-password"
             };
-            _authService.Setup(s => s.Login(dto)).ReturnsAsync((string?)null);
+            _authService.Setup(s => s.Login(dto)).ReturnsAsync((AuthTokensDto?)null);
             var controller = CreateController();
 
             var result = await controller.Login(dto);

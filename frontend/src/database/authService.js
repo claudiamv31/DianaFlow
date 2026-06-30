@@ -1,20 +1,7 @@
 import apiClient from '../api/apiClient';
-import { API_URL } from '../config';
 
 export const login = async (email, password) => {
-  const res = await fetch(`${API_URL}/api/users/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-
-  if (!res.ok) {
-    throw new Error('Credenciales inválidas');
-  }
-
-  const data = await res.json();
-  localStorage.setItem('jwtToken', data.token);
-  return data;
+  return apiClient.login(email, password);
 };
 
 export const register = async (email, password, name, lastName) => {
@@ -39,5 +26,5 @@ export function checkUser(callback) {
 
 
 export const logout = async () => {
-  localStorage.removeItem('jwtToken');
+  await apiClient.logout();
 };

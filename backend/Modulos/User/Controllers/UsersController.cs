@@ -10,13 +10,20 @@ namespace backend.Modulos.User.Controllers
     [Route("api/users")]
     public class UsersController : ControllerBase
     {
+        private const string RefreshTokenCookieName = "refreshToken";
+
         private readonly IAuthService _authService;
         private readonly IProfileService _profileService;
+        private readonly IWebHostEnvironment _environment;
 
-        public UsersController(IAuthService authService, IProfileService profileService)
+        public UsersController(
+            IAuthService authService,
+            IProfileService profileService,
+            IWebHostEnvironment environment)
         {
             _authService = authService;
             _profileService = profileService;
+            _environment = environment;
         }
 
         [HttpPost("sign-up")]
@@ -33,12 +40,26 @@ namespace backend.Modulos.User.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var token = await _authService.Login(dto);
+            var tokens = await _authService.Login(dto);
             
-            if (token == null)
+            if (tokens == null)
                 return Unauthorized(new { message = "Invalid email or password." });
+            
+            SetRefreshTokenCookie(tokens.RefreshToken);
 
-            return Ok(new { token });
+            return Ok(new { accessToken = tokens.AccessToken });
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = GetCurrentUserId();
+
+            await _authService.LogoutAsync(userId);
+            DeleteRefreshTokenCookie();
+
+            return Ok(new { message = "User logged out successfully" });
         }
 
         [Authorize]
@@ -83,6 +104,28 @@ namespace backend.Modulos.User.Controllers
             });
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            var refreshToken = Request.Cookies[RefreshTokenCookieName];
+
+            if (string.IsNullOrEmpty(refreshToken))
+                return Unauthorized(new { message = "Refresh token missing" });
+
+            var tokens = await _authService.RefreshTokenAsync(refreshToken);
+
+            if (tokens == null)
+            {
+                DeleteRefreshTokenCookie();
+                return Unauthorized(new { message = "Invalid or expired session" });
+            }
+
+            SetRefreshTokenCookie(tokens.RefreshToken);
+
+            return Ok(new { accessToken = tokens.AccessToken });
+        }
+
+
         private Guid GetCurrentUserId()
         {
             var userIdString = User.FindFirst("sub")?.Value
@@ -92,6 +135,32 @@ namespace backend.Modulos.User.Controllers
                 return userId;
 
             return Guid.Empty;
+        }
+
+        private void SetRefreshTokenCookie(string refreshToken)
+        {
+            var cookieOptions = BuildRefreshTokenCookieOptions();
+            cookieOptions.Expires = DateTimeOffset.UtcNow.AddDays(7);
+
+            Response.Cookies.Append(RefreshTokenCookieName, refreshToken, cookieOptions);
+        }
+
+        private void DeleteRefreshTokenCookie()
+        {
+            Response.Cookies.Delete(RefreshTokenCookieName, BuildRefreshTokenCookieOptions());
+        }
+
+        private CookieOptions BuildRefreshTokenCookieOptions()
+        {
+            var isDevelopment = _environment.IsDevelopment();
+
+            return new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = !isDevelopment,
+                SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
+                Path = "/api/users"
+            };
         }
     }
 }
