@@ -71,21 +71,99 @@ namespace backend.Tests
             phase.PhaseLength.Should().Be(5);
         }
 
-        [Fact]
-        public void CalculatePhaseInfo_ForOvulation_ReturnsOvulationWindowDay()
+        [Theory]
+        [InlineData(28, 9, 15, 14)]
+        [InlineData(30, 11, 17, 16)]
+        [InlineData(32, 13, 19, 18)]
+        public void CalculatePhaseInfo_ForOvulation_ShiftsWithCycleLength(
+            int cycleLength,
+            int expectedFertileStart,
+            int expectedFertileEnd,
+            int expectedOvulationDay)
         {
             var service = new CycleService(null!, null!);
+            var cycleStart = new DateOnly(2026, 6, 1);
 
-            var phase = service.CalculatePhaseInfo(
-                new DateOnly(2026, 6, 1),
-                28,
-                new DateOnly(2026, 6, 14),
+            var fertileStart = service.CalculatePhaseInfo(
+                cycleStart,
+                cycleLength,
+                cycleStart.AddDays(expectedFertileStart - 1),
                 5);
 
-            phase.Phase.Should().Be(ECyclePhase.Ovulation);
-            phase.CycleDay.Should().Be(14);
-            phase.PhaseDay.Should().Be(2);
-            phase.PhaseLength.Should().Be(3);
+            var ovulation = service.CalculatePhaseInfo(
+                cycleStart,
+                cycleLength,
+                cycleStart.AddDays(expectedOvulationDay - 1),
+                5);
+
+            var fertileEnd = service.CalculatePhaseInfo(
+                cycleStart,
+                cycleLength,
+                cycleStart.AddDays(expectedFertileEnd - 1),
+                5);
+
+            fertileStart.Phase.Should().Be(ECyclePhase.Ovulation);
+            fertileStart.CycleDay.Should().Be(expectedFertileStart);
+            fertileStart.PhaseDay.Should().Be(1);
+            fertileStart.PhaseLength.Should().Be(7);
+            fertileStart.OvulationDay.Should().Be(expectedOvulationDay);
+
+            ovulation.Phase.Should().Be(ECyclePhase.Ovulation);
+            ovulation.CycleDay.Should().Be(expectedOvulationDay);
+            ovulation.PhaseDay.Should().Be(6);
+            ovulation.PhaseLength.Should().Be(7);
+            ovulation.OvulationDay.Should().Be(expectedOvulationDay);
+
+            fertileEnd.Phase.Should().Be(ECyclePhase.Ovulation);
+            fertileEnd.CycleDay.Should().Be(expectedFertileEnd);
+            fertileEnd.PhaseDay.Should().Be(7);
+            fertileEnd.PhaseLength.Should().Be(7);
+            fertileEnd.OvulationDay.Should().Be(expectedOvulationDay);
+        }
+
+        [Theory]
+        [InlineData(28, 9, 15, 14)]
+        [InlineData(30, 11, 17, 16)]
+        [InlineData(32, 13, 19, 18)]
+        public void CalculateCycleInfo_ForFertileWindow_ShiftsWithCycleLength(
+            int cycleLength,
+            int expectedFertileStart,
+            int expectedFertileEnd,
+            int expectedOvulationDay)
+        {
+            var service = new CycleService(null!, null!);
+            var latestPeriod = Period(new DateOnly(2026, 6, 1));
+
+            var beforeFertileWindow = service.CalculateCycleInfo(
+                latestPeriod,
+                latestPeriod.StartDate.AddDays(expectedFertileStart - 2),
+                cycleLength);
+            var fertileStart = service.CalculateCycleInfo(
+                latestPeriod,
+                latestPeriod.StartDate.AddDays(expectedFertileStart - 1),
+                cycleLength);
+            var ovulation = service.CalculateCycleInfo(
+                latestPeriod,
+                latestPeriod.StartDate.AddDays(expectedOvulationDay - 1),
+                cycleLength);
+            var fertileEnd = service.CalculateCycleInfo(
+                latestPeriod,
+                latestPeriod.StartDate.AddDays(expectedFertileEnd - 1),
+                cycleLength);
+            var afterFertileWindow = service.CalculateCycleInfo(
+                latestPeriod,
+                latestPeriod.StartDate.AddDays(expectedFertileEnd),
+                cycleLength);
+
+            beforeFertileWindow.IsFertile.Should().BeFalse();
+            fertileStart.IsFertile.Should().BeTrue();
+            fertileStart.FertilityLevel.Should().Be("medium");
+            ovulation.IsOvulation.Should().BeTrue();
+            ovulation.FertilityLevel.Should().Be("high");
+            fertileEnd.IsFertile.Should().BeTrue();
+            fertileEnd.IsOvulation.Should().BeFalse();
+            fertileEnd.FertilityLevel.Should().Be("medium");
+            afterFertileWindow.IsFertile.Should().BeFalse();
         }
 
         private static PeriodDto Period(DateOnly startDate)

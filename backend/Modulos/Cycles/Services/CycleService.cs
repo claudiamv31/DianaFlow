@@ -92,10 +92,10 @@ namespace backend.Modulos.Cycles.Services
         {
             int cycleDay = date.DayNumber - latest.StartDate.DayNumber + 1;
             var cycleLength = avgCycleLength > 0 ? avgCycleLength : 28;
-            int estimatedOvulationDay = Math.Clamp(cycleLength - 14, 1, cycleLength);
-            
-            int fertileWindowStart = estimatedOvulationDay - 5;
-            int fertileWindowEnd = estimatedOvulationDay;
+            var fertileWindow = GetFertileWindow(cycleLength);
+            int fertileWindowStart = fertileWindow.Start;
+            int fertileWindowEnd = fertileWindow.End;
+            int estimatedOvulationDay = fertileWindow.OvulationDay;
             
             bool isOvulation = cycleDay == estimatedOvulationDay;
             bool isFertile = cycleDay > 0 && cycleDay >= fertileWindowStart && cycleDay <= fertileWindowEnd;
@@ -123,10 +123,10 @@ namespace backend.Modulos.Cycles.Services
             var cycleDay = date.DayNumber - periodStartDate.DayNumber + 1;
             var normalizedCycleLength = cycleLength > 0 ? cycleLength : 28;
             var normalizedPeriodLength = Math.Clamp(periodLength > 0 ? periodLength : 5, 1, normalizedCycleLength);
-            var ovulationMinDay = Math.Min(normalizedPeriodLength + 1, normalizedCycleLength);
-            var ovulationDay = Math.Clamp(normalizedCycleLength - 14, ovulationMinDay, normalizedCycleLength);
-            var ovulationStart = Math.Min(normalizedCycleLength, Math.Max(normalizedPeriodLength + 1, ovulationDay - 1));
-            var ovulationEnd = Math.Max(ovulationStart, Math.Min(normalizedCycleLength, ovulationDay + 1));
+            var fertileWindow = GetFertileWindow(normalizedCycleLength, normalizedPeriodLength + 1);
+            int ovulationStart = fertileWindow.Start;
+            int ovulationEnd = fertileWindow.End;
+            int ovulationDay = fertileWindow.OvulationDay;
 
             if (cycleDay <= 0)
             {
@@ -210,6 +210,18 @@ namespace backend.Modulos.Cycles.Services
             }
 
             return cachedMessage ?? "Listen to your body today.";
-        }       
+        }     
+
+        private static (int Start, int End, int OvulationDay) GetFertileWindow(int cycleLength, int minimumStartDay = 1)
+        {
+            var normalizedCycleLength = cycleLength > 0 ? cycleLength : 28;
+            var startFloor = Math.Clamp(minimumStartDay, 1, normalizedCycleLength);
+            var ovulationDay = Math.Clamp(normalizedCycleLength - 14, startFloor, normalizedCycleLength);
+            var fertileWindowStart = Math.Clamp(ovulationDay - 5, startFloor, normalizedCycleLength);
+            var fertileWindowEnd = Math.Clamp(ovulationDay + 1, startFloor, normalizedCycleLength);
+
+            return (fertileWindowStart, fertileWindowEnd, ovulationDay);
+        }  
+
     }
 }
