@@ -160,6 +160,7 @@ const CalendarPage = () => {
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorScreen onRetry={() => refetch()} />;
 
+  console.log('calendarDays', calendarDays);
 
   return (
     <>
@@ -222,11 +223,19 @@ const CalendarPage = () => {
             });
             setIsEditingPeriod(false);
           }}
-          initialDate={currentPeriod ? currentPeriod.startDate : formatDateLocal(selectedDate)}
-          endDate={currentPeriod ? currentPeriod.endDate : formatDateLocal(selectedDate)}
+          initialDate={
+            currentPeriod
+              ? currentPeriod.startDate
+              : formatDateLocal(selectedDate)
+          }
+          endDate={
+            currentPeriod
+              ? currentPeriod.endDate
+              : formatDateLocal(selectedDate)
+          }
           initialSelectedDays={currentPeriod ? currentPeriod.selectedDays : []}
           isInActivePeriod={!!currentPeriod}
-          durationDays={currentPeriod ? (currentPeriod.duration || 5) : 5}
+          durationDays={currentPeriod ? currentPeriod.duration || 5 : 5}
         />
       )}
     </>
