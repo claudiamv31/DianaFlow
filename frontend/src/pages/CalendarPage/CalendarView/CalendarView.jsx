@@ -37,6 +37,10 @@ const CalendarView = ({
       dayInfo?.isPeriod ||
       highlightPeriodDays?.includes(dateString);
 
+    const isOvulationDay = dayInfo?.fertilityLevel === 'high';
+
+    const isFertileDay = dayInfo?.fertilityLevel === 'medium';
+
     const isPredictedPeriodDay =
       nextPeriod &&
       dateString >= nextPeriod.startDate &&
@@ -46,6 +50,10 @@ const CalendarView = ({
       classes.push('calendar-day-selected');
     } else if (isToday) {
       classes.push('calendar-day-today');
+    } else if (isOvulationDay) {
+      classes.push('calendar-day-ovulation');
+    } else if (isFertileDay) {
+      classes.push('calendar-day-fertile');
     } else if (isPeriodDay) {
       classes.push('calendar-day-period');
     } else if (isPredictedPeriodDay) {

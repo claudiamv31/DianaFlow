@@ -47,6 +47,7 @@ module.exports = {
         "tertiary-fixed-dim": "#f0e0ca",
         "tertiary-dim": "#5c5240",
         "secondary": "#655884",
+        "fertility": "#358d95",
         "primary-fixed-dim": "#f29bab",
         "on-surface": "#34322f",
         "on-secondary-fixed-variant": "#615580",

@@ -47,6 +47,7 @@ namespace backend.Modulos.Cycles.Services
         public CycleStatus BuildCycleStatus(PeriodDto latest, int cycleLength, int periodLength, DateOnly today)
         {
             var nextPeriodStart = latest.StartDate.AddDays(cycleLength);
+            var cycleInfo = CalculateCycleInfo(latest, today, cycleLength);
             
             int daysDiff = nextPeriodStart.DayNumber - today.DayNumber;
             var cycleDay = today.DayNumber - latest.StartDate.DayNumber + 1;
@@ -84,7 +85,8 @@ namespace backend.Modulos.Cycles.Services
                 Status = status,
                 CycleDay = cycleDay,
                 Days = daysDiff,
-                PeriodDuration = (latest.EndDate?.DayNumber ?? 0) - latest.StartDate.DayNumber + 1
+                PeriodDuration = (latest.EndDate?.DayNumber ?? 0) - latest.StartDate.DayNumber + 1,
+                FertilityLevel = cycleInfo.FertilityLevel
             };
         }
 

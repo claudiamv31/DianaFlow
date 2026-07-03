@@ -166,6 +166,22 @@ namespace backend.Tests
             afterFertileWindow.IsFertile.Should().BeFalse();
         }
 
+        [Fact]
+        public void BuildCycleStatus_OnOvulationDay_IncludesFertilityLevel()
+        {
+            var service = new CycleService(null!, null!);
+            var latestPeriod = Period(new DateOnly(2026, 6, 1));
+
+            var status = service.BuildCycleStatus(
+                latestPeriod,
+                cycleLength: 28,
+                periodLength: 5,
+                today: new DateOnly(2026, 6, 14));
+
+            status.CycleDay.Should().Be(14);
+            status.FertilityLevel.Should().Be("high");
+        }
+
         private static PeriodDto Period(DateOnly startDate)
         {
             return new PeriodDto

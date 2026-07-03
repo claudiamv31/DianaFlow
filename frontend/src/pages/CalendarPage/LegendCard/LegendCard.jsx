@@ -15,6 +15,18 @@ const LegendCard = () => {
                     <span className="w-4 h-4 rounded-full bg-secondary/100"></span>
                     <span className="text-sm font-body text-on-surface">Today</span>
                 </li>
+                <li className='flex items-center gap-3'>
+                    <span className="flex w-4 h-4 items-center justify-center text-xs font-bold text-fertility">
+                        12
+                    </span>
+                    <span className="text-sm font-body text-on-surface">Fertile Day</span>
+                </li>
+                <li className='flex items-center gap-3'>
+                    <span className="flex w-4 h-4 items-center justify-center rounded-full border-2 border-dashed border-fertility text-xs font-bold text-fertility">
+                        14
+                    </span>
+                    <span className="text-sm font-body text-on-surface">Peak Fertility</span>
+                </li>
             </ul>
         </div>
     );

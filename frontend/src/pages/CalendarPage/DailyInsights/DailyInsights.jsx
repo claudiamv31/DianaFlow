@@ -41,7 +41,8 @@ const DailyInsigths = ({
               {cycleInfo?.date && formatMonthDay(cycleInfo.date)}
             </p>
             <h3 className="font-headline font-bold text-2xl text-on-surface">
-              {phaseName && `Cycle Phase: ${phaseName}`}
+              {phaseName &&
+                `Cycle Day ${hasCycleDay ? cycleInfo.cycleDay : '--'}`}
             </h3>
           </div>
           {isToday && (
@@ -52,26 +53,32 @@ const DailyInsigths = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 py-4 border-y border-outline-variant/30">
-          <div>
-            <p className="text-xs font-label font-semibold uppercase tracking-widest text-on-surface-variant">
-              Cycle day
-            </p>
-            <p className="font-headline font-bold text-xl text-on-surface">
-              {hasCycleDay ? cycleInfo.cycleDay : '--'}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-label font-semibold uppercase tracking-widest text-on-surface-variant">
-              {phaseDayLabel}
-            </p>
-            <p className="font-headline font-bold text-xl text-on-surface">
-              {formatPhaseDay(cycleInfo)}
-            </p>
-            {cycleInfo?.isOvulation && (
-              <p className="text-xs font-semibold !text-secondary mt-1">
-                Estimated ovulation day
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <p className="text-xs font-label font-semibold uppercase tracking-widest text-on-surface-variant">
+                {phaseDayLabel}
               </p>
-            )}
+              <p className="font-headline font-bold text-xl text-on-surface">
+                {formatPhaseDay(cycleInfo)}
+              </p>
+              {cycleInfo?.isOvulation && (
+                <p className="text-xs font-semibold !text-secondary mt-1">
+                  Estimated ovulation day
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-label font-semibold uppercase tracking-widest text-on-surface-variant">
+              Fertility probability
+            </p>
+            <p className="font-headline font-bold text-xl text-on-surface">
+              {hasCycleDay
+                ? cycleInfo.fertilityLevel.toString().charAt(0).toUpperCase() +
+                  cycleInfo.fertilityLevel.toString().slice(1)
+                : '--'}
+            </p>
           </div>
         </div>
 
