@@ -162,6 +162,23 @@
   color: #9c9691;
 }
 
+.calendar-view .react-calendar__tile.calendar-day-ovulation {
+  color: theme('colors.fertility');
+  font-weight: 600;
+}
+
+.calendar-view .react-calendar__tile.calendar-day-ovulation::before {
+  border-width: 2px;
+  border-style: dashed;
+  border-color: theme('colors.fertility');
+  background: transparent;
+}
+
+.calendar-view .react-calendar__tile.calendar-day-fertile {
+  color: theme('colors.fertility');
+  font-weight: 600;
+}
+
 @media (max-width: 1000px) {
   .calendar-view .react-calendar {
     --calendar-day-size: clamp(2.35rem, 8vw, 3.2rem);

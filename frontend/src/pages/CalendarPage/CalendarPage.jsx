@@ -160,7 +160,7 @@ const CalendarPage = () => {
   if (isLoading) return <LoadingSpinner />;
   if (error) return <ErrorScreen onRetry={() => refetch()} />;
 
-  //console.log('calendarDays', calendarDays);
+  console.log('calendarDays', calendarDays);
 
   return (
     <>

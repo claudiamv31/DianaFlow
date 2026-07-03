@@ -190,6 +190,8 @@ function Home() {
               <CurrentCycleCard
                 periodDuration={safeStatus?.cycleStatus?.periodDuration}
                 cycleDay={safeStatus?.cycleStatus?.cycleDay}
+                cycleLength={safeStatus?.cycleStatus?.cycleLength}
+                fertilityLevel={safeStatus?.cycleStatus?.fertilityLevel}
               />
               {safeStatus.previousCycle && (
                 <CycleInsightsCard previousCycle={safeStatus.previousCycle} />
