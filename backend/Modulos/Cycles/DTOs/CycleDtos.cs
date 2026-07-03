@@ -39,6 +39,7 @@ namespace backend.Modulos.Cycles.DTOs
         public int CurrentPeriodDay { get; set; }
         public int DaysLeftInPeriod { get; set; }
         public int? PeriodDuration { get; set; }
+        public string FertilityLevel { get; set; } = "low";
         
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public CycleRegularityLevel Consistency { get; set; } = CycleRegularityLevel.Unknown;
