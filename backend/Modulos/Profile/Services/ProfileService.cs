@@ -22,6 +22,7 @@ namespace backend.Modulos.Profile.Services
         {
             // Using plural _context.Profiles
             return await _context.Profiles
+                .AsNoTracking()
                 .Include(p => p.User)
                 .FirstOrDefaultAsync(p => p.UserId == userId);
         }

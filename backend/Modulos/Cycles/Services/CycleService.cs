@@ -195,13 +195,10 @@ namespace backend.Modulos.Cycles.Services
 
             if (!_cache.TryGetValue(cacheKey, out string? cachedMessage))
             {
-                var messages = await _context.PhaseMessages
-                    .Where(m => m.Phase == phase && m.MessageType == messageType)
-                    .Select(m => m.Message)
-                    .ToListAsync();
+                var messages = await GetPhaseMessagesAsync(phase, messageType);
 
-                cachedMessage = messages.Any() 
-                    ? messages[new Random().Next(messages.Count)] 
+                cachedMessage = messages.Any()
+                    ? messages[Random.Shared.Next(messages.Count)]
                     : "Listen to your body today.";
 
                 // Guardamos en caché para que si vuelve a tocar ese mismo día en la misma sesión, cargue al instante
@@ -212,7 +209,28 @@ namespace backend.Modulos.Cycles.Services
             }
 
             return cachedMessage ?? "Listen to your body today.";
-        }     
+        }
+
+        private async Task<List<string>> GetPhaseMessagesAsync(ECyclePhase phase, EPhaseMessageType messageType)
+        {
+            string cacheKey = $"PhaseMessages_{phase}_{messageType}";
+
+            if (!_cache.TryGetValue(cacheKey, out List<string>? messages))
+            {
+                messages = await _context.PhaseMessages
+                    .AsNoTracking()
+                    .Where(m => m.Phase == phase && m.MessageType == messageType && m.Message != null && m.Message != "")
+                    .Select(m => m.Message!)
+                    .ToListAsync();
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(12));
+
+                _cache.Set(cacheKey, messages, cacheEntryOptions);
+            }
+
+            return messages ?? new List<string>();
+        }
 
         private static (int Start, int End, int OvulationDay) GetFertileWindow(int cycleLength, int minimumStartDay = 1)
         {

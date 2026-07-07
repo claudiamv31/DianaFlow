@@ -59,7 +59,6 @@ namespace backend.Modulos.Cycles.Services
                     averageCycleLength,
                     day,
                     GetPeriodLength(cycleStartPeriod, averagePeriodLength));
-                var message = await _cycleService.GetCachedDailyInsightAsync(userId, phaseInfo.Phase, day);
 
                 calendar.Add(new CalendarDayDto
                 {
@@ -73,7 +72,6 @@ namespace backend.Modulos.Cycles.Services
                     Phase = phaseInfo.Phase.ToString(),
                     PhaseDay = phaseInfo.PhaseDay,
                     PhaseLength = phaseInfo.PhaseLength,
-                    DailyInsight = message,
                     Flow = periodDay?.Flow,
                     PeriodDaysId = periodDay?.Id
                 });

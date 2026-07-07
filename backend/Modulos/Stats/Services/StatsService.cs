@@ -27,7 +27,7 @@ namespace backend.Modulos.Stats.Services
         public async Task<StatsDto> GetStatsByUserId(Guid userId)
         {
             var periods = await _periodService.GetLast6PeriodsByUser(userId);
-            var nextPeriod = await _periodService.GetNextPeriodPredictionAsync(userId);
+            var nextPeriod = GetNextPeriodPrediction(periods);
 
             var stats = new StatsDto
             {
@@ -40,6 +40,23 @@ namespace backend.Modulos.Stats.Services
             };
 
             return stats;
+        }
+
+        private PeriodPredictionDto? GetNextPeriodPrediction(List<PeriodDto> periods)
+        {
+            if (periods == null || periods.Count == 0)
+                return null;
+
+            var avgCycleLength = _cycleService.CalculateAverageCycleLength(periods);
+            var lastPeriod = periods.OrderByDescending(p => p.StartDate).First();
+            var nextStartDate = lastPeriod.StartDate.AddDays(avgCycleLength);
+            var avgPeriodLength = CalculateAveragePeriodLength(periods);
+
+            return new PeriodPredictionDto
+            {
+                StartDate = nextStartDate,
+                EndDate = nextStartDate.AddDays(avgPeriodLength - 1)
+            };
         }
 
         private int CalculateAveragePeriodLength(List<PeriodDto> periods)

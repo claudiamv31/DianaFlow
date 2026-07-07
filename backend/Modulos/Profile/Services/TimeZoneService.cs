@@ -1,6 +1,7 @@
 using System;
 using backend.Data;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Modulos.Profile.Services
 {
@@ -25,7 +26,9 @@ namespace backend.Modulos.Profile.Services
                 return requestTimeZone;
             }
 
-            var profile = _context.Profiles.FirstOrDefault(p => p.UserId == userId);
+            var profile = _context.Profiles
+                .AsNoTracking()
+                .FirstOrDefault(p => p.UserId == userId);
             var profileTimeZone = NormalizeTimeZoneId(profile?.TimeZone);
             if (!string.IsNullOrEmpty(profileTimeZone))
             {

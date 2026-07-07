@@ -47,7 +47,9 @@ public class AuthService : IAuthService
 
     public async Task<AuthTokensDto?> Login(LoginDto dto)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.Email);
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Email == dto.Email);
         
         if (user == null || !_passwordService.VerifyPassword(dto.Password, user.PasswordHash))
             return null; // Return null if auth fails

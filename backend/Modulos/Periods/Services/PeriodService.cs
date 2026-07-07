@@ -29,6 +29,7 @@ namespace backend.Modulos.Periods.Services
         public virtual async Task<List<PeriodDto>> GetLast6PeriodsByUser(Guid userId)
         {
             var periods = await _context.Periods
+                .AsNoTracking()
                 .Where(p => p.UserId == userId)
                 .OrderByDescending(p => p.StartDate)
                 .Take(6)
@@ -36,6 +37,7 @@ namespace backend.Modulos.Periods.Services
 
             var periodIds = periods.Select(p => p.Id).ToList();
             var days = await _context.PeriodDays
+                .AsNoTracking()
                 .Where(pd => periodIds.Contains(pd.PeriodId))
                 .ToListAsync();
 
@@ -48,12 +50,14 @@ namespace backend.Modulos.Periods.Services
             var endYear = new DateOnly(year, 12, 31);
 
             var periods = await _context.Periods
+                .AsNoTracking()
                 .Where(p => p.UserId == userId && p.StartDate <= endYear && p.EndDate >= startYear)
                 .OrderByDescending(p => p.StartDate)
                 .ToListAsync();
 
             var periodIds = periods.Select(p => p.Id).ToList();
             var days = await _context.PeriodDays
+                .AsNoTracking()
                 .Where(pd => periodIds.Contains(pd.PeriodId))
                 .ToListAsync();
 
@@ -66,12 +70,14 @@ namespace backend.Modulos.Periods.Services
             var endMonth = startMonth.AddMonths(1).AddDays(-1);
 
             var periods = await _context.Periods
+                .AsNoTracking()
                 .Where(p => p.UserId == userId && p.StartDate <= endMonth && p.EndDate >= startMonth)
                 .OrderByDescending(p => p.StartDate)
                 .ToListAsync();
 
             var periodIds = periods.Select(p => p.Id).ToList();
             var days = await _context.PeriodDays
+                .AsNoTracking()
                 .Where(pd => periodIds.Contains(pd.PeriodId))
                 .ToListAsync();
 
@@ -81,6 +87,7 @@ namespace backend.Modulos.Periods.Services
         public virtual async Task<List<PeriodDto>> GetPeriodsPagination(Guid userId, int page, int pageSize)
         {
             var periods = await _context.Periods
+                .AsNoTracking()
                 .Where(p => p.UserId == userId)
                 .OrderByDescending(p => p.StartDate)
                 .Skip((page - 1) * pageSize)
@@ -89,6 +96,7 @@ namespace backend.Modulos.Periods.Services
 
             var periodIds = periods.Select(p => p.Id).ToList();
             var days = await _context.PeriodDays
+                .AsNoTracking()
                 .Where(pd => periodIds.Contains(pd.PeriodId))
                 .ToListAsync();
 
@@ -98,6 +106,7 @@ namespace backend.Modulos.Periods.Services
         public virtual async Task<PeriodDto?> GetLatestPeriodAsync(Guid userId)
         {
             var period = await _context.Periods
+                .AsNoTracking()
                 .Where(p => p.UserId == userId)
                 .OrderByDescending(p => p.StartDate)
                 .FirstOrDefaultAsync();
@@ -105,6 +114,7 @@ namespace backend.Modulos.Periods.Services
             if (period == null) return null;
 
             var days = await _context.PeriodDays
+                .AsNoTracking()
                 .Where(pd => pd.PeriodId == period.Id)
                 .ToListAsync();
 
@@ -187,11 +197,14 @@ namespace backend.Modulos.Periods.Services
 
         public virtual async Task<PeriodDto?> GetPeriodById(int id, string userTimeZoneId)
         {
-            var period = await _context.Periods.FindAsync(id);
+            var period = await _context.Periods
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id);
             if (period == null) return null;
             
             var today = _timeZoneService.GetProfileToday(userTimeZoneId);
             var days = await _context.PeriodDays
+                .AsNoTracking()
                 .Where(pd => pd.PeriodId == period.Id)
                 .ToListAsync();
 
@@ -215,6 +228,7 @@ namespace backend.Modulos.Periods.Services
         public virtual async Task<List<backend.Modulos.Periods.Models.PeriodDays>> GetPeriodsDaysByUserId(Guid userId)
         {
             return await _context.PeriodDays
+                .AsNoTracking()
                 .Include(pd => pd.Periods)
                 .Where(pd => pd.Periods!.UserId == userId)
                 .ToListAsync();
