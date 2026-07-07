@@ -10,6 +10,7 @@ import CycleInsightsCard from './CycleInsightsCard/CycleInsigthCard';
 import YourPeriodCard from './YourPeriod/YourPeriodCard';
 import CurrentCycleCard from './CurrentCycleCard/CurrentCycleCard';
 import LogTodayModal from '../../components/LogTodayModal/LogTodayModal';
+import LogFlow from '../../components/LogFlow/LogFlow';
 import Button from '../../components/Button';
 import { formatDateLocal } from '../../utils/calendarUtils';
 import { refreshCycleQueries } from '../../utils/queryInvalidation';
@@ -25,6 +26,7 @@ function Home() {
   const queryClient = useQueryClient();
   const [user, setUser] = useState(null);
   const [isLoggingToday, setIsLoggingToday] = useState(false);
+  const [isLoggingNewPeriod, setIsLoggingNewPeriod] = useState(false);
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser) => {
@@ -63,23 +65,14 @@ function Home() {
   const logTodayMutation = useMutation({
     mutationFn: async (flowIntensity) => {
       const todayStr = statusOfPeriod?.today || formatDateLocal(new Date());
-      if (statusOfPeriod && statusOfPeriod.isActive) {
-        // Today is within an active period, update day flow
-        return await apiClient.put(`/periods/day`, {
-          date: todayStr,
-          flow: flowIntensity
-        });
-      } else if (flowIntensity > 0) {
-        // Today is not in a period, start a new period today
-        return await apiClient.post(`/periods`, {
-          selectedDays: [
-            {
-              date: todayStr,
-              flow: flowIntensity
-            }
-          ]
-        });
+      if (!statusOfPeriod?.isActive) {
+        throw new Error('Flow can only be logged during an active period.');
       }
+
+      return await apiClient.put(`/periods/day`, {
+        date: todayStr,
+        flow: flowIntensity
+      });
     },
     onSuccess: async () => {
       await refreshCycleQueries(queryClient);
@@ -89,6 +82,28 @@ function Home() {
     },
     onError: (err) => {
       toast.error('Could not save log. Please try again.', {
+        icon: '⚠️'
+      });
+    }
+  });
+
+  const savePeriodMutation = useMutation({
+    mutationFn: async (selectedDays) => {
+      return await apiClient.post(`/periods`, {
+        selectedDays: selectedDays.map((date) => ({
+          date,
+          flow: 2
+        }))
+      });
+    },
+    onSuccess: async () => {
+      await refreshCycleQueries(queryClient);
+      toast.success('Period saved successfully', {
+        icon: '🌸'
+      });
+    },
+    onError: () => {
+      toast.error('Could not save period. Please try again.', {
         icon: '⚠️'
       });
     }
@@ -130,13 +145,14 @@ function Home() {
   };
 
   const handleSaveToday = (flowIntensity) => {
-    if (statusOfPeriod?.isActive || flowIntensity > 0) {
+    if (statusOfPeriod?.isActive) {
       logTodayMutation.mutate(flowIntensity, {
         onSuccess: () => setIsLoggingToday(false)
       });
       return;
     }
     setIsLoggingToday(false);
+    setIsLoggingNewPeriod(true);
   };
 
   if (isLoading || statusOfPeriod === undefined) return <LoadingSpinner />;
@@ -150,6 +166,9 @@ function Home() {
   const todayStr = safeStatus.today || formatDateLocal(new Date());
   const todayRecord = safeStatus.selectedDays?.find((d) => d.date === todayStr);
   const todayFlow = todayRecord ? todayRecord.flow : 0;
+  const isPeriodActive = safeStatus.isActive === true;
+  const suggestedPeriodDuration =
+    safeStatus.durationDays || safeStatus.cycleStatus?.periodDuration || 5;
 
   return (
     <>
@@ -179,9 +198,16 @@ function Home() {
           <Button
             variant="primary"
             className="w-48 mt-2"
-            onClick={() => setIsLoggingToday(true)}
+            onClick={() => {
+              if (isPeriodActive) {
+                setIsLoggingToday(true);
+                return;
+              }
+
+              setIsLoggingNewPeriod(true);
+            }}
           >
-            Log Today
+            {isPeriodActive ? 'Log Today' : 'Log a New Period'}
           </Button>
         </section>
 
@@ -216,6 +242,24 @@ function Home() {
           initialFlow={todayFlow}
           todayDate={todayStr}
           isSaving={logTodayMutation.isPending}
+        />
+      )}
+
+      {isLoggingNewPeriod && (
+        <LogFlow
+          key={`home-new-${todayStr}`}
+          onClose={() => setIsLoggingNewPeriod(false)}
+          onSave={(data) => {
+            savePeriodMutation.mutate(data.SelectedDays, {
+              onSuccess: () => setIsLoggingNewPeriod(false)
+            });
+          }}
+          initialDate={todayStr}
+          endDate={todayStr}
+          initialSelectedDays={[]}
+          isInActivePeriod={false}
+          durationDays={suggestedPeriodDuration}
+          isSaving={savePeriodMutation.isPending}
         />
       )}
     </>
