@@ -37,11 +37,26 @@ namespace backend.Data
                 .HasForeignKey(pd => pd.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Periods>()
+                .HasIndex(p => new { p.UserId, p.StartDate });
+
+            modelBuilder.Entity<Periods>()
+                .HasIndex(p => new { p.UserId, p.EndDate });
+
             modelBuilder.Entity<PeriodDays>()
                 .HasOne(pd => pd.Periods)    
                 .WithMany()
                 .HasForeignKey(pd => pd.PeriodId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PeriodDays>()
+                .HasIndex(pd => new { pd.PeriodId, pd.Date });
+
+            modelBuilder.Entity<PeriodDays>()
+                .HasIndex(pd => pd.Date);
+
+            modelBuilder.Entity<PhaseMessages>()
+                .HasIndex(m => new { m.Phase, m.MessageType });
             
             modelBuilder.Entity<Profile>()
                 .HasOne(p => p.User)
@@ -62,6 +77,9 @@ namespace backend.Data
             modelBuilder.Entity<RefreshToken>()
                 .HasIndex(rt => rt.Token)
                 .IsUnique();
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasIndex(rt => new { rt.UserId, rt.IsRevoked });
         }
     }
 }

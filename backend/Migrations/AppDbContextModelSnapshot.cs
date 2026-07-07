@@ -41,6 +41,8 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Phase", "MessageType");
+
                     b.ToTable("PhaseMessages");
                 });
 
@@ -73,7 +75,11 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Date");
+
                     b.HasIndex("PeriodId");
+
+                    b.HasIndex("PeriodId", "Date");
 
                     b.ToTable("PeriodDays");
                 });
@@ -104,6 +110,10 @@ namespace backend.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "EndDate");
+
+                    b.HasIndex("UserId", "StartDate");
 
                     b.ToTable("Periods");
                 });
@@ -173,6 +183,8 @@ namespace backend.Migrations
                         .IsUnique();
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "IsRevoked");
 
                     b.ToTable("RefreshTokens");
                 });
