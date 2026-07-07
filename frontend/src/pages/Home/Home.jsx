@@ -131,7 +131,10 @@ function Home() {
 
   const handleSaveToday = (flowIntensity) => {
     if (statusOfPeriod?.isActive || flowIntensity > 0) {
-      logTodayMutation.mutate(flowIntensity);
+      logTodayMutation.mutate(flowIntensity, {
+        onSuccess: () => setIsLoggingToday(false)
+      });
+      return;
     }
     setIsLoggingToday(false);
   };
@@ -212,6 +215,7 @@ function Home() {
           onSave={handleSaveToday}
           initialFlow={todayFlow}
           todayDate={todayStr}
+          isSaving={logTodayMutation.isPending}
         />
       )}
     </>

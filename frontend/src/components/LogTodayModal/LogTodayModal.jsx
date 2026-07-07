@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import Button from '../Button';
 import { formatLongDate } from '../../utils/calendarUtils';
+import LoadingSpinner from '../LoadingSpinner';
 
-const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
+const LogTodayModal = ({
+  onClose,
+  onSave,
+  initialFlow = 0,
+  todayDate,
+  isSaving = false
+}) => {
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -34,7 +41,7 @@ const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/20 backdrop-blur-sm transition-opacity duration-300"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget && !isSaving) onClose();
       }}
     >
       <div
@@ -54,6 +61,7 @@ const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
           <button
             className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors group"
             onClick={onClose}
+            disabled={isSaving}
           >
             <span className="material-symbols-outlined text-gray-600 group-active:scale-90 transition-transform">
               close
@@ -72,7 +80,9 @@ const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
               {/* None */}
               <div
                 className="flex flex-col items-center gap-3 cursor-pointer flex-1"
-                onClick={() => setCurrentFlowIntensity(0)}
+                onClick={() => {
+                  if (!isSaving) setCurrentFlowIntensity(0);
+                }}
               >
                 <div
                   className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(0)}`}
@@ -94,7 +104,9 @@ const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
               {/* Light */}
               <div
                 className="flex flex-col items-center gap-3 cursor-pointer flex-1"
-                onClick={() => setCurrentFlowIntensity(1)}
+                onClick={() => {
+                  if (!isSaving) setCurrentFlowIntensity(1);
+                }}
               >
                 <div
                   className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(1)}`}
@@ -116,7 +128,9 @@ const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
               {/* Medium */}
               <div
                 className="flex flex-col items-center gap-3 cursor-pointer flex-1"
-                onClick={() => setCurrentFlowIntensity(2)}
+                onClick={() => {
+                  if (!isSaving) setCurrentFlowIntensity(2);
+                }}
               >
                 <div
                   className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(2)}`}
@@ -146,7 +160,9 @@ const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
               {/* Heavy */}
               <div
                 className="flex flex-col items-center gap-3 cursor-pointer flex-1"
-                onClick={() => setCurrentFlowIntensity(3)}
+                onClick={() => {
+                  if (!isSaving) setCurrentFlowIntensity(3);
+                }}
               >
                 <div
                   className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(3)}`}
@@ -174,11 +190,26 @@ const LogTodayModal = ({ onClose, onSave, initialFlow = 0, todayDate }) => {
             <button
               className="h-14 w-full flex items-center justify-center font-headline font-bold text-gray-500 hover:bg-gray-100 transition-all rounded-full active:scale-95"
               onClick={onClose}
+              disabled={isSaving}
             >
               Cancel
             </button>
-            <Button className="w-full" variant="primary" onClick={handleSave}>
-              Save Log
+            <Button
+              className="w-full"
+              variant="primary"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <LoadingSpinner
+                  size="sm"
+                  layout="inline"
+                  tone="current"
+                  label="Saving log"
+                />
+              ) : (
+                'Save Log'
+              )}
             </Button>
           </div>
         </div>

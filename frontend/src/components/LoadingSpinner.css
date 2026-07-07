@@ -1,25 +1,107 @@
-.spinner {
+.loading-spinner {
+  --spinner-size: 2.75rem;
+  --spinner-thickness: 0.34rem;
+  --spinner-track: rgba(144, 73, 88, 0.14);
+  --spinner-highlight: var(--secondary-color);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 600px;
-}
-.spinner:after {
-  content: '';
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 6px solid var(--primary-color);
-  border-color: var(--primary-color) transparent var(--primary-color)
-    transparent;
-  animation: spinner 1.2s linear infinite;
+  color: var(--primary-color);
 }
 
-@keyframes spinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+.loading-spinner--page {
+  min-height: min(60vh, 600px);
+  width: 100%;
+}
+
+.loading-spinner--screen {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.loading-spinner--center {
+  min-height: 8rem;
+  width: 100%;
+}
+
+.loading-spinner--inline {
+  display: inline-flex;
+  width: auto;
+  min-height: 0;
+  vertical-align: middle;
+}
+
+.loading-spinner--sm {
+  --spinner-size: 1.15rem;
+  --spinner-thickness: 0.16rem;
+}
+
+.loading-spinner--md {
+  --spinner-size: 2.75rem;
+  --spinner-thickness: 0.34rem;
+}
+
+.loading-spinner--lg {
+  --spinner-size: 4rem;
+  --spinner-thickness: 0.44rem;
+}
+
+.loading-spinner--current {
+  --spinner-track: rgba(255, 255, 255, 0.32);
+  --spinner-highlight: currentColor;
+
+  color: inherit;
+}
+
+.loading-spinner__ring {
+  position: relative;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  border-radius: 50%;
+}
+
+.loading-spinner__ring::before,
+.loading-spinner__ring::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.loading-spinner__ring::before {
+  border: var(--spinner-thickness) solid var(--spinner-track);
+}
+
+.loading-spinner__ring::after {
+  background: conic-gradient(
+    from 90deg,
+    transparent 0 18%,
+    currentColor 42%,
+    var(--spinner-highlight) 74%,
+    transparent 100%
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--spinner-thickness)),
+    #000 0
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--spinner-thickness)),
+    #000 0
+  );
+  animation: loading-spinner-rotate 0.85s linear infinite;
+}
+
+@keyframes loading-spinner-rotate {
+  to {
     transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-spinner__ring::after {
+    animation-duration: 1.8s;
   }
 }

@@ -24,7 +24,7 @@ const HistoryPeriod = ({ latestPeriods }) => {
   });
 
   const handleSave = (payload) => {
-    saveLogMutation.mutate(payload);
+    return saveLogMutation.mutateAsync(payload);
   };
 
   if (!latestPeriods || latestPeriods.length === 0) {

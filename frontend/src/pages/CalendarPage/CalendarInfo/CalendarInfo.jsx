@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../../../api/apiClient';
 import PrimaryButton from '../../../components/PrimaryButton';
 import { refreshCycleQueries } from '../../../utils/queryInvalidation';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 import './CalendarInfo.css';
 
 const CalendarInfo = ({
@@ -77,10 +78,13 @@ const CalendarInfo = ({
     }
   });
 
+  const isSavingPeriod =
+    deletePeriodMutation.isPending || upsertPeriodMutation.isPending;
+
   return (
     <div className="calendar-info">
       {!cycleInfo ? (
-        <div className="calendar-info__placeholder">Loading day info…</div>
+        <LoadingSpinner layout="center" size="md" />
       ) : (
         <div className="day-info">
           <p>
@@ -99,6 +103,7 @@ const CalendarInfo = ({
       <div className="update-button">
         {!isEditingPeriod ? (
           <PrimaryButton
+            disabled={isSavingPeriod}
             onClick={(e) => {
               e.preventDefault();
               setIsEditingPeriod(true);
@@ -108,13 +113,25 @@ const CalendarInfo = ({
           </PrimaryButton>
         ) : (
           <div style={{ display: 'flex', gap: '10px' }}>
-            <PrimaryButton onClick={handleSavePeriod}>Save</PrimaryButton>
+            <PrimaryButton onClick={handleSavePeriod} disabled={isSavingPeriod}>
+              {isSavingPeriod ? (
+                <LoadingSpinner
+                  size="sm"
+                  layout="inline"
+                  tone="current"
+                  label="Saving period"
+                />
+              ) : (
+                'Save'
+              )}
+            </PrimaryButton>
             <PrimaryButton
               onClick={() => {
                 setPeriodDays([]);
                 setIsEditingPeriod(false);
               }}
               style={{ backgroundColor: '#999' }}
+              disabled={isSavingPeriod}
             >
               Cancel
             </PrimaryButton>

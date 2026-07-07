@@ -4,6 +4,7 @@ import PeriodEditModal from '../../components/PeriodEditModal/PeriodEditModal';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { refreshCycleQueries } from '../../utils/queryInvalidation';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const ArchivePage = () => {
   const queryClient = useQueryClient();
@@ -152,6 +153,8 @@ const ArchivePage = () => {
   };
 
   const groupedPeriods = groupPeriodsByYear(periods);
+  const isInitialLoading = loading && periods.length === 0;
+  const isLoadingMore = loading && periods.length > 0;
 
   return (
     <div className="min-h-screen bg-surface text-on-surface">
@@ -165,6 +168,8 @@ const ArchivePage = () => {
             A sanctuary for your past cycles. Reflect on your body's rhythm and insights over the seasons.
           </p>
         </header>
+
+        {isInitialLoading && <LoadingSpinner layout="center" size="lg" />}
 
         {periods.length === 0 && !loading && (
           <p className="text-on-surface-variant text-sm text-center py-8">
@@ -235,9 +240,9 @@ const ArchivePage = () => {
           ))}
         </div>
 
-        {loading && (
+        {isLoadingMore && (
           <div className="flex justify-center py-6">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            <LoadingSpinner layout="inline" size="md" />
           </div>
         )}
 

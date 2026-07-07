@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useChangePassword } from '../../../hooks/useProfileHooks';
 import Button from '../../../components/Button';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
   const changePasswordMutation = useChangePassword();
@@ -236,7 +237,16 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 className="w-full h-14"
                 disabled={changePasswordMutation.isPending}
               >
-                {changePasswordMutation.isPending ? 'Changing...' : 'Change'}
+                {changePasswordMutation.isPending ? (
+                  <LoadingSpinner
+                    size="sm"
+                    layout="inline"
+                    tone="current"
+                    label="Changing password"
+                  />
+                ) : (
+                  'Change'
+                )}
               </Button>
             </div>
           </div>

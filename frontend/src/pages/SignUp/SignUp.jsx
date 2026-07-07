@@ -8,6 +8,7 @@ import leftCardImg from '../../assets/login-left-card.png';
 import rightCardImg from '../../assets/login-right-card.png';
 
 import Button from '../../components/Button';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -15,6 +16,7 @@ const SignUp = () => {
   const [name, setName] = useState('');
   const [lastName, setLastName] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
@@ -34,6 +36,7 @@ const SignUp = () => {
       return;
     }
 
+    setLoading(true);
     try {
       await apiClient.post('/users/sign-up', {
         Name: name,
@@ -56,6 +59,8 @@ const SignUp = () => {
       setFieldErrors({
         form: errorMessage
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -273,8 +278,22 @@ const SignUp = () => {
                 {fieldErrors.form}
               </p>
             )}
-            <Button type="submit" variant="primary">
-              Sign Up
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={loading}
+              className="min-w-[7rem]"
+            >
+              {loading ? (
+                <LoadingSpinner
+                  size="sm"
+                  layout="inline"
+                  tone="current"
+                  label="Creating account"
+                />
+              ) : (
+                'Sign Up'
+              )}
             </Button>
           </form>
         </div>

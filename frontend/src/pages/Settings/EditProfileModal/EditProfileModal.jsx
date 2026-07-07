@@ -6,6 +6,7 @@ import {
 import Button from '../../../components/Button';
 import { API_URL } from '../../../config';
 import defaultProfilePic from '../../../assets/default-profile-pic.png';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 const DEFAULT_AVATAR = defaultProfilePic;
 
@@ -286,7 +287,16 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 className="w-full h-14"
                 disabled={updateProfileMutation.isPending || profileLoading}
               >
-                {updateProfileMutation.isPending ? 'Saving...' : 'Save'}
+                {updateProfileMutation.isPending ? (
+                  <LoadingSpinner
+                    size="sm"
+                    layout="inline"
+                    tone="current"
+                    label="Saving profile"
+                  />
+                ) : (
+                  'Save'
+                )}
               </Button>
             </div>
           </div>

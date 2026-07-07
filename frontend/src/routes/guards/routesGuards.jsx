@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { checkUser } from '../../database/authService';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 export function PrivateRoute({ children }) {
   const [user, setUser] = useState(null);
@@ -15,7 +16,7 @@ export function PrivateRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <p>Cargando...</p>;
+    return <LoadingSpinner layout="screen" size="lg" />;
   }
 
   return user ? children : <Navigate to="/login" />;
@@ -34,7 +35,7 @@ export function PublicRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <p>Cargando...</p>;
+    return <LoadingSpinner layout="screen" size="lg" />;
   }
 
   return !user ? children : <Navigate to="/" />;

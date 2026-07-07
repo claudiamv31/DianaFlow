@@ -5,6 +5,7 @@ import leftCardImg from '../../assets/login-left-card.png';
 import rightCardImg from '../../assets/login-right-card.png';
 import './Login.css';
 import Button from '../../components/Button';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -215,8 +216,22 @@ function Login() {
             )}
 
             {/* Submit Button */}
-            <Button type="submit" disabled={loading} variant="primary">
-              {loading ? 'Signing In...' : 'Sign In'}
+            <Button
+              type="submit"
+              disabled={loading}
+              variant="primary"
+              className="min-w-[7rem]"
+            >
+              {loading ? (
+                <LoadingSpinner
+                  size="sm"
+                  layout="inline"
+                  tone="current"
+                  label="Signing in"
+                />
+              ) : (
+                'Sign In'
+              )}
             </Button>
           </form>
 

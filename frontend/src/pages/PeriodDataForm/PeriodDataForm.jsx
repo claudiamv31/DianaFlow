@@ -3,6 +3,7 @@ import { checkUser } from '../../database/authService';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
 import { buildPeriodPayload } from '../../utils/periodPayload';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const PeriodDataForm = () => {
   const [daysOfPeriod, setDaysPeriod] = useState(5);
@@ -41,7 +42,7 @@ const PeriodDataForm = () => {
     }
   };
 
-  if (loading) return <p>Loading user...</p>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <form onSubmit={handleSubmit}>

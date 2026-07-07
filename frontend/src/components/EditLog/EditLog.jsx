@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { formatDateLocal } from '../../utils/calendarUtils';
 import { refreshCycleQueries } from '../../utils/queryInvalidation';
 import Button from '../Button';
+import LoadingSpinner from '../LoadingSpinner';
 
 const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
   useEffect(() => {
@@ -63,7 +64,8 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
       onClick={(e) => {
-        if (e.target === e.currentTarget) handleCancel();
+        if (e.target === e.currentTarget && !saveLogMutation.isPending)
+          handleCancel();
       }}
     >
       <div
@@ -87,6 +89,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
           <button
             className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
             onClick={handleCancel}
+            disabled={saveLogMutation.isPending}
           >
             <span className="material-symbols-outlined text-on-surface-variant group-active:scale-90 transition-transform">
               close
@@ -108,7 +111,9 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
               <div className="flex flex-col items-center gap-3 group cursor-pointer">
                 <div
                   className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(0)}`}
-                  onClick={() => setCurrentFlowIntensity(0)}
+                  onClick={() => {
+                    if (!saveLogMutation.isPending) setCurrentFlowIntensity(0);
+                  }}
                 >
                   <span
                     className="material-symbols-outlined text-3xl"
@@ -128,7 +133,9 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
               <div className="flex flex-col items-center gap-3 group cursor-pointer">
                 <div
                   className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(1)}`}
-                  onClick={() => setCurrentFlowIntensity(1)}
+                  onClick={() => {
+                    if (!saveLogMutation.isPending) setCurrentFlowIntensity(1);
+                  }}
                 >
                   <span
                     className="material-symbols-outlined text-3xl"
@@ -146,7 +153,9 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
               <div className="flex flex-col items-center gap-3 group cursor-pointer">
                 <div
                   className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(2)}`}
-                  onClick={() => setCurrentFlowIntensity(2)}
+                  onClick={() => {
+                    if (!saveLogMutation.isPending) setCurrentFlowIntensity(2);
+                  }}
                 >
                   <div className="flex gap-[-4px]">
                     <span
@@ -172,7 +181,9 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
               <div className="flex flex-col items-center gap-3 group cursor-pointer">
                 <div
                   className={`w-14 h-14 rounded-full border-2 flex items-center justify-center transition-colors ${addClassIfSelected(3)}`}
-                  onClick={() => setCurrentFlowIntensity(3)}
+                  onClick={() => {
+                    if (!saveLogMutation.isPending) setCurrentFlowIntensity(3);
+                  }}
                 >
                   <span
                     className="material-symbols-outlined text-4xl"
@@ -197,11 +208,26 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
             <button
               className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
               onClick={handleCancel}
+              disabled={saveLogMutation.isPending}
             >
               Cancel
             </button>
-            <Button className="w-full" variant="primary" onClick={handleSaveLog}>
-              Save Log
+            <Button
+              className="w-full"
+              variant="primary"
+              onClick={handleSaveLog}
+              disabled={saveLogMutation.isPending}
+            >
+              {saveLogMutation.isPending ? (
+                <LoadingSpinner
+                  size="sm"
+                  layout="inline"
+                  tone="current"
+                  label="Saving log"
+                />
+              ) : (
+                'Save Log'
+              )}
             </Button>
           </div>
         </div>

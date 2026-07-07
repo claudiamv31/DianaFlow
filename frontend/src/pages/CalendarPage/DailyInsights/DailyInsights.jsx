@@ -1,5 +1,6 @@
 import { FaEdit } from 'react-icons/fa';
 import { formatMonthDay, formatDateLocal } from '../../../utils/calendarUtils';
+import LoadingSpinner from '../../../components/LoadingSpinner';
 
 const phaseDayLabels = {
   Menstruation: 'Menstruation day',
@@ -23,6 +24,7 @@ const formatPhaseDay = (cycleInfo) => {
 
 const DailyInsigths = ({
   cycleInfo,
+  isLoading = false,
   setIsEditingPeriod,
   setIsDailyLogActive,
   isPeriod
@@ -31,6 +33,16 @@ const DailyInsigths = ({
   const hasCycleDay = cycleInfo?.cycleDay && cycleInfo.cycleDay > 0;
   const phaseName = cycleInfo?.phase || 'Cycle';
   const phaseDayLabel = phaseDayLabels[cycleInfo?.phase] || 'Phase day';
+
+  if (isLoading) {
+    return (
+      <div className="md:col-span-4 flex flex-col gap-6">
+        <div className="bg-surface-container-highest/50 border border-outline-variant/30 p-6 rounded-lg animate-slide-in shadow-lg">
+          <LoadingSpinner layout="center" size="md" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="md:col-span-4 flex flex-col gap-6">

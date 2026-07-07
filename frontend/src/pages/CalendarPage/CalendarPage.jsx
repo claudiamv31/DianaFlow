@@ -114,7 +114,7 @@ const CalendarPage = () => {
   };
 
   // 🔹 Info del día
-  const { data: cycleInfo } = useQuery({
+  const { data: cycleInfo, isLoading: isDayInfoLoading } = useQuery({
     queryKey: ['calendar-day', user?.id, selectedDate],
     queryFn: async () => {
       if (!selectedDate) return null;
@@ -185,6 +185,7 @@ const CalendarPage = () => {
           <div className="cards-container">
             <DailyInsigths
               cycleInfo={cycleInfo}
+              isLoading={isDayInfoLoading}
               setIsEditingPeriod={setIsEditingPeriod}
               selectedDate={selectedDate}
               setIsDailyLogActive={setIsDailyLogActive}
@@ -209,17 +210,21 @@ const CalendarPage = () => {
           key={`${currentPeriod?.id || 'new'}-${formatDateLocal(selectedDate)}`}
           onClose={() => setIsEditingPeriod(false)}
           onSave={(data) => {
-            saveCycle.mutate({
-              selectedDays: data.SelectedDays.map((d) => ({
-                date: d,
-                flow: 2
-              })),
-              periodId:
-                currentPeriod && !data.shouldCreateNewPeriod
-                  ? Number(currentPeriod.id)
-                  : null
-            });
-            setIsEditingPeriod(false);
+            saveCycle.mutate(
+              {
+                selectedDays: data.SelectedDays.map((d) => ({
+                  date: d,
+                  flow: 2
+                })),
+                periodId:
+                  currentPeriod && !data.shouldCreateNewPeriod
+                    ? Number(currentPeriod.id)
+                    : null
+              },
+              {
+                onSuccess: () => setIsEditingPeriod(false)
+              }
+            );
           }}
           initialDate={
             currentPeriod
@@ -234,6 +239,7 @@ const CalendarPage = () => {
           initialSelectedDays={currentPeriod ? currentPeriod.selectedDays : []}
           isInActivePeriod={!!currentPeriod}
           durationDays={currentPeriod ? currentPeriod.duration || 5 : 5}
+          isSaving={saveCycle.isPending}
         />
       )}
     </>

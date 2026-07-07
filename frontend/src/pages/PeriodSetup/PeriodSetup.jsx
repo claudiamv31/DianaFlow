@@ -5,6 +5,7 @@ import apiClient from '../../api/apiClient';
 import PeriodDataWizard from '../../components/PeriodDataWizard/PeriodDataWizard';
 import toast from 'react-hot-toast';
 import { buildPeriodPayload } from '../../utils/periodPayload';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
 const PeriodSetup = () => {
   const [user, setUser] = useState(null);
@@ -50,7 +51,7 @@ const PeriodSetup = () => {
           className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col items-center justify-center"
           style={{ height: '300px', borderRadius: '3rem' }}
         >
-          <div className="w-12 h-12 border-4 border-surface-container-high border-t-primary/100 rounded-full animate-spin" />
+          <LoadingSpinner layout="center" size="lg" />
         </div>
       </div>
     );

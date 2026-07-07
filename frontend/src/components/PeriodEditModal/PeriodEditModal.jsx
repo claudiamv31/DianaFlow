@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Button from '../Button';
 import CustomDatePicker from '../PeriodDataWizard/CustomDatePicker';
+import LoadingSpinner from '../LoadingSpinner';
 
 const PeriodEditModal = ({ period, onClose, onSave }) => {
   useEffect(() => {
@@ -13,6 +14,14 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
   const [startDate, setStartDate] = useState('');
   const [selectedDates, setSelectedDates] = useState([]);
   const [bleedingDays, setBleedingDays] = useState(1);
+  const [isSaving, setIsSaving] = useState(false);
+  const isMounted = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (period) {
@@ -41,22 +50,32 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
     }
   }, [startDate, bleedingDays]);
 
-  const handleSave = () => {
-    onSave({
-      PeriodId: period.id,
-      SelectedDays: selectedDates.map((date) => ({
-        date,
-        flow: 1
-      }))
-    });
-    onClose();
+  const handleSave = async () => {
+    if (isSaving) return;
+
+    setIsSaving(true);
+    try {
+      await Promise.resolve(
+        onSave({
+          PeriodId: period.id,
+          SelectedDays: selectedDates.map((date) => ({
+            date,
+            flow: 1
+          }))
+        })
+      );
+    } catch (error) {
+      console.error('Error saving period:', error);
+    } finally {
+      if (isMounted.current) setIsSaving(false);
+    }
   };
 
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget && !isSaving) onClose();
       }}
     >
       <div
@@ -71,6 +90,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
           <button
             className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
             onClick={onClose}
+            disabled={isSaving}
           >
             <span className="material-symbols-outlined text-on-surface-variant group-active:scale-90 transition-transform">
               close
@@ -114,6 +134,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
                   type="button"
                   onClick={() => setBleedingDays((d) => Math.max(1, d - 1))}
+                  disabled={isSaving}
                 >
                   <span className="material-symbols-outlined">remove</span>
                 </button>
@@ -124,6 +145,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
                   min="1"
                   max="15"
                   value={bleedingDays}
+                  disabled={isSaving}
                   onChange={(e) =>
                     setBleedingDays(
                       Math.min(15, Math.max(1, parseInt(e.target.value) || 1))
@@ -134,6 +156,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
                   type="button"
                   onClick={() => setBleedingDays((d) => Math.min(15, d + 1))}
+                  disabled={isSaving}
                 >
                   <span className="material-symbols-outlined">add</span>
                 </button>
@@ -148,11 +171,26 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
             <button
               className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
               onClick={onClose}
+              disabled={isSaving}
             >
               Cancel
             </button>
-            <Button className="w-full" variant="primary" onClick={handleSave}>
-              Save
+            <Button
+              className="w-full"
+              variant="primary"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <LoadingSpinner
+                  size="sm"
+                  layout="inline"
+                  tone="current"
+                  label="Saving period"
+                />
+              ) : (
+                'Save'
+              )}
             </Button>
           </div>
         </div>

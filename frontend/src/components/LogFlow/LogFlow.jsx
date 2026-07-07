@@ -3,6 +3,7 @@ import Button from '../Button';
 import Calendar from 'react-calendar';
 import { formatDateLocal, parseLocalDate } from '../../utils/calendarUtils';
 import './LogFlow.css';
+import LoadingSpinner from '../LoadingSpinner';
 
 const DEFAULT_PERIOD_DURATION = 5;
 const SAME_PERIOD_GAP_BUFFER_DAYS = 2;
@@ -52,7 +53,8 @@ function LogFlow({
   endDate,
   initialSelectedDays = [],
   isInActivePeriod,
-  durationDays
+  durationDays,
+  isSaving = false
 }) {
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -171,7 +173,7 @@ function LogFlow({
     <div
       className="log-flow-modal fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget && !isSaving) onClose();
       }}
     >
       <div
@@ -185,6 +187,7 @@ function LogFlow({
           <button
             className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
             onClick={onClose}
+            disabled={isSaving}
           >
             <span className="material-symbols-outlined text-on-surface-variant group-active:scale-90 transition-transform">
               close
@@ -203,6 +206,7 @@ function LogFlow({
               className="log-flow-calendar"
               key={range.join(',')}
               onClickDay={handleDayClick}
+              tileDisabled={() => isSaving}
               activeStartDate={activeMonth}
               onActiveStartDateChange={onMonthChange}
               calendarType="gregory"
@@ -227,11 +231,26 @@ function LogFlow({
             <button
               className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
               onClick={onClose}
+              disabled={isSaving}
             >
               Cancel
             </button>
-            <Button className="w-full" variant="primary" onClick={handleSave}>
-              Save Entry
+            <Button
+              className="w-full"
+              variant="primary"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <LoadingSpinner
+                  size="sm"
+                  layout="inline"
+                  tone="current"
+                  label="Saving entry"
+                />
+              ) : (
+                'Save Entry'
+              )}
             </Button>
           </div>
         </div>
