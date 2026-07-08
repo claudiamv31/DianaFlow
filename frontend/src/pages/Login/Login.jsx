@@ -161,16 +161,10 @@ function Login() {
 
             {/* Password Field */}
             <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center px-1">
+              <div className="px-1">
                 <label className="text-xs font-semibold text-[#6D3B47] uppercase tracking-wider">
                   Password
                 </label>
-                <a
-                  href="#forgot"
-                  className="text-xs font-semibold text-[#904958] hover:underline"
-                >
-                  Forgot?
-                </a>
               </div>
               <div className="relative">
                 <input

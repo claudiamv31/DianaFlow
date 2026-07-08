@@ -119,7 +119,7 @@ const DailyInsigths = ({
             className="w-full py-3 rounded-full border !border-primary/30 !text-primary/70 font-headline font-semibold text-xs hover:!bg-primary/5 transition-colors uppercase tracking-wider"
             onClick={() => setIsEditingPeriod(true)}
           >
-            {isPeriod ? 'Edit Period Dates' : 'Is your period starting?'}
+            {isPeriod ? 'Edit Period Dates' : 'Log a New Period'}
           </button>
         </div>
       </div>
