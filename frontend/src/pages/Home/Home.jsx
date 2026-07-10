@@ -155,8 +155,10 @@ function Home() {
     setIsLoggingNewPeriod(true);
   };
 
-  if (isLoading || statusOfPeriod === undefined) return <LoadingSpinner />;
-  if (error) return <ErrorScreen onRetry={() => refetch()} />;
+  if (isLoading || statusOfPeriod === undefined)
+    return <LoadingSpinner label="Loading DianaFlow..." showLabel />;
+  if (error)
+    return <ErrorScreen message={error.message} onRetry={() => refetch()} />;
 
   const safeStatus = statusOfPeriod || {
     cycleStatus: { status: 'unknown' },

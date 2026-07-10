@@ -1,5 +1,12 @@
 import LoadingSpinner from './LoadingSpinner';
 
 export default function Loader() {
-  return <LoadingSpinner layout="screen" size="lg" />;
+  return (
+    <LoadingSpinner
+      layout="screen"
+      size="lg"
+      label="Loading DianaFlow..."
+      showLabel
+    />
+  );
 }

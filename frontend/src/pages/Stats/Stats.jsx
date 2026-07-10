@@ -34,10 +34,11 @@ const StatsPage = () => {
     enabled: !!user
   });
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <LoadingSpinner label="Loading DianaFlow..." showLabel />;
   if (error)
     return (
       <ErrorScreen
+        message={error.message}
         onRetry={() => {
           refetchSummary();
         }}

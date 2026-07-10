@@ -36,6 +36,8 @@ if (string.IsNullOrWhiteSpace(connectionString))
         "Database connection string is not configured. Set ConnectionStrings__PostgreSQLConnection or DATABASE_URL.");
 }
 
+connectionString = TuneConnectionStringForServerless(connectionString, builder.Environment);
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -92,12 +94,6 @@ builder.Services.AddScoped<TimeZoneService>();
 builder.Services.AddMemoryCache();
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-}
-
 app.UseCors("AllowReactApp");
 
 if (app.Environment.IsDevelopment())
@@ -113,9 +109,31 @@ app.UseAuthorization();
 
 app.UseStaticFiles();
 
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }))
+    .AllowAnonymous();
+
 app.MapControllers();
 
 app.Run();
+
+static string TuneConnectionStringForServerless(string connectionString, IWebHostEnvironment environment)
+{
+    if (environment.IsDevelopment())
+    {
+        return connectionString;
+    }
+
+    var builder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString)
+    {
+        Pooling = true,
+        MinPoolSize = 0,
+        MaxPoolSize = 2,
+        ConnectionIdleLifetime = 60,
+        ConnectionPruningInterval = 10
+    };
+
+    return builder.ConnectionString;
+}
 
 static string? BuildPostgresConnectionString(string? databaseUrl)
 {
