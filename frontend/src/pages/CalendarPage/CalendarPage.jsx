@@ -157,8 +157,9 @@ const CalendarPage = () => {
     }
   });
 
-  if (isLoading) return <LoadingSpinner />;
-  if (error) return <ErrorScreen onRetry={() => refetch()} />;
+  if (isLoading) return <LoadingSpinner label="Loading DianaFlow..." showLabel />;
+  if (error)
+    return <ErrorScreen message={error.message} onRetry={() => refetch()} />;
 
   return (
     <>

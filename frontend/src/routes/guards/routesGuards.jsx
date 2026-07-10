@@ -16,7 +16,14 @@ export function PrivateRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <LoadingSpinner layout="screen" size="lg" />;
+    return (
+      <LoadingSpinner
+        layout="screen"
+        size="lg"
+        label="Loading DianaFlow..."
+        showLabel
+      />
+    );
   }
 
   return user ? children : <Navigate to="/login" />;
@@ -35,7 +42,14 @@ export function PublicRoute({ children }) {
   }, []);
 
   if (loading) {
-    return <LoadingSpinner layout="screen" size="lg" />;
+    return (
+      <LoadingSpinner
+        layout="screen"
+        size="lg"
+        label="Loading DianaFlow..."
+        showLabel
+      />
+    );
   }
 
   return !user ? children : <Navigate to="/" />;

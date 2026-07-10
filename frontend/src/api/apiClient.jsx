@@ -3,11 +3,14 @@ import { API_URL } from '../config';
 import { getClientTimeZone } from '../utils/timeZone';
 
 const ACCESS_TOKEN_KEY = 'jwtToken';
+const REQUEST_TIMEOUT_MS = 45000;
+const COLD_START_RETRY_DELAYS_MS = [1500, 3500];
 let refreshRequest = null;
+let activeColdStartRetries = 0;
 
 const apiClient = axios.create({
   baseURL: API_URL,
-  timeout: 30000,
+  timeout: REQUEST_TIMEOUT_MS,
   withCredentials: true
 });
 
@@ -30,14 +33,87 @@ const shouldSkipRefresh = (config = {}) => {
   return url.includes('/users/login') || url.includes('/users/refresh');
 };
 
+const sleep = (delayMs) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, delayMs);
+  });
+
+const isColdStartStatus = (status) => [502, 503, 504].includes(status);
+
+const isBrowserNetworkError = (error) =>
+  !error.response && error.message === 'Network Error';
+
+const isColdStartError = (error) =>
+  error.code === 'ECONNABORTED' ||
+  isColdStartStatus(error.response?.status);
+
+const canRetryColdStart = (config = {}) => {
+  const method = (config.method || 'get').toLowerCase();
+  const url = config.url || '';
+
+  return (
+    ['get', 'head', 'options', 'put', 'delete'].includes(method) ||
+    (method === 'post' && url.includes('/users/login')) ||
+    (method === 'post' && url.includes('/users/sign-up')) ||
+    (method === 'post' && url.includes('/users/refresh'))
+  );
+};
+
+const notifyColdStartRetry = (isRetrying) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  activeColdStartRetries += isRetrying ? 1 : -1;
+  activeColdStartRetries = Math.max(0, activeColdStartRetries);
+
+  window.dispatchEvent(
+    new CustomEvent('dianaflow:cold-start-retry', {
+      detail: { isRetrying: activeColdStartRetries > 0 }
+    })
+  );
+};
+
+const requestWithColdStartRetry = async (requestConfig) => {
+  try {
+    return await axios.request(requestConfig);
+  } catch (error) {
+    const config = error.config || requestConfig;
+    const retryCount = config._coldStartRetryCount || 0;
+
+    if (
+      retryCount < COLD_START_RETRY_DELAYS_MS.length &&
+      canRetryColdStart(config) &&
+      isColdStartError(error)
+    ) {
+      notifyColdStartRetry(true);
+
+      try {
+        await sleep(COLD_START_RETRY_DELAYS_MS[retryCount]);
+
+        return await requestWithColdStartRetry({
+          ...config,
+          timeout: REQUEST_TIMEOUT_MS,
+          _coldStartRetryCount: retryCount + 1
+        });
+      } finally {
+        notifyColdStartRetry(false);
+      }
+    }
+
+    throw error;
+  }
+};
+
 const refreshAccessToken = async () => {
   if (!refreshRequest) {
-    refreshRequest = axios
-      .post(
-        `${API_URL}/api/users/refresh`,
-        {},
-        { timeout: 30000, withCredentials: true }
-      )
+    refreshRequest = requestWithColdStartRetry({
+      method: 'post',
+      url: `${API_URL}/api/users/refresh`,
+      data: {},
+      timeout: REQUEST_TIMEOUT_MS,
+      withCredentials: true
+    })
       .then((response) => {
         storeAuthTokens(response.data);
         return response.data.accessToken;
@@ -54,6 +130,30 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    if (
+      originalRequest &&
+      !originalRequest._retry &&
+      canRetryColdStart(originalRequest) &&
+      isColdStartError(error)
+    ) {
+      const retryCount = originalRequest._coldStartRetryCount || 0;
+
+      if (retryCount < COLD_START_RETRY_DELAYS_MS.length) {
+        originalRequest._coldStartRetryCount = retryCount + 1;
+        originalRequest.timeout = REQUEST_TIMEOUT_MS;
+
+        notifyColdStartRetry(true);
+
+        try {
+          await sleep(COLD_START_RETRY_DELAYS_MS[retryCount]);
+
+          return await apiClient(originalRequest);
+        } finally {
+          notifyColdStartRetry(false);
+        }
+      }
+    }
 
     if (
       error.response?.status === 401 &&
@@ -76,11 +176,18 @@ apiClient.interceptors.response.use(
 
     if (error.code === 'ECONNABORTED') {
       return Promise.reject(
-        new Error('⏱ Timeout error. The API did not respond.')
+        new Error('DianaFlow is still waking up. Please try again in a moment.')
       );
     }
-    if (!error.response) {
-      return Promise.reject(new Error('No connection with the server.'));
+    if (isBrowserNetworkError(error)) {
+      return Promise.reject(
+        new Error('No connection with the server. Please check your connection.')
+      );
+    }
+    if (isColdStartStatus(error.response.status)) {
+      return Promise.reject(
+        new Error('DianaFlow is still waking up. Please try again in a moment.')
+      );
     }
     return Promise.reject(error);
   }
