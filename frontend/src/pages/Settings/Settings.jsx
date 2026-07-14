@@ -85,9 +85,9 @@ const Settings = () => {
 
       {/* Settings Grid / Menu Items */}
       <div className="space-y-4">
-        <section className="bg-surface-container-low p-4 rounded-2xl">
-          <div className="flex items-center justify-between gap-4 rounded-2xl bg-surface-container-lowest p-4">
-            <div className="flex items-center gap-4">
+        <section className="bg-surface-container-low p-2 rounded-2xl">
+          <div className="flex w-full items-center justify-between gap-3 rounded-[1rem] bg-surface-container-lowest p-4">
+            <div className="flex min-w-0 items-center gap-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tertiary-container">
                 <span
                   className="material-symbols-outlined text-on-tertiary-container"
@@ -96,11 +96,11 @@ const Settings = () => {
                   language
                 </span>
               </div>
-              <span className="font-label font-semibold text-on-surface">
+              <span className="truncate font-label font-semibold text-on-surface">
                 {t('settings.language')}
               </span>
             </div>
-            <LanguageSelector />
+            <LanguageSelector variant="settings" />
           </div>
         </section>
 
