@@ -22,7 +22,7 @@ const fertilityDetails = {
     value: 'Low',
     description: 'Lower fertility estimate',
     valueClassName: 'text-[var(--text-color)]',
-    iconClassName: 'bg-secondary/10 text-secondary'
+    iconClassName: 'bg-fertility/10 text-fertility'
   }
 };
 
