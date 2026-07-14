@@ -7,6 +7,7 @@ import { useGetProfile } from '../../hooks/useProfileHooks';
 import { API_URL } from '../../config';
 import defaultProfilePic from '../../assets/default-profile-pic.png';
 import { useLocale } from '../../i18n/LocaleContext';
+import LanguageSelector from '../../components/LanguageSelector';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -84,6 +85,25 @@ const Settings = () => {
 
       {/* Settings Grid / Menu Items */}
       <div className="space-y-4">
+        <section className="bg-surface-container-low p-4 rounded-2xl">
+          <div className="flex items-center justify-between gap-4 rounded-2xl bg-surface-container-lowest p-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tertiary-container">
+                <span
+                  className="material-symbols-outlined text-on-tertiary-container"
+                  aria-hidden="true"
+                >
+                  language
+                </span>
+              </div>
+              <span className="font-label font-semibold text-on-surface">
+                {t('settings.language')}
+              </span>
+            </div>
+            <LanguageSelector />
+          </div>
+        </section>
+
         {/* Profile Settings Group */}
         <div className="bg-surface-container-low p-2 rounded-2xl">
           <button

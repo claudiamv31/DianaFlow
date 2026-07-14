@@ -5,7 +5,6 @@ import { FaMoon } from 'react-icons/fa';
 
 import './Header.css';
 import ErrorScreen from '../ErrorScreen';
-import LanguageSelector from '../LanguageSelector';
 
 const HeaderNotLogged = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -35,7 +34,6 @@ const HeaderNotLogged = () => {
           <h1>DianaFlow</h1>
         </div>
       </Link>
-      <LanguageSelector />
     </header>
   );
 };

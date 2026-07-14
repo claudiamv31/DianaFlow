@@ -4,7 +4,6 @@ import { FaMoon } from 'react-icons/fa';
 
 import './Header.css';
 import ErrorScreen from '../ErrorScreen';
-import LanguageSelector from '../LanguageSelector';
 
 const Header = () => {
   const [error] = useState(false);
@@ -47,7 +46,6 @@ const Header = () => {
 
       {/* User */}
       <div className="options">
-        <LanguageSelector />
         {/*<NavLink to="/config" className="user-menu-link">
           <FontAwesomeIcon icon={faUser} className="user-icon" />
         </NavLink>*/}
