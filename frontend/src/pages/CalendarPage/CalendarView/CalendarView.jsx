@@ -1,6 +1,10 @@
 import Calendar from 'react-calendar';
-import { formatDateLocal } from '../../../utils/calendarUtils';
+import {
+  formatCalendarWeekday,
+  formatDateLocal
+} from '../../../utils/calendarUtils';
 import './CalendarView.css';
+import { useLocale } from '../../../i18n/LocaleContext';
 
 const CalendarView = ({
   date: activeMonthDate,
@@ -17,6 +21,7 @@ const CalendarView = ({
   setCurrentPeriod,
   nextPeriod
 }) => {
+  const { dateLocale } = useLocale();
   const tileClassName = ({ date, activeStartDate }) => {
     const dateString = formatDateLocal(date);
     const today = formatDateLocal(new Date());
@@ -97,13 +102,8 @@ const CalendarView = ({
         onActiveStartDateChange={onMonthChange}
         calendarType="gregory"
         showNeighboringMonth={true}
-        locale="en-US"
-        formatShortWeekday={(locale, date) =>
-          date
-            .toLocaleDateString(locale, { weekday: 'short' })
-            .slice(0, 1)
-            .toUpperCase()
-        }
+        locale={dateLocale}
+        formatShortWeekday={formatCalendarWeekday}
         tileClassName={({ date, view, activeStartDate }) =>
           view === 'month' ? tileClassName({ date, activeStartDate }) : null
         }

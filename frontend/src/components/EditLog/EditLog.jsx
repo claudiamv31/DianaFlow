@@ -5,8 +5,10 @@ import { formatDateLocal } from '../../utils/calendarUtils';
 import { refreshCycleQueries } from '../../utils/queryInvalidation';
 import Button from '../Button';
 import LoadingSpinner from '../LoadingSpinner';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
+  const { t, dateLocale } = useLocale();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -76,10 +78,10 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
         <div className="px-8 pt-10 pb-4 flex items-center justify-between">
           <div>
             <h2 className="font-headline font-bold text-2xl text-on-surface">
-              Edit Daily Log
+              {t('log.editDaily')}
             </h2>
             <p className="text-sm font-semibold tracking-widest uppercase text-primary/70 mt-1">
-              {selectedDate?.toLocaleDateString('en-US', {
+              {selectedDate?.toLocaleDateString(dateLocale, {
                 weekday: 'long',
                 month: 'short',
                 day: 'numeric'
@@ -100,12 +102,13 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
         {/* Scrollable Content */}
         <div className="px-8 pb-4 overflow-y-auto flex-1">
           <p className="text-on-surface-variant text-sm mb-8 px-2">
-            Day {cycleInfo?.cycleDay} — {cycleInfo?.phase}
+            {t('cycle.dayValue', { count: cycleInfo?.cycleDay })} —{' '}
+            {cycleInfo?.phase ? t(`phase.${cycleInfo.phase}`) : '--'}
           </p>
 
           <section className="mb-4">
             <h3 className="font-headline text-on-surface text-lg font-bold mb-6 px-2">
-              Flow Intensity
+              {t('log.flowIntensity')}
             </h3>
             <div className="flex justify-between items-center px-4">
               <div className="flex flex-col items-center gap-3 group cursor-pointer">
@@ -127,7 +130,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
                     0
                   )}`}
                 >
-                  None
+                  {t('common.none')}
                 </span>
               </div>
               <div className="flex flex-col items-center gap-3 group cursor-pointer">
@@ -147,7 +150,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
                 <span
                   className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(1)}`}
                 >
-                  Light
+                  {t('common.light')}
                 </span>
               </div>
               <div className="flex flex-col items-center gap-3 group cursor-pointer">
@@ -175,7 +178,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
                 <span
                   className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(2)}`}
                 >
-                  Medium
+                  {t('common.medium')}
                 </span>
               </div>
               <div className="flex flex-col items-center gap-3 group cursor-pointer">
@@ -195,7 +198,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
                 <span
                   className={`font-label text-xs font-semibold uppercase tracking-tighter ${addClassTextSelected(3)}`}
                 >
-                  Heavy
+                  {t('common.heavy')}
                 </span>
               </div>
             </div>
@@ -210,7 +213,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
               onClick={handleCancel}
               disabled={saveLogMutation.isPending}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <Button
               className="w-full"
@@ -223,10 +226,10 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
                   size="sm"
                   layout="inline"
                   tone="current"
-                  label="Saving log"
+                  label={t('log.saving')}
                 />
               ) : (
-                'Save Log'
+                t('log.save')
               )}
             </Button>
           </div>

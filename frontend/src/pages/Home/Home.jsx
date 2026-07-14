@@ -14,16 +14,12 @@ import LogFlow from '../../components/LogFlow/LogFlow';
 import Button from '../../components/Button';
 import { formatDateLocal } from '../../utils/calendarUtils';
 import { refreshCycleQueries } from '../../utils/queryInvalidation';
-
-const PHASE_MESSAGES = {
-  Menstruation: "Listen to your body's need for rest. Energy is drawing inward for renewal.",
-  Follicular: "A time of rising energy and fresh perspectives. Ideal for starting new projects.",
-  Ovulation: "Your energy and communication are at their peak. Great for collaboration and sharing ideas.",
-  Luteal: "Slow down and wrap up details. Focus on finishing tasks and self-care."
-};
+import { useLocale } from '../../i18n/LocaleContext';
+import { getErrorMessageKey } from '../../api/AppError';
 
 function Home() {
   const queryClient = useQueryClient();
+  const { t } = useLocale();
   const [user, setUser] = useState(null);
   const [isLoggingToday, setIsLoggingToday] = useState(false);
   const [isLoggingNewPeriod, setIsLoggingNewPeriod] = useState(false);
@@ -66,7 +62,7 @@ function Home() {
     mutationFn: async (flowIntensity) => {
       const todayStr = statusOfPeriod?.today || formatDateLocal(new Date());
       if (!statusOfPeriod?.isActive) {
-        throw new Error('Flow can only be logged during an active period.');
+        throw new Error(t('home.flowActiveOnly'));
       }
 
       return await apiClient.put(`/periods/day`, {
@@ -76,12 +72,12 @@ function Home() {
     },
     onSuccess: async () => {
       await refreshCycleQueries(queryClient);
-      toast.success('Log saved successfully', {
+      toast.success(t('home.logSaved'), {
         icon: '🌸'
       });
     },
     onError: (err) => {
-      toast.error('Could not save log. Please try again.', {
+      toast.error(t('home.logError'), {
         icon: '⚠️'
       });
     }
@@ -98,12 +94,12 @@ function Home() {
     },
     onSuccess: async () => {
       await refreshCycleQueries(queryClient);
-      toast.success('Period saved successfully', {
+      toast.success(t('home.periodSaved'), {
         icon: '🌸'
       });
     },
     onError: () => {
-      toast.error('Could not save period. Please try again.', {
+      toast.error(t('home.periodError'), {
         icon: '⚠️'
       });
     }
@@ -113,34 +109,35 @@ function Home() {
     switch (status?.status) {
       case 'active_period':
         if (status?.daysLeftInPeriod === 0) {
-          return 'Last day of your period';
+          return t('home.periodLastDay');
         }
         return (
           <>
-            You have <span className="days">{status?.daysLeftInPeriod} </span>
-            days left of your period
+            {t('home.periodDaysLeft', {
+              count: status?.daysLeftInPeriod
+            })}
           </>
         );
       case 'next_period':
         return (
           <>
-            Your next period in <span className="days">{status.days} days</span>
+            {t('home.nextPeriod', { count: status.days })}
           </>
         );
       case 'period_should_start_today':
         return (
           <>
-            Your period should start <span className="days">today</span>.
+            {t('home.periodToday')}
           </>
         );
       case 'delayed':
         return (
           <>
-            Period is late <span className="days">{status.days} days</span>
+            {t('home.periodLate', { count: status.days })}
           </>
         );
       default:
-        return <>No period recorded yet</>;
+        return <>{t('home.noPeriod')}</>;
     }
   };
 
@@ -156,9 +153,14 @@ function Home() {
   };
 
   if (isLoading || statusOfPeriod === undefined)
-    return <LoadingSpinner label="Loading DianaFlow..." showLabel />;
+    return <LoadingSpinner label={t('common.loadingApp')} showLabel />;
   if (error)
-    return <ErrorScreen message={error.message} onRetry={() => refetch()} />;
+    return (
+      <ErrorScreen
+        messageKey={getErrorMessageKey(error, 'error.loadingPage')}
+        onRetry={() => refetch()}
+      />
+    );
 
   const safeStatus = statusOfPeriod || {
     cycleStatus: { status: 'unknown' },
@@ -181,8 +183,8 @@ function Home() {
           <div className="home-orb">
             <p className="text-phase">
               {safeStatus.currentPhase
-                ? safeStatus.currentPhase.toUpperCase()
-                : 'NO PERIOD RECORDED'}
+                ? t(`phase.${safeStatus.currentPhase}`).toUpperCase()
+                : t('home.noPeriod').toUpperCase()}
             </p>
             <p className="text-status">
               {getCycleMessage(safeStatus.cycleStatus)}
@@ -190,9 +192,9 @@ function Home() {
           </div>
 
           {/* Dynamic Phase Message */}
-          {safeStatus.currentPhase && PHASE_MESSAGES[safeStatus.currentPhase] && (
+          {safeStatus.currentPhase && (
             <p className="text-sm italic text-gray-600 max-w-md text-center mt-2 px-4 animate-fade-in">
-              "{PHASE_MESSAGES[safeStatus.currentPhase]}"
+              “{t(`home.phase.${safeStatus.currentPhase}`)}”
             </p>
           )}
 
@@ -209,7 +211,7 @@ function Home() {
               setIsLoggingNewPeriod(true);
             }}
           >
-            {isPeriodActive ? 'Log Today' : 'Log a New Period'}
+            {isPeriodActive ? t('home.logToday') : t('home.logPeriod')}
           </Button>
         </section>
 

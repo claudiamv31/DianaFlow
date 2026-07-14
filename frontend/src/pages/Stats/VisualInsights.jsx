@@ -1,6 +1,8 @@
 import React from 'react';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const VisualInsights = ({ summary }) => {
+  const { t, dateLocale } = useLocale();
   const periods = summary?.periods || [];
 
   // Parse and prepare period data. If the user has fewer than 6 logged periods,
@@ -45,9 +47,8 @@ const VisualInsights = ({ summary }) => {
     if (!dateStr) return '';
     const parts = dateStr.split('-');
     if (parts.length < 2) return '';
-    const monthIndex = parseInt(parts[1], 10) - 1;
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months[monthIndex] || '';
+    const date = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+    return new Intl.DateTimeFormat(dateLocale, { month: 'short' }).format(date);
   };
 
   return (
@@ -55,16 +56,16 @@ const VisualInsights = ({ summary }) => {
         <div className="flex justify-between items-end">
           <div>
             <h3 className="font-headline font-bold text-xl text-on-surface">
-              Cycle Regularity
+              {t('stats.cycleRegularity')}
             </h3>
             <p className="text-on-surface-variant text-sm">
-              Last 6 periods length tracking
+              {t('stats.lastSix')}
             </p>
           </div>
           <div className="flex gap-2 items-center">
             <span className="w-3 h-3 rounded-full bg-primary/100"></span>
             <span className="text-[10px] uppercase tracking-tighter font-bold text-on-surface-variant">
-              Cycle Days
+              {t('stats.cycleDays')}
             </span>
           </div>
         </div>
@@ -85,7 +86,7 @@ const VisualInsights = ({ summary }) => {
                   {/* Tooltip on hover - only for actual period data */}
                   {isReal && (
                     <span className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-surface-container-highest text-on-surface text-[11px] px-2 py-1 rounded transition-opacity duration-200 whitespace-nowrap z-10 font-bold shadow-sm">
-                      {duration} days
+                      {t('cycle.durationValue', { count: duration })}
                     </span>
                   )}
                   <div
@@ -109,4 +110,3 @@ const VisualInsights = ({ summary }) => {
 };
 
 export default VisualInsights;
-

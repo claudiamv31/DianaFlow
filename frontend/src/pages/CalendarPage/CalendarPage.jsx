@@ -13,6 +13,8 @@ import { refreshCycleQueries } from '../../utils/queryInvalidation';
 import LogFlow from '../../components/LogFlow/LogFlow';
 import DailyInsigths from './DailyInsights/DailyInsights';
 import EditLog from '../../components/EditLog/EditLog';
+import { useLocale } from '../../i18n/LocaleContext';
+import { getErrorMessageKey } from '../../api/AppError';
 
 const findPeriodByDate = (periods, date) => {
   if (!date || !Array.isArray(periods)) return null;
@@ -44,6 +46,7 @@ const buildPeriodDays = (period) => {
 
 const CalendarPage = () => {
   const queryClient = useQueryClient();
+  const { t } = useLocale();
   const [user, setUser] = useState(null);
   const [date, setDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -146,26 +149,32 @@ const CalendarPage = () => {
     },
     onSuccess: async () => {
       await refreshCycleQueries(queryClient);
-      toast.success('Cycle saved correctly', {
+      toast.success(t('calendar.saved'), {
         icon: '🌸'
       });
     },
     onError: (err) => {
-      toast.error('There was a problem saving your cycle, retry later', {
+      toast.error(t('calendar.saveError'), {
         icon: '⚠️'
       });
     }
   });
 
-  if (isLoading) return <LoadingSpinner label="Loading DianaFlow..." showLabel />;
+  if (isLoading)
+    return <LoadingSpinner label={t('common.loadingApp')} showLabel />;
   if (error)
-    return <ErrorScreen message={error.message} onRetry={() => refetch()} />;
+    return (
+      <ErrorScreen
+        messageKey={getErrorMessageKey(error, 'error.loadingPage')}
+        onRetry={() => refetch()}
+      />
+    );
 
   return (
     <>
       <div className="calendar-page">
-        <h2 className="title">Cycle Rhythm</h2>
-        <h3 className="subtitle">Your sanctuary of flow and focus.</h3>
+        <h2 className="title">{t('calendar.title')}</h2>
+        <h3 className="subtitle">{t('calendar.subtitle')}</h3>
         <div className="calendar-page-container">
           <div className="calendar-view-container">
             <CalendarView

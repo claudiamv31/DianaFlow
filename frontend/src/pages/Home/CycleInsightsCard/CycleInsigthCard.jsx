@@ -1,32 +1,34 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faClover } from '@fortawesome/free-solid-svg-icons';
 import { formatDateDayMonthYear } from '../../../utils/calendarUtils';
+import { useLocale } from '../../../i18n/LocaleContext';
 
 const CycleInsightsCard = ({ previousCycle }) => {
+  const { t, dateLocale } = useLocale();
   return (
     <div className="flex-1 w-full">
       <h2 className="text-base font-bold mb-4 text-[var(--text-color)]">
-        Cycle Insights
+        {t('insights.title')}
       </h2>
 
       <div className="bg-[var(--accent-color)] rounded-3xl p-4 sm:p-5">
         <p className="text-[0.7rem] pl-4 text-[var(--label-color)] uppercase tracking-widest mb-4">
-          Previous Cycle Summary
+          {t('insights.previousSummary')}
         </p>
 
         {/* Cycle Length & Consistency */}
         <div className="flex flex-row justify-between mx-4 my-6 text-[0.8rem] text-[var(--label-color)]">
           <div>
             <p className="text-2xl font-bold text-[var(--primary-color)]">
-              {previousCycle.cycleLength} Days
+              {t('cycle.durationValue', { count: previousCycle.cycleLength })}
             </p>
-            <p>Cycle Length</p>
+            <p>{t('insights.cycleLength')}</p>
           </div>
           <div>
             <p className="text-[1.3rem] font-bold text-[var(--purple-color)]">
               {previousCycle.consistency}
             </p>
-            <p>Consistency</p>
+            <p>{t('insights.consistency')}</p>
           </div>
         </div>
 
@@ -38,9 +40,9 @@ const CycleInsightsCard = ({ previousCycle }) => {
               className="text-2xl mb-2 text-[var(--primary-color)]"
             />
             <p className="text-base font-bold text-[var(--text-color)]">
-              {previousCycle.days} Days
+              {t('cycle.durationValue', { count: previousCycle.days })}
             </p>
-            <p>Period Duration</p>
+            <p>{t('cycle.periodDuration')}</p>
           </div>
 
           <div className="flex-1 flex flex-col justify-between text-[0.8rem] text-[var(--label-color)] py-4 px-3 sm:px-4 bg-[var(--tags-content)] rounded-2xl">
@@ -49,9 +51,9 @@ const CycleInsightsCard = ({ previousCycle }) => {
               className="text-2xl mb-2 text-[var(--purple-color)]"
             />
             <p className="text-base font-bold text-[var(--text-color)]">
-              {formatDateDayMonthYear(previousCycle.startDate)}
+              {formatDateDayMonthYear(previousCycle.startDate, dateLocale)}
             </p>
-            <p>First Day</p>
+            <p>{t('insights.firstDay')}</p>
           </div>
         </div>
       </div>

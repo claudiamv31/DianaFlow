@@ -7,10 +7,13 @@ import Button from '../../../components/Button';
 import { API_URL } from '../../../config';
 import defaultProfilePic from '../../../assets/default-profile-pic.png';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import { useLocale } from '../../../i18n/LocaleContext';
+import { getErrorMessageKey } from '../../../api/AppError';
 
 const DEFAULT_AVATAR = defaultProfilePic;
 
 const EditProfileModal = ({ isOpen, onClose }) => {
+  const { t } = useLocale();
   const { data: profileData, isLoading: profileLoading } = useGetProfile();
   const updateProfileMutation = useUpdateProfile();
 
@@ -75,10 +78,12 @@ const EditProfileModal = ({ isOpen, onClose }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!profileDetails.name.trim()) newErrors.name = 'The name is required';
-    if (!profileDetails.email.trim()) newErrors.email = 'The email is required';
+    if (!profileDetails.name.trim())
+      newErrors.name = 'profile.nameRequired';
+    if (!profileDetails.email.trim())
+      newErrors.email = 'profile.emailRequired';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileDetails.email))
-      newErrors.email = 'The email format is invalid';
+      newErrors.email = 'profile.emailInvalid';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -99,7 +104,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
       onClose();
     } catch (error) {
       setErrors({
-        submit: error.response?.data?.message || 'Error updating profile'
+        submit: getErrorMessageKey(error, 'profile.updateError')
       });
     }
   };
@@ -120,7 +125,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="px-8 pt-10 pb-4 flex items-center justify-between">
           <h2 className="font-headline font-bold text-2xl text-on-surface">
-            Edit Profile
+            {t('profile.title')}
           </h2>
           <button
             type="button"
@@ -140,7 +145,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
         >
           <div className="px-8 pb-6 overflow-y-auto flex-1">
             <p className="text-on-surface-variant text-sm mb-6 px-2">
-              Update your personal information.
+              {t('profile.description')}
             </p>
 
             <div className="space-y-6">
@@ -153,7 +158,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   {avatarPreview ? (
                     <img
                       src={avatarPreview}
-                      alt="Avatar preview"
+                      alt={t('profile.avatarAlt')}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -181,18 +186,18 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   onClick={() => fileInputRef.current?.click()}
                   className="mt-2 text-xs font-bold text-primary/100 hover:underline"
                 >
-                  Change profile picture
+                  {t('profile.changePicture')}
                 </button>
                 {avatarBase64 && (
                   <span className="text-[11px] text-on-surface-variant mt-1">
-                    ✓ New photo selected
+                    {t('profile.newPhoto')}
                   </span>
                 )}
               </div>
 
               {errors.submit && (
                 <div className="p-4 bg-error/10 border border-error/20 rounded-2xl text-error text-xs font-semibold px-4">
-                  {errors.submit}
+                  {t(errors.submit)}
                 </div>
               )}
 
@@ -202,7 +207,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
                   htmlFor="modal-profile-name"
                 >
-                  Name
+                  {t('auth.name')}
                 </label>
                 <input
                   className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
@@ -213,11 +218,11 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   onChange={handleFieldChange}
                   disabled={profileLoading || updateProfileMutation.isPending}
                   required
-                  placeholder="Your name"
+                  placeholder={t('profile.namePlaceholder')}
                 />
                 {errors.name && (
                   <p className="text-error text-xs px-2 font-semibold">
-                    {errors.name}
+                    {t(errors.name)}
                   </p>
                 )}
               </div>
@@ -228,7 +233,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
                   htmlFor="modal-profile-lastname"
                 >
-                  Last Name
+                  {t('auth.lastName')}
                 </label>
                 <input
                   className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
@@ -238,7 +243,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   value={profileDetails.lastName}
                   onChange={handleFieldChange}
                   disabled={profileLoading || updateProfileMutation.isPending}
-                  placeholder="Your last name"
+                  placeholder={t('profile.lastNamePlaceholder')}
                 />
               </div>
 
@@ -248,7 +253,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
                   htmlFor="modal-profile-email"
                 >
-                  Email
+                  {t('auth.email')}
                 </label>
                 <input
                   className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
@@ -263,7 +268,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 />
                 {errors.email && (
                   <p className="text-error text-xs px-2 font-semibold">
-                    {errors.email}
+                    {t(errors.email)}
                   </p>
                 )}
               </div>
@@ -279,7 +284,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 onClick={onClose}
                 disabled={updateProfileMutation.isPending}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <Button
                 type="submit"
@@ -292,10 +297,10 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                     size="sm"
                     layout="inline"
                     tone="current"
-                    label="Saving profile"
+                    label={t('profile.saving')}
                   />
                 ) : (
-                  'Save'
+                  t('common.save')
                 )}
               </Button>
             </div>

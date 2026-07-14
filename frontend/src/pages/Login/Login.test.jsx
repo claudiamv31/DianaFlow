@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Login from './Login';
 import apiClient from '../../api/apiClient';
+import { LocaleProvider } from '../../i18n/LocaleContext';
 
 jest.mock('../../api/apiClient', () => ({
   __esModule: true,
@@ -15,15 +16,18 @@ jest.mock('../../api/apiClient', () => ({
 describe('Login', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    window.localStorage.clear();
   });
 
   const renderLogin = () =>
     render(
       <MemoryRouter initialEntries={['/login']}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<h2>Home page</h2>} />
-        </Routes>
+        <LocaleProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<h2>Home page</h2>} />
+          </Routes>
+        </LocaleProvider>
       </MemoryRouter>
     );
 
@@ -42,6 +46,20 @@ describe('Login', () => {
       'true'
     );
     expect(apiClient.login).not.toHaveBeenCalled();
+  });
+
+  test('updates visible validation messages after changing language', async () => {
+    renderLogin();
+
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+    expect(screen.getAllByText('Required')).toHaveLength(2);
+
+    await userEvent.selectOptions(
+      screen.getByRole('combobox', { name: 'Language' }),
+      'es'
+    );
+
+    expect(screen.getAllByText('Obligatorio')).toHaveLength(2);
   });
 
   test('shows wrong password message on the password field', async () => {

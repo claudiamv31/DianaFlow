@@ -1,16 +1,20 @@
 import { useEffect, useState } from 'react';
 import './LoadingSpinner.css';
+import { useLocale } from '../i18n/LocaleContext';
 
 const LoadingSpinner = ({
   size = 'md',
   layout = 'page',
   tone = 'default',
-  label = 'Loading',
+  label,
   showLabel = false,
   className = ''
 }) => {
+  const { t } = useLocale();
   const [isColdStartRetrying, setIsColdStartRetrying] = useState(false);
-  const statusLabel = isColdStartRetrying ? 'Waking up DianaFlow...' : label;
+  const statusLabel = isColdStartRetrying
+    ? t('common.wakingApp')
+    : label || t('common.loading');
   const shouldShowLabel = showLabel || isColdStartRetrying;
   const classNames = [
     'loading-spinner',

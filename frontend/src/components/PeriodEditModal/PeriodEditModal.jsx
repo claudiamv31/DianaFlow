@@ -2,8 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import Button from '../Button';
 import CustomDatePicker from '../PeriodDataWizard/CustomDatePicker';
 import LoadingSpinner from '../LoadingSpinner';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const PeriodEditModal = ({ period, onClose, onSave }) => {
+  const { t } = useLocale();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -85,7 +87,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
         {/* Header */}
         <div className="px-8 pt-10 pb-4 flex items-center justify-between">
           <h2 className="font-headline font-bold text-2xl text-on-surface">
-            Edit your Period
+            {t('period.editTitle')}
           </h2>
           <button
             className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
@@ -101,8 +103,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
         {/* Scrollable Content */}
         <div className="px-8 pb-4 overflow-y-auto flex-1">
           <p className="text-on-surface-variant text-sm mb-8 px-2">
-            Select the start date of your period and how many days the bleeding
-            lasted.
+            {t('period.editDescription')}
           </p>
 
           <div className="space-y-6 mb-4">
@@ -112,7 +113,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
                 className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
                 htmlFor="modal-start-date"
               >
-                Start Date
+                {t('period.startDate')}
               </label>
               <CustomDatePicker
                 value={startDate}
@@ -127,7 +128,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
                 className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
                 htmlFor="modal-bleeding-days"
               >
-                Bleeding days
+                {t('period.bleedingDays')}
               </label>
               <div className="flex items-center gap-4 bg-surface-container-low rounded-full p-2 h-14">
                 <button
@@ -173,7 +174,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
               onClick={onClose}
               disabled={isSaving}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <Button
               className="w-full"
@@ -186,10 +187,10 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
                   size="sm"
                   layout="inline"
                   tone="current"
-                  label="Saving period"
+                  label={t('period.saving')}
                 />
               ) : (
-                'Save'
+                t('common.save')
               )}
             </Button>
           </div>

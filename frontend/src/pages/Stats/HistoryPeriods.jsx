@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import PeriodEditModal from '../../components/PeriodEditModal/PeriodEditModal';
 import { refreshCycleQueries } from '../../utils/queryInvalidation';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const HistoryPeriod = ({ latestPeriods }) => {
   const queryClient = useQueryClient();
   const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const { t, dateLocale } = useLocale();
 
   const saveLogMutation = useMutation({
     mutationFn: async (payload) => {
@@ -32,13 +34,13 @@ const HistoryPeriod = ({ latestPeriods }) => {
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="font-headline font-bold text-xl md:text-2xl text-on-surface">
-            Past Journeys
+            {t('history.pastJourneys')}
           </h3>
           <Link to="/archive" className="text-primary/100 font-bold text-sm">
-            View Archive
+            {t('history.viewArchive')}
           </Link>
         </div>
-        <p className="text-on-surface-variant text-sm">No periods found</p>
+        <p className="text-on-surface-variant text-sm">{t('history.none')}</p>
       </section>
     );
   }
@@ -49,30 +51,20 @@ const HistoryPeriod = ({ latestPeriods }) => {
     if (parts.length < 3) return { month: '', day: '', formatted: '' };
     const monthIdx = parseInt(parts[1], 10) - 1;
     const day = parts[2];
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
+    const month = new Intl.DateTimeFormat(dateLocale, {
+      month: 'short'
+    }).format(new Date(Number(parts[0]), monthIdx, 1));
     return {
-      month: months[monthIdx] || '',
+      month,
       day: day,
-      formatted: `${months[monthIdx]} ${parseInt(day, 10)}`
+      formatted: `${month} ${parseInt(day, 10)}`
     };
   };
 
   const getPeriodRange = (period) => {
     const startInfo = formatDateLocal(period.startDate);
-    if (!period.endDate) return `${startInfo.formatted} – Present`;
+    if (!period.endDate)
+      return `${startInfo.formatted} – ${t('history.present')}`;
     const endInfo = formatDateLocal(period.endDate);
     return `${startInfo.formatted} – ${endInfo.formatted}`;
   };
@@ -86,7 +78,7 @@ const HistoryPeriod = ({ latestPeriods }) => {
               (1000 * 60 * 60 * 24)
           ) + 1
         : 1);
-    return `${duration} Day${duration !== 1 ? 's' : ''}`;
+    return t('cycle.durationValue', { count: duration });
   };
 
   const periods = latestPeriods.map((period, index) => {
@@ -116,7 +108,7 @@ const HistoryPeriod = ({ latestPeriods }) => {
               {rangeText}
             </p>
             <p className="text-xs text-on-surface-variant mt-0.5">
-              Logged period journey
+              {t('history.logged')}
             </p>
           </div>
         </div>
@@ -142,10 +134,10 @@ const HistoryPeriod = ({ latestPeriods }) => {
       <section className="space-y-6">
         <div className="flex items-center justify-between">
           <h3 className="font-headline font-bold text-xl md:text-2xl text-on-surface">
-            Past Journeys
+            {t('history.pastJourneys')}
           </h3>
           <Link to="/archive" className="text-primary/100 font-bold text-sm">
-            View Archive
+            {t('history.viewArchive')}
           </Link>
         </div>
         <div className="space-y-3">{periods}</div>

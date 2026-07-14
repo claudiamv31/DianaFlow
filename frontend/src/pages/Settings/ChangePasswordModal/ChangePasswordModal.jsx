@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useChangePassword } from '../../../hooks/useProfileHooks';
 import Button from '../../../components/Button';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import { useLocale } from '../../../i18n/LocaleContext';
+import { getErrorMessageKey } from '../../../api/AppError';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
+  const { t } = useLocale();
   const changePasswordMutation = useChangePassword();
 
   // Password Change State
@@ -45,20 +48,18 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
     const newErrors = {};
 
     if (!passwordData.currentPassword) {
-      newErrors.currentPassword = 'The current password is required';
+      newErrors.currentPassword = 'password.currentRequired';
     }
     if (!passwordData.newPassword) {
-      newErrors.newPassword = 'The new password is required';
+      newErrors.newPassword = 'password.newRequired';
     } else if (passwordData.newPassword.length < 8) {
-      newErrors.newPassword =
-        'The new password must be at least 8 characters long';
+      newErrors.newPassword = 'password.tooShort';
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      newErrors.confirmPassword = 'The passwords do not match';
+      newErrors.confirmPassword = 'password.noMatch';
     }
     if (passwordData.currentPassword === passwordData.newPassword) {
-      newErrors.newPassword =
-        'The new password must be different from the current password';
+      newErrors.newPassword = 'password.mustDiffer';
     }
 
     setErrors(newErrors);
@@ -83,9 +84,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
       onClose();
     } catch (error) {
       setErrors({
-        passwordSubmit:
-          error.response?.data?.message ||
-          'There was an error changing the password'
+        passwordSubmit: getErrorMessageKey(error, 'password.changeError')
       });
     }
   };
@@ -106,7 +105,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="px-8 pt-10 pb-4 flex items-center justify-between">
           <h2 className="font-headline font-bold text-2xl text-on-surface">
-            Change Password
+            {t('password.title')}
           </h2>
           <button
             type="button"
@@ -126,13 +125,12 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
         >
           <div className="px-8 pb-6 overflow-y-auto flex-1">
             <div className="bg-primary-container/10 border border-primary-container/20 rounded-3xl p-4 text-on-surface-variant text-xs font-medium leading-relaxed mb-6">
-              For security, enter your current password before establishing a
-              new one.
+              {t('password.description')}
             </div>
 
             {errors.passwordSubmit && (
               <div className="p-4 bg-error/10 border border-error/20 rounded-2xl text-error/100 text-xs font-semibold mb-6">
-                {errors.passwordSubmit}
+                {t(errors.passwordSubmit)}
               </div>
             )}
 
@@ -143,7 +141,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                   className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
                   htmlFor="modal-password-current"
                 >
-                  Current Password
+                  {t('password.current')}
                 </label>
                 <input
                   className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
@@ -158,7 +156,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 />
                 {errors.currentPassword && (
                   <p className="text-error text-xs px-2 font-semibold">
-                    {errors.currentPassword}
+                    {t(errors.currentPassword)}
                   </p>
                 )}
               </div>
@@ -169,7 +167,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                   className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
                   htmlFor="modal-password-new"
                 >
-                  New Password
+                  {t('password.new')}
                 </label>
                 <input
                   className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
@@ -184,11 +182,11 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 />
                 {errors.newPassword && (
                   <p className="text-error text-xs px-2 font-semibold">
-                    {errors.newPassword}
+                    {t(errors.newPassword)}
                   </p>
                 )}
                 <span className="block text-[10px] text-on-surface-variant px-2">
-                  Minimum 8 characters
+                  {t('password.minimum')}
                 </span>
               </div>
 
@@ -198,7 +196,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                   className="block text-xs font-bold text-primary/100 tracking-widest uppercase px-2"
                   htmlFor="modal-password-confirm"
                 >
-                  Confirm New Password
+                  {t('password.confirm')}
                 </label>
                 <input
                   className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
@@ -213,7 +211,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 />
                 {errors.confirmPassword && (
                   <p className="text-error text-xs px-2 font-semibold">
-                    {errors.confirmPassword}
+                    {t(errors.confirmPassword)}
                   </p>
                 )}
               </div>
@@ -229,7 +227,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 onClick={onClose}
                 disabled={changePasswordMutation.isPending}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <Button
                 type="submit"
@@ -242,10 +240,10 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                     size="sm"
                     layout="inline"
                     tone="current"
-                    label="Changing password"
+                    label={t('password.saving')}
                   />
                 ) : (
-                  'Change'
+                  t('password.change')
                 )}
               </Button>
             </div>

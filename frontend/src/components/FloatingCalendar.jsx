@@ -2,8 +2,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Calendar from 'react-calendar';
 import PropTypes from 'prop-types';
 import './FloatingCalendar.css';
+import { useLocale } from '../i18n/LocaleContext';
 
 const FloatingCalendar = ({ show, onClose, onSelectDate, date, onSave }) => {
+  const { t, dateLocale } = useLocale();
   return (
     <AnimatePresence>
       {show && (
@@ -22,7 +24,7 @@ const FloatingCalendar = ({ show, onClose, onSelectDate, date, onSave }) => {
             exit={{ scale: 0.9, opacity: 0 }}
             transition={{ duration: 0.25 }}
           >
-            <Calendar value={date} onChange={onSelectDate} />
+            <Calendar value={date} onChange={onSelectDate} locale={dateLocale} />
 
             {date && (
               <button
@@ -33,7 +35,7 @@ const FloatingCalendar = ({ show, onClose, onSelectDate, date, onSave }) => {
                   onClose();
                 }}
               >
-                Save Cycle
+                {t('calendar.saveCycle')}
               </button>
             )}
           </motion.div>

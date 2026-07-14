@@ -96,8 +96,9 @@ describe('SignUp', () => {
     );
   });
 
-  test('shows the backend error message when sign up fails', async () => {
+  test('shows a localized fallback when sign up fails', async () => {
     apiClient.post.mockRejectedValue({
+      code: 'ERR_BAD_REQUEST',
       response: {
         data: {
           message: 'The email is alredy in use.'
@@ -119,7 +120,7 @@ describe('SignUp', () => {
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
 
     expect(
-      await screen.findByText('The email is alredy in use.')
+      await screen.findByText('Error creating account')
     ).toBeInTheDocument();
   });
 });
