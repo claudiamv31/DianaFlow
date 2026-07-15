@@ -16,6 +16,18 @@ public static class CyclePhaseCodes
     };
 }
 
+public static class CycleRegularityCodes
+{
+    public static string ToApiCode(CycleRegularityLevel level) => level switch
+    {
+        CycleRegularityLevel.Unknown => "unknown",
+        CycleRegularityLevel.Regular => "regular",
+        CycleRegularityLevel.Irregular => "irregular",
+        CycleRegularityLevel.VeryIrregular => "very_irregular",
+        _ => throw new ArgumentOutOfRangeException(nameof(level), level, null)
+    };
+}
+
 public static class GuidanceSelector
 {
     private static readonly IReadOnlyDictionary<(GuidanceType Type, ECyclePhase Phase), string[]> Keys =

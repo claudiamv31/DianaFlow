@@ -94,10 +94,24 @@ namespace backend.Modulos.User.Controllers
         {
             var userId = GetCurrentUserId();
 
-            await _authService.ChangePasswordAsync(
-                userId,
-                dto.CurrentPassword,
-                dto.NewPassword);
+            if (userId == Guid.Empty)
+                return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
+
+            try
+            {
+                await _authService.ChangePasswordAsync(
+                    userId,
+                    dto.CurrentPassword,
+                    dto.NewPassword);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return BadRequest(new ApiError(ApiErrorCodes.CurrentPasswordIncorrect, "currentPassword"));
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound(new ApiError(ApiErrorCodes.UserNotFound));
+            }
 
             return Ok(new
             {

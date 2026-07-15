@@ -16,7 +16,7 @@ export const formatCalendarWeekday = (locale, date) =>
   date
     .toLocaleDateString(locale, { weekday: 'short' })
     .slice(0, 1)
-    .toUpperCase();
+    .toLocaleUpperCase(locale);
 
 export const parseLocalDate = (dateString) => {
   if (!dateString) return null;

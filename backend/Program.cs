@@ -8,6 +8,9 @@ using backend.Modulos.Cycles.Services;
 using backend.Modulos.Stats.Services;
 using backend.Modulos.Profile.Services;
 using System.Text.Json.Serialization;
+using System.Text.Json;
+using backend.Api;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 var port = Environment.GetEnvironmentVariable("PORT");
@@ -23,6 +26,11 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     });
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+        new BadRequestObjectResult(new ApiError(ApiErrorCodes.InvalidRequest));
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -92,6 +100,32 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<TimeZoneService>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler(exceptionHandlerApp =>
+{
+    exceptionHandlerApp.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync(JsonSerializer.Serialize(
+            new ApiError(ApiErrorCodes.InternalError),
+            new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+    });
+});
+
+app.UseStatusCodePages(async statusCodeContext =>
+{
+    var response = statusCodeContext.HttpContext.Response;
+    var code = response.StatusCode switch
+    {
+        StatusCodes.Status401Unauthorized or StatusCodes.Status403Forbidden => ApiErrorCodes.NotAuthorized,
+        StatusCodes.Status404NotFound => ApiErrorCodes.ResourceNotFound,
+        _ => ApiErrorCodes.InvalidRequest
+    };
+
+    response.ContentType = "application/json";
+    await response.WriteAsJsonAsync(new ApiError(code));
+});
 
 app.UseCors("AllowReactApp");
 

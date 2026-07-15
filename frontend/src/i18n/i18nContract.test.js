@@ -2,6 +2,7 @@ import { DEFAULT_LOCALE, supportedLocales } from './locales';
 import { resources } from './resources';
 import { GUIDANCE_KEYS } from './guidance';
 import { API_ERROR_TRANSLATION_KEYS } from '../api/AppError';
+import { FLOW_CODES, REGULARITY_CODES } from './domainCodes';
 
 describe('supported locale contract', () => {
   test('every active locale contains the complete canonical catalogue', () => {
@@ -30,14 +31,23 @@ describe('supported locale contract', () => {
     });
   });
 
-  test('every plural key provides both singular and plural forms', () => {
+  test('every plural stem provides every category required by its locale', () => {
     supportedLocales.forEach(({ code }) => {
       const keys = Object.keys(resources[code].translation);
-      keys
-        .filter((key) => key.endsWith('_one'))
-        .forEach((key) => {
-          expect(keys).toContain(key.replace(/_one$/, '_other'));
+      const categories = new Intl.PluralRules(code).resolvedOptions()
+        .pluralCategories;
+      const pluralSuffix = /_(zero|one|two|few|many|other)$/;
+      const stems = new Set(
+        keys
+          .filter((key) => pluralSuffix.test(key))
+          .map((key) => key.replace(pluralSuffix, ''))
+      );
+
+      stems.forEach((stem) => {
+        categories.forEach((category) => {
+          expect(keys).toContain(`${stem}_${category}`);
         });
+      });
     });
   });
 
@@ -53,6 +63,19 @@ describe('supported locale contract', () => {
     supportedLocales.forEach(({ code }) => {
       Object.values(API_ERROR_TRANSLATION_KEYS).forEach((key) => {
         expect(resources[code].translation[key]).toBeTruthy();
+      });
+    });
+  });
+
+  test('every active locale covers every presentation code', () => {
+    supportedLocales.forEach(({ code }) => {
+      FLOW_CODES.forEach((flowCode) => {
+        expect(resources[code].translation[`flow.${flowCode}`]).toBeTruthy();
+      });
+      REGULARITY_CODES.forEach((regularityCode) => {
+        expect(
+          resources[code].translation[`regularity.${regularityCode}`]
+        ).toBeTruthy();
       });
     });
   });

@@ -11,7 +11,11 @@ i18n.use(initReactI18next).init({
   load: 'currentOnly',
   initImmediate: false,
   interpolation: {
-    escapeValue: false
+    escapeValue: false,
+    format: (value, format, language) =>
+      format === 'number'
+        ? new Intl.NumberFormat(language || DEFAULT_LOCALE).format(value)
+        : value
   },
   returnNull: false
 });

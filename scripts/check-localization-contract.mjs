@@ -42,11 +42,34 @@ const frontendErrorCodes = matches(
   read('frontend/src/api/AppError.js'),
   /^\s*([A-Z][A-Z_]+):/gm
 );
+const backendFlowCodes = matches(
+  read('backend/Modulos/Periods/Services/FlowIntensityCodes.cs'),
+  /=> "([a-z_]+)"/g
+);
+const frontendFlowCodes = matches(
+  read('frontend/src/i18n/domainCodes.js'),
+  /'(light|medium|heavy)'/g
+);
+const backendRegularityCodes = matches(
+  read('backend/Modulos/Cycles/Services/GuidanceSelector.cs'),
+  /CycleRegularityLevel\.\w+ => "([a-z_]+)"/g
+);
+const frontendRegularityCodes = matches(
+  read('frontend/src/i18n/domainCodes.js'),
+  /'(unknown|regular|irregular|very_irregular)'/g
+);
 
 assertSameContract('Guidance key contract', backendGuidanceKeys, frontendGuidanceKeys);
 assertSameContract('API error contract', backendErrorCodes, frontendErrorCodes);
+assertSameContract('Flow code contract', backendFlowCodes, frontendFlowCodes);
+assertSameContract(
+  'Regularity code contract',
+  backendRegularityCodes,
+  frontendRegularityCodes
+);
 
 console.log(
   `Localization contracts valid: ${backendGuidanceKeys.length} guidance keys, ` +
-    `${backendErrorCodes.length} API error codes.`
+    `${backendErrorCodes.length} API error codes, ` +
+    `${backendFlowCodes.length + backendRegularityCodes.length} presentation codes.`
 );

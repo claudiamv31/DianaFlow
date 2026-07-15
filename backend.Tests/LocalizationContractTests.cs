@@ -1,5 +1,6 @@
 using backend.Modulos.Cycles.Enums;
 using backend.Modulos.Cycles.Services;
+using backend.Modulos.Periods.Services;
 using FluentAssertions;
 
 namespace backend.Tests;
@@ -49,5 +50,28 @@ public class LocalizationContractTests
         string expectedCode)
     {
         CyclePhaseCodes.ToApiCode(phase).Should().Be(expectedCode);
+    }
+
+    [Theory]
+    [InlineData(CycleRegularityLevel.Unknown, "unknown")]
+    [InlineData(CycleRegularityLevel.Regular, "regular")]
+    [InlineData(CycleRegularityLevel.Irregular, "irregular")]
+    [InlineData(CycleRegularityLevel.VeryIrregular, "very_irregular")]
+    public void ToApiCode_ReturnsStableLowercaseRegularityCode(
+        CycleRegularityLevel level,
+        string expectedCode)
+    {
+        CycleRegularityCodes.ToApiCode(level).Should().Be(expectedCode);
+    }
+
+    [Theory]
+    [InlineData(1, "light")]
+    [InlineData(2, "medium")]
+    [InlineData(3, "heavy")]
+    public void ToApiCode_ReturnsStableLowercaseFlowCode(
+        int intensity,
+        string expectedCode)
+    {
+        FlowIntensityCodes.ToApiCode(intensity).Should().Be(expectedCode);
     }
 }

@@ -2,7 +2,7 @@ import { formatDateShort } from '../../utils/calendarUtils';
 import { useLocale } from '../../i18n/LocaleContext';
 
 const SummaryStats = ({ summary }) => {
-  const { t, locale } = useLocale();
+  const { t, locale, formatNumber } = useLocale();
   if (!summary) return null;
 
   return (
@@ -14,7 +14,7 @@ const SummaryStats = ({ summary }) => {
           </span>
           <div className="flex items-baseline gap-1">
             <span className="text-3xl font-headline font-bold text-on-surface">
-              {summary.averageCycleLength}
+              {formatNumber(summary.averageCycleLength)}
             </span>
             <span className="text-on-surface-variant text-sm font-medium">
               {t('common.days')}
@@ -27,7 +27,7 @@ const SummaryStats = ({ summary }) => {
           </span>
           <div className="flex items-baseline gap-1">
             <span className="text-3xl font-headline font-bold text-on-surface">
-              {summary.averagePeriodLength}
+              {formatNumber(summary.averagePeriodLength)}
             </span>
             <span className="text-on-surface-variant text-sm font-medium">
               {t('common.days')}
@@ -40,7 +40,7 @@ const SummaryStats = ({ summary }) => {
           </span>
           <div className="flex items-baseline gap-1">
             <span className="text-3xl font-headline font-bold text-on-surface">
-              {summary.regularity}
+              {formatNumber(summary.regularity)}
             </span>
             <span className="text-on-surface-variant text-sm font-medium">%</span>
           </div>

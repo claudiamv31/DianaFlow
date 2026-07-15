@@ -19,7 +19,7 @@ import { getErrorMessageKey } from '../../api/AppError';
 
 function Home() {
   const queryClient = useQueryClient();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [user, setUser] = useState(null);
   const [isLoggingToday, setIsLoggingToday] = useState(false);
   const [isLoggingNewPeriod, setIsLoggingNewPeriod] = useState(false);
@@ -183,8 +183,8 @@ function Home() {
           <div className="home-orb">
             <p className="text-phase">
               {safeStatus.currentPhase
-                ? t(`phase.${safeStatus.currentPhase}`).toUpperCase()
-                : t('home.noPeriod').toUpperCase()}
+                ? t(`phase.${safeStatus.currentPhase}`).toLocaleUpperCase(locale)
+                : t('home.noPeriod').toLocaleUpperCase(locale)}
             </p>
             <p className="text-status">
               {getCycleMessage(safeStatus.cycleStatus)}

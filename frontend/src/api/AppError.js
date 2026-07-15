@@ -8,6 +8,9 @@ export class AppError extends Error {
 
 export const API_ERROR_TRANSLATION_KEYS = {
   INVALID_CREDENTIALS: 'auth.error.invalidPassword',
+  CURRENT_PASSWORD_INCORRECT: 'password.currentIncorrect',
+  INVALID_REQUEST: 'api.error.invalidRequest',
+  RESOURCE_NOT_FOUND: 'api.error.resourceNotFound',
   EMAIL_ALREADY_IN_USE: 'auth.error.emailInUse',
   NOT_AUTHORIZED: 'auth.error.login',
   USER_NOT_FOUND: 'setup.noUser',

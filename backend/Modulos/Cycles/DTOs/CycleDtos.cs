@@ -1,5 +1,4 @@
 using backend.Modulos.Periods.Models;
-using System.Text.Json.Serialization;
 using backend.Modulos.Cycles.Enums;
 
 namespace backend.Modulos.Cycles.DTOs
@@ -41,8 +40,7 @@ namespace backend.Modulos.Cycles.DTOs
         public int? PeriodDuration { get; set; }
         public string FertilityLevel { get; set; } = "low";
         
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public CycleRegularityLevel Consistency { get; set; } = CycleRegularityLevel.Unknown;
+        public string Consistency { get; set; } = "unknown";
     }
 
     public class UpsertPeriodDto

@@ -151,5 +151,40 @@ namespace backend.Tests
 
             result.Should().BeOfType<NotFoundObjectResult>();
         }
+
+        [Fact]
+        public async Task ChangePassword_WithInvalidClaim_ReturnsMachineReadableUnauthorized()
+        {
+            var controller = CreateController("not-a-guid");
+
+            var result = await controller.ChangePassword(new ChangePasswordDto());
+
+            var unauthorized = result.Should().BeOfType<UnauthorizedObjectResult>().Subject;
+            unauthorized.Value.ShouldHaveApiError(ApiErrorCodes.NotAuthorized);
+        }
+
+        [Fact]
+        public async Task ChangePassword_WithIncorrectCurrentPassword_ReturnsFieldError()
+        {
+            var dto = new ChangePasswordDto
+            {
+                CurrentPassword = "wrong-password",
+                NewPassword = "new-password"
+            };
+            _authService
+                .Setup(service => service.ChangePasswordAsync(
+                    _userId,
+                    dto.CurrentPassword,
+                    dto.NewPassword))
+                .ThrowsAsync(new UnauthorizedAccessException());
+            var controller = CreateController(_userId.ToString());
+
+            var result = await controller.ChangePassword(dto);
+
+            var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            badRequest.Value.ShouldHaveApiError(
+                ApiErrorCodes.CurrentPasswordIncorrect,
+                "currentPassword");
+        }
     }
 }

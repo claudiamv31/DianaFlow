@@ -170,7 +170,7 @@ namespace backend.Modulos.Periods.Services
                     CycleLength = cycleLength,
                     Status = "completed", // Previous cycles are completed
                     CycleDay = 0,
-                    Consistency = GetRegularityLevel(cycleLength),
+                    Consistency = CycleRegularityCodes.ToApiCode(GetRegularityLevel(cycleLength)),
                     Days = previous.EndDate.HasValue ? (previous.EndDate.Value.DayNumber - previous.StartDate.DayNumber + 1) : periodLength
                 };
             }
@@ -417,13 +417,7 @@ namespace backend.Modulos.Periods.Services
 
                 if (flowGroup != null)
                 {
-                    predominantFlow = flowGroup.Key switch
-                    {
-                        1 => "Light Flow",
-                        2 => "Medium Flow",
-                        3 => "Heavy Flow",
-                        _ => null
-                    };
+                    predominantFlow = FlowIntensityCodes.ToApiCode(flowGroup.Key);
                 }
             }
 

@@ -26,7 +26,7 @@ const CycleInsightsCard = ({ previousCycle }) => {
           </div>
           <div>
             <p className="text-[1.3rem] font-bold text-[var(--purple-color)]">
-              {previousCycle.consistency}
+              {t(`regularity.${previousCycle.consistency}`)}
             </p>
             <p>{t('insights.consistency')}</p>
           </div>

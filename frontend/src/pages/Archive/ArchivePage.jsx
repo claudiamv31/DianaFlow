@@ -222,7 +222,7 @@ const ArchivePage = () => {
                             <span className="material-symbols-outlined text-[18px]">
                               water_drop
                             </span>
-                            <span>{period.predominantFlow}</span>
+                            <span>{t(`flow.${period.predominantFlow}`)}</span>
                           </div>
                         </div>
                       )}

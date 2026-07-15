@@ -5,6 +5,9 @@ public sealed record ApiError(string Code, string? Field = null);
 public static class ApiErrorCodes
 {
     public const string InvalidCredentials = "INVALID_CREDENTIALS";
+    public const string CurrentPasswordIncorrect = "CURRENT_PASSWORD_INCORRECT";
+    public const string InvalidRequest = "INVALID_REQUEST";
+    public const string ResourceNotFound = "RESOURCE_NOT_FOUND";
     public const string EmailAlreadyInUse = "EMAIL_ALREADY_IN_USE";
     public const string NotAuthorized = "NOT_AUTHORIZED";
     public const string UserNotFound = "USER_NOT_FOUND";
