@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import LanguageSelector from '../components/LanguageSelector';
 import { LocaleProvider, useLocale } from './LocaleContext';
+import { getUserSelectableLocales } from './locales';
 
 const TranslatedNavigation = () => {
   const { t } = useLocale();
@@ -33,6 +34,13 @@ describe('language selection', () => {
     expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue(
       'en-US'
     );
+  });
+
+  test('does not expose the developer pseudo-locale as a user option', () => {
+    expect(getUserSelectableLocales('development').map(({ code }) => code)).toEqual([
+      'en-US',
+      'es-MX'
+    ]);
   });
 
   test('switches to Spanish and remembers the selection', () => {

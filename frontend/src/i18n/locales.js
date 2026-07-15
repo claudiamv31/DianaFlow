@@ -18,6 +18,10 @@ export const selectableLocales =
     ? [...supportedLocales, DEVELOPMENT_LOCALE]
     : supportedLocales;
 
+export const getUserSelectableLocales = () => supportedLocales;
+
+export const userSelectableLocales = getUserSelectableLocales();
+
 export const isSupportedLocale = (locale) =>
   selectableLocales.some(({ code }) => code === locale);
 

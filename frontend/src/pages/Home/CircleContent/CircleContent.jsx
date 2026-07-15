@@ -1,5 +1,6 @@
 import './CircleContent.css';
 import { useLocale } from '../../../i18n/LocaleContext';
+import { phaseTranslationKey } from '../../../i18n/domainCodes';
 
 const CircleContent = ({ status }) => {
   const { t } = useLocale();
@@ -8,11 +9,12 @@ const CircleContent = ({ status }) => {
   }
 
   const { cycleStatus } = status;
+  const phaseKey = phaseTranslationKey(status.currentPhase);
 
   return (
     <div className="inner-circle-content">
       <p className="phase-label">
-        {status.currentPhase ? t(`phase.${status.currentPhase}`) : '--'}
+        {phaseKey ? t(phaseKey) : '--'}
       </p>
       <strong className="main-status">
         {cycleStatus.status === 'active_period'

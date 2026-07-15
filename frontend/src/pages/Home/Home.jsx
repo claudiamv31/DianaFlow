@@ -16,6 +16,7 @@ import { formatDateLocal } from '../../utils/calendarUtils';
 import { refreshCycleQueries } from '../../utils/queryInvalidation';
 import { useLocale } from '../../i18n/LocaleContext';
 import { getErrorMessageKey } from '../../api/AppError';
+import { normalizePhaseCode, phaseTranslationKey } from '../../i18n/domainCodes';
 
 function Home() {
   const queryClient = useQueryClient();
@@ -173,6 +174,7 @@ function Home() {
   const isPeriodActive = safeStatus.isActive === true;
   const suggestedPeriodDuration =
     safeStatus.durationDays || safeStatus.cycleStatus?.periodDuration || 5;
+  const currentPhase = normalizePhaseCode(safeStatus.currentPhase);
 
   return (
     <>
@@ -182,8 +184,8 @@ function Home() {
           {/* Orb */}
           <div className="home-orb">
             <p className="text-phase">
-              {safeStatus.currentPhase
-                ? t(`phase.${safeStatus.currentPhase}`).toLocaleUpperCase(locale)
+              {currentPhase
+                ? t(phaseTranslationKey(currentPhase)).toLocaleUpperCase(locale)
                 : t('home.noPeriod').toLocaleUpperCase(locale)}
             </p>
             <p className="text-status">
@@ -192,9 +194,9 @@ function Home() {
           </div>
 
           {/* Dynamic Phase Message */}
-          {safeStatus.currentPhase && (
+          {currentPhase && (
             <p className="text-sm italic text-gray-600 max-w-md text-center mt-2 px-4 animate-fade-in">
-              “{t(`home.phase.${safeStatus.currentPhase}`)}”
+              “{t(`home.phase.${currentPhase}`)}”
             </p>
           )}
 

@@ -1,5 +1,5 @@
 import { useLocale } from '../i18n/LocaleContext';
-import { selectableLocales } from '../i18n/locales';
+import { userSelectableLocales } from '../i18n/locales';
 
 const LanguageSelector = ({ variant = 'compact' }) => {
   const { locale, setLocale, t } = useLocale();
@@ -27,7 +27,7 @@ const LanguageSelector = ({ variant = 'compact' }) => {
         value={locale}
         onChange={(event) => setLocale(event.target.value)}
       >
-        {selectableLocales.map(({ code, label }) => (
+        {userSelectableLocales.map(({ code, label }) => (
           <option key={code} value={code}>
             {label}
           </option>
