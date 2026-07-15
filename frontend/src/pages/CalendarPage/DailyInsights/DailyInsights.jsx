@@ -3,6 +3,7 @@ import { formatMonthDay, formatDateLocal } from '../../../utils/calendarUtils';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { translateGuidance } from '../../../i18n/guidance';
+import { calendarPhaseDayTranslationKey } from '../../../i18n/domainCodes';
 
 const formatPhaseDay = (cycleInfo, t) => {
   if (!cycleInfo?.phaseDay || cycleInfo.phaseDay <= 0) {
@@ -30,9 +31,7 @@ const DailyInsigths = ({
   const { t, locale } = useLocale();
   const isToday = cycleInfo?.date === formatDateLocal(new Date());
   const hasCycleDay = cycleInfo?.cycleDay && cycleInfo.cycleDay > 0;
-  const phaseDayLabel = cycleInfo?.phase
-    ? t(`calendar.phaseDay.${cycleInfo.phase}`)
-    : t('calendar.phaseDay');
+  const phaseDayLabel = t(calendarPhaseDayTranslationKey(cycleInfo?.phase));
 
   if (isLoading) {
     return (

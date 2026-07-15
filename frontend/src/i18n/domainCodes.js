@@ -23,3 +23,10 @@ export const phaseTranslationKey = (phase) => {
   const normalized = normalizePhaseCode(phase);
   return normalized ? `phase.${normalized}` : null;
 };
+
+export const calendarPhaseDayTranslationKey = (phase) => {
+  const normalized = normalizePhaseCode(phase);
+  return normalized
+    ? `calendar.phaseDay.${normalized}`
+    : 'calendar.phaseDay';
+};
