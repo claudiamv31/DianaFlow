@@ -45,12 +45,11 @@ namespace backend.Modulos.Periods.DTOs
         public bool IsActive { get; set; }
         public int DaysUntilNextPeriod { get; set; }
         
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public ECyclePhase CurrentPhase {get; set;}
+        public string CurrentPhase { get; set; } = string.Empty;
 
         public CycleStatus? PreviousCycle { get; set; }
         public CycleStatus CycleStatus { get; set; } = new();
-        public string? DailyFocus { get; set; }
+        public string? DailyFocusKey { get; set; }
         public List<DailyRecordInput> SelectedDays { get; set; } = new();
     }
 

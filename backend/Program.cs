@@ -91,7 +91,6 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<TimeZoneService>();
 
-builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 app.UseCors("AllowReactApp");

@@ -11,6 +11,7 @@ using backend.Modulos.Cycles.Controllers;
 using backend.Modulos.Cycles.Services;
 using backend.Modulos.Cycles.DTOs;
 using backend.Modulos.Periods.DTOs;
+using backend.Api;
 
 namespace backend.Tests
 {
@@ -59,7 +60,7 @@ namespace backend.Tests
             var result = await controller.GetCalendar(2026, 6);
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -76,7 +77,7 @@ namespace backend.Tests
 
             // Assert
             var notFoundResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
-            notFoundResult.Value.Should().Be("No periods found.");
+            notFoundResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodsNotFound);
         }
 
         [Fact]
@@ -121,7 +122,7 @@ namespace backend.Tests
             // Assert
             var objectResult = result.Should().BeOfType<ObjectResult>().Subject;
             objectResult.StatusCode.Should().Be(500);
-            objectResult.Value.Should().Be($"Internal server error: {exceptionMessage}");
+            objectResult.Value.ShouldHaveApiError(ApiErrorCodes.InternalError);
         }
 
         #endregion
@@ -139,7 +140,7 @@ namespace backend.Tests
             var result = await controller.GetCalendar(testDate);
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -187,7 +188,7 @@ namespace backend.Tests
             var result = await controller.Upsert(dto);
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -269,7 +270,7 @@ namespace backend.Tests
             // Assert
             var objectResult = result.Should().BeOfType<ObjectResult>().Subject;
             objectResult.StatusCode.Should().Be(500);
-            objectResult.Value.Should().Be($"Error interno: {exceptionMessage}");
+            objectResult.Value.ShouldHaveApiError(ApiErrorCodes.CalendarUpdateFailed);
         }
 
         #endregion

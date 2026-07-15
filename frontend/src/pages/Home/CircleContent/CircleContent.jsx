@@ -11,14 +11,19 @@ const CircleContent = ({ status }) => {
 
   return (
     <div className="inner-circle-content">
-      <p className="phase-label">{t('phase.Luteal')}</p>
+      <p className="phase-label">
+        {status.currentPhase ? t(`phase.${status.currentPhase}`) : '--'}
+      </p>
       <strong className="main-status">
         {cycleStatus.status === 'active_period'
           ? t('cycle.dayValue', { count: cycleStatus.days })
           : t('home.periodIn', { count: cycleStatus.days })}
       </strong>
       <p className="day-counter">
-        {t('cycle.dayOfTotal', { day: 24, total: 28 })}
+        {t('cycle.dayOfTotal', {
+          day: cycleStatus.cycleDay,
+          total: cycleStatus.cycleLength
+        })}
       </p>
     </div>
   );

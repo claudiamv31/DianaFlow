@@ -122,7 +122,7 @@ const SignUp = () => {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Jane"
+                  placeholder={t('auth.placeholder.name')}
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
@@ -162,7 +162,7 @@ const SignUp = () => {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Doe"
+                  placeholder={t('auth.placeholder.lastName')}
                   value={lastName}
                   onChange={(e) => {
                     setLastName(e.target.value);
@@ -202,7 +202,7 @@ const SignUp = () => {
               <div className="relative">
                 <input
                   type="email"
-                  placeholder="jane@sanctuary.com"
+                  placeholder={t('auth.placeholder.email')}
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
@@ -242,7 +242,7 @@ const SignUp = () => {
               <div className="relative">
                 <input
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder.password')}
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);

@@ -4,7 +4,7 @@ import { formatDateDayMonthYear } from '../../../utils/calendarUtils';
 import { useLocale } from '../../../i18n/LocaleContext';
 
 const CycleInsightsCard = ({ previousCycle }) => {
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   return (
     <div className="flex-1 w-full">
       <h2 className="text-base font-bold mb-4 text-[var(--text-color)]">
@@ -51,7 +51,7 @@ const CycleInsightsCard = ({ previousCycle }) => {
               className="text-2xl mb-2 text-[var(--purple-color)]"
             />
             <p className="text-base font-bold text-[var(--text-color)]">
-              {formatDateDayMonthYear(previousCycle.startDate, dateLocale)}
+              {formatDateDayMonthYear(previousCycle.startDate, locale)}
             </p>
             <p>{t('insights.firstDay')}</p>
           </div>

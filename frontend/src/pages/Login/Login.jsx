@@ -50,18 +50,8 @@ function Login() {
     } catch (error) {
       console.error('❌ Error logging in:', error);
       const errorData = error.response?.data;
-      const status = error.response?.status;
-      const responseMessage = errorData?.message || '';
-      const isInvalidCredentials =
-        status === 401 ||
-        responseMessage.toLowerCase().includes('credenciales inválidas') ||
-        responseMessage.toLowerCase().includes('invalid credentials');
-
-      const field =
-        errorData?.field || (isInvalidCredentials ? 'password' : 'form');
-      const message = isInvalidCredentials
-        ? 'auth.error.invalidPassword'
-        : getErrorMessageKey(error, 'auth.error.login');
+      const field = errorData?.field || 'form';
+      const message = getErrorMessageKey(error, 'auth.error.login');
 
       setFieldErrors({ [field]: message });
     } finally {
@@ -129,7 +119,7 @@ function Login() {
               <div className="relative">
                 <input
                   type="email"
-                  placeholder="name@sanctuary.com"
+                  placeholder={t('auth.placeholder.email')}
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
@@ -173,7 +163,7 @@ function Login() {
               <div className="relative">
                 <input
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder.password')}
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);

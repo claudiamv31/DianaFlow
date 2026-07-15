@@ -14,6 +14,7 @@ using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Periods.Models;
 using backend.Modulos.Cycles.DTOs;
 using backend.Modulos.Cycles.Enums;
+using backend.Api;
 
 namespace backend.Tests
 {
@@ -64,7 +65,7 @@ namespace backend.Tests
             var result = await controller.CreatePeriod(dto);
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -79,7 +80,7 @@ namespace backend.Tests
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            badRequestResult.Value.Should().Be("Debe seleccionar al menos un día.");
+            badRequestResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodDaysRequired, "selectedDays");
         }
 
         [Fact]
@@ -94,7 +95,7 @@ namespace backend.Tests
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            badRequestResult.Value.Should().Be("Debe seleccionar al menos un día.");
+            badRequestResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodDaysRequired, "selectedDays");
         }
 
         [Fact]
@@ -115,7 +116,7 @@ namespace backend.Tests
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            badRequestResult.Value.Should().Be("La fecha de inicio es requerida.");
+            badRequestResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodStartRequired, "startDate");
         }
 
         [Fact(Skip = "Sorting of SelectedDays in the controller prevents endDate < startDate from ever occurring")]
@@ -137,7 +138,7 @@ namespace backend.Tests
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            badRequestResult.Value.Should().Be("La fecha de fin no puede ser menor a la de inicio.");
+            badRequestResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodStartRequired, "endDate");
         }
 
         [Fact]
@@ -192,7 +193,7 @@ namespace backend.Tests
             // Assert
             var statusCodeResult = result.Should().BeOfType<ObjectResult>().Subject;
             statusCodeResult.StatusCode.Should().Be(500);
-            statusCodeResult.Value.Should().Be("Internal server error: Database error");
+            statusCodeResult.Value.ShouldHaveApiError(ApiErrorCodes.InternalError);
         }
 
         #endregion
@@ -209,7 +210,7 @@ namespace backend.Tests
             var result = await controller.GetPeriods(null, null);
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -305,7 +306,7 @@ namespace backend.Tests
             // Assert
             var statusCodeResult = result.Should().BeOfType<ObjectResult>().Subject;
             statusCodeResult.StatusCode.Should().Be(500);
-            statusCodeResult.Value.Should().Be("Internal server error: Database connection failed");
+            statusCodeResult.Value.ShouldHaveApiError(ApiErrorCodes.InternalError);
         }
 
         #endregion
@@ -322,7 +323,7 @@ namespace backend.Tests
             var result = await controller.GetLatestPeriod();
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -340,7 +341,7 @@ namespace backend.Tests
 
             // Assert
             var notFoundResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
-            notFoundResult.Value.Should().Be("No periods found.");
+            notFoundResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodsNotFound);
         }
 
         [Fact]
@@ -394,7 +395,7 @@ namespace backend.Tests
             var result = await controller.GetNextPeriod();
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -412,7 +413,7 @@ namespace backend.Tests
 
             // Assert
             var notFoundResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
-            notFoundResult.Value.Should().Be("No period found.");
+            notFoundResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodNotFound);
         }
 
         [Fact]
@@ -470,7 +471,7 @@ namespace backend.Tests
             var result = await controller.GetHome();
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -483,7 +484,7 @@ namespace backend.Tests
                 PeriodId = 12,
                 StartDate = new DateOnly(2026, 6, 1),
                 IsActive = true,
-                CurrentPhase = ECyclePhase.Menstruation
+                CurrentPhase = "menstruation"
             };
 
             _mockPeriodService
@@ -514,7 +515,7 @@ namespace backend.Tests
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            badRequestResult.Value.Should().Be("Period ID is required.");
+            badRequestResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodIdRequired, "periodId");
         }
 
         [Fact]
@@ -528,7 +529,7 @@ namespace backend.Tests
             var result = await controller.UpdatePeriod(dto);
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -547,7 +548,7 @@ namespace backend.Tests
 
             // Assert
             var notFoundResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
-            notFoundResult.Value.Should().Be("Period not found.");
+            notFoundResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodNotFound);
         }
 
         [Fact]
@@ -586,7 +587,7 @@ namespace backend.Tests
             // Assert
             var statusCodeResult = result.Should().BeOfType<ObjectResult>().Subject;
             statusCodeResult.StatusCode.Should().Be(500);
-            statusCodeResult.Value.Should().Be("Internal server error: DB Conflict");
+            statusCodeResult.Value.ShouldHaveApiError(ApiErrorCodes.InternalError);
         }
 
         #endregion
@@ -605,7 +606,7 @@ namespace backend.Tests
 
             // Assert
             var badRequestResult = result.Should().BeOfType<BadRequestObjectResult>().Subject;
-            badRequestResult.Value.Should().Be("Date is required.");
+            badRequestResult.Value.ShouldHaveApiError(ApiErrorCodes.DateRequired, "date");
         }
 
         [Fact]
@@ -619,7 +620,7 @@ namespace backend.Tests
             var result = await controller.UpdatePeriodDay(dto);
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -639,7 +640,7 @@ namespace backend.Tests
             // Assert
             var statusCodeResult = result.Should().BeOfType<ObjectResult>().Subject;
             statusCodeResult.StatusCode.Should().Be(500);
-            statusCodeResult.Value.Should().Be("Could not update period day.");
+            statusCodeResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodUpdateFailed);
         }
 
         [Fact]
@@ -688,7 +689,7 @@ namespace backend.Tests
             // Assert
             var statusCodeResult = result.Should().BeOfType<ObjectResult>().Subject;
             statusCodeResult.StatusCode.Should().Be(500);
-            statusCodeResult.Value.Should().Be("Internal server error: Lock failure");
+            statusCodeResult.Value.ShouldHaveApiError(ApiErrorCodes.InternalError);
         }
 
         #endregion
@@ -706,7 +707,7 @@ namespace backend.Tests
             var result = await controller.DeletePeriod(id);
 
             // Assert
-            result.Should().BeOfType<UnauthorizedResult>();
+            result.Should().BeOfType<UnauthorizedObjectResult>();
         }
 
         [Fact]
@@ -725,7 +726,7 @@ namespace backend.Tests
 
             // Assert
             var notFoundResult = result.Should().BeOfType<NotFoundObjectResult>().Subject;
-            notFoundResult.Value.Should().Be("Period not found.");
+            notFoundResult.Value.ShouldHaveApiError(ApiErrorCodes.PeriodNotFound);
         }
 
         [Fact]
@@ -763,7 +764,7 @@ namespace backend.Tests
             // Assert
             var statusCodeResult = result.Should().BeOfType<ObjectResult>().Subject;
             statusCodeResult.StatusCode.Should().Be(500);
-            statusCodeResult.Value.Should().Be("Internal server error: DB connection dropped");
+            statusCodeResult.Value.ShouldHaveApiError(ApiErrorCodes.InternalError);
         }
 
         #endregion

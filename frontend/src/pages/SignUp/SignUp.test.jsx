@@ -46,11 +46,11 @@ describe('SignUp', () => {
       'aria-invalid',
       'true'
     );
-    expect(screen.getByPlaceholderText(/jane@sanctuary.com/i)).toHaveAttribute(
+    expect(screen.getByPlaceholderText(/name@example.com/i)).toHaveAttribute(
       'aria-invalid',
       'true'
     );
-    expect(screen.getByPlaceholderText('••••••••')).toHaveAttribute(
+    expect(screen.getByPlaceholderText('Enter your password')).toHaveAttribute(
       'aria-invalid',
       'true'
     );
@@ -68,11 +68,11 @@ describe('SignUp', () => {
     await userEvent.type(screen.getByPlaceholderText('Jane'), 'Jane');
     await userEvent.type(screen.getByPlaceholderText('Doe'), 'Doe');
     await userEvent.type(
-      screen.getByPlaceholderText(/jane@sanctuary.com/i),
+      screen.getByPlaceholderText(/name@example.com/i),
       'jane@example.com'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('••••••••'),
+      screen.getByPlaceholderText('Enter your password'),
       'secure-password'
     );
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
@@ -110,11 +110,11 @@ describe('SignUp', () => {
     await userEvent.type(screen.getByPlaceholderText('Jane'), 'Jane');
     await userEvent.type(screen.getByPlaceholderText('Doe'), 'Doe');
     await userEvent.type(
-      screen.getByPlaceholderText(/jane@sanctuary.com/i),
+      screen.getByPlaceholderText(/name@example.com/i),
       'jane@example.com'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('••••••••'),
+      screen.getByPlaceholderText('Enter your password'),
       'secure-password'
     );
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));

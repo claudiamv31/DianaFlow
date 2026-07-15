@@ -57,7 +57,7 @@ namespace backend.Tests
         [Fact]
         public void CalculatePhaseInfo_ForMenstruation_ReturnsMenstruationDay()
         {
-            var service = new CycleService(null!, null!);
+            var service = new CycleService();
 
             var phase = service.CalculatePhaseInfo(
                 new DateOnly(2026, 6, 1),
@@ -81,7 +81,7 @@ namespace backend.Tests
             int expectedFertileEnd,
             int expectedOvulationDay)
         {
-            var service = new CycleService(null!, null!);
+            var service = new CycleService();
             var cycleStart = new DateOnly(2026, 6, 1);
 
             var fertileStart = service.CalculatePhaseInfo(
@@ -131,7 +131,7 @@ namespace backend.Tests
             int expectedFertileEnd,
             int expectedOvulationDay)
         {
-            var service = new CycleService(null!, null!);
+            var service = new CycleService();
             var latestPeriod = Period(new DateOnly(2026, 6, 1));
 
             var beforeFertileWindow = service.CalculateCycleInfo(
@@ -169,7 +169,7 @@ namespace backend.Tests
         [Fact]
         public void BuildCycleStatus_OnOvulationDay_IncludesFertilityLevel()
         {
-            var service = new CycleService(null!, null!);
+            var service = new CycleService();
             var latestPeriod = Period(new DateOnly(2026, 6, 1));
 
             var status = service.BuildCycleStatus(

@@ -37,11 +37,11 @@ describe('Login', () => {
     await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(screen.getAllByText('Required')).toHaveLength(2);
-    expect(screen.getByPlaceholderText(/name@sanctuary.com/i)).toHaveAttribute(
+    expect(screen.getByPlaceholderText(/name@example.com/i)).toHaveAttribute(
       'aria-invalid',
       'true'
     );
-    expect(screen.getByPlaceholderText('••••••••')).toHaveAttribute(
+    expect(screen.getByPlaceholderText('Enter your password')).toHaveAttribute(
       'aria-invalid',
       'true'
     );
@@ -56,7 +56,7 @@ describe('Login', () => {
 
     await userEvent.selectOptions(
       screen.getByRole('combobox', { name: 'Language' }),
-      'es'
+      'es-MX'
     );
 
     expect(screen.getAllByText('Obligatorio')).toHaveLength(2);
@@ -68,23 +68,23 @@ describe('Login', () => {
         status: 401,
         data: {
           field: 'password',
-          message: 'The password does not match this account.'
+          code: 'INVALID_CREDENTIALS'
         }
       }
     });
     renderLogin();
 
     await userEvent.type(
-      screen.getByPlaceholderText(/name@sanctuary.com/i),
+      screen.getByPlaceholderText(/name@example.com/i),
       'jane@example.com'
     );
-    await userEvent.type(screen.getByPlaceholderText('••••••••'), 'wrong-password');
+    await userEvent.type(screen.getByPlaceholderText('Enter your password'), 'wrong-password');
     await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(
       await screen.findByText('The password does not match this account.')
     ).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('••••••••')).toHaveAttribute(
+    expect(screen.getByPlaceholderText('Enter your password')).toHaveAttribute(
       'aria-invalid',
       'true'
     );
@@ -99,11 +99,11 @@ describe('Login', () => {
     renderLogin();
 
     await userEvent.type(
-      screen.getByPlaceholderText(/name@sanctuary.com/i),
+      screen.getByPlaceholderText(/name@example.com/i),
       'jane@example.com'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('••••••••'),
+      screen.getByPlaceholderText('Enter your password'),
       'correct-password'
     );
     await userEvent.click(screen.getByRole('button', { name: /sign in/i }));

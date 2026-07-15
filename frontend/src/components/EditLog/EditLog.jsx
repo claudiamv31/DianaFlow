@@ -8,7 +8,7 @@ import LoadingSpinner from '../LoadingSpinner';
 import { useLocale } from '../../i18n/LocaleContext';
 
 const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -81,7 +81,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
               {t('log.editDaily')}
             </h2>
             <p className="text-sm font-semibold tracking-widest uppercase text-primary/70 mt-1">
-              {selectedDate?.toLocaleDateString(dateLocale, {
+              {selectedDate?.toLocaleDateString(locale, {
                 weekday: 'long',
                 month: 'short',
                 day: 'numeric'

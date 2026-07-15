@@ -3,6 +3,7 @@ using backend.Modulos.User.DTOs;
 using backend.Modulos.Profile.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using backend.Api;
 
 namespace backend.Modulos.User.Controllers
 {
@@ -32,7 +33,7 @@ namespace backend.Modulos.User.Controllers
             var errorMessage = await _authService.RegisterAsync(dto);
             
             if (errorMessage != null)
-                return BadRequest(new { message = errorMessage });
+                return BadRequest(new ApiError(ApiErrorCodes.EmailAlreadyInUse, "email"));
 
             return Ok(new { message = "User registered successfully" });
         }
@@ -43,7 +44,7 @@ namespace backend.Modulos.User.Controllers
             var tokens = await _authService.Login(dto);
             
             if (tokens == null)
-                return Unauthorized(new { message = "Invalid email or password." });
+                return Unauthorized(new ApiError(ApiErrorCodes.InvalidCredentials, "password"));
             
             SetRefreshTokenCookie(tokens.RefreshToken);
 
@@ -68,11 +69,11 @@ namespace backend.Modulos.User.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized(new { message = "Not authorized" });
+                return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
             var profile = await _profileService.GetProfileByUserIdAsync(userId);
             if (profile == null)
-                return NotFound(new { message = "User not found" });
+                return NotFound(new ApiError(ApiErrorCodes.UserNotFound));
 
             return Ok(new
             {
@@ -110,14 +111,14 @@ namespace backend.Modulos.User.Controllers
             var refreshToken = Request.Cookies[RefreshTokenCookieName];
 
             if (string.IsNullOrEmpty(refreshToken))
-                return Unauthorized(new { message = "Refresh token missing" });
+                return Unauthorized(new ApiError(ApiErrorCodes.RefreshTokenMissing));
 
             var tokens = await _authService.RefreshTokenAsync(refreshToken);
 
             if (tokens == null)
             {
                 DeleteRefreshTokenCookie();
-                return Unauthorized(new { message = "Invalid or expired session" });
+                return Unauthorized(new ApiError(ApiErrorCodes.SessionExpired));
             }
 
             SetRefreshTokenCookie(tokens.RefreshToken);

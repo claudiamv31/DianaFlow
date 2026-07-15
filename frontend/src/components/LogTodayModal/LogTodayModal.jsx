@@ -11,7 +11,7 @@ const LogTodayModal = ({
   todayDate,
   isSaving = false
 }) => {
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -57,7 +57,7 @@ const LogTodayModal = ({
               {t('home.logToday')}
             </h2>
             <p className="text-sm font-semibold tracking-widest uppercase text-[var(--primary-color)] mt-1">
-              {formatLongDate(todayDate || new Date(), dateLocale)}
+              {formatLongDate(todayDate || new Date(), locale)}
             </p>
           </div>
           <button

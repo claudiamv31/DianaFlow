@@ -9,7 +9,7 @@ import { useLocale } from '../../i18n/LocaleContext';
 
 const ArchivePage = () => {
   const queryClient = useQueryClient();
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   const [periods, setPeriods] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -107,7 +107,7 @@ const ArchivePage = () => {
     if (!start) return '';
 
     const formatDatePart = ({ year, monthIdx, day }) =>
-      new Intl.DateTimeFormat(dateLocale, {
+      new Intl.DateTimeFormat(locale, {
         month: 'short',
         day: 'numeric'
       }).format(new Date(year, monthIdx, day));

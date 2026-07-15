@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using Xunit;
+using backend.Api;
 
 namespace backend.Tests
 {
@@ -89,7 +90,10 @@ namespace backend.Tests
 
             var result = await controller.Login(dto);
 
-            result.Should().BeOfType<UnauthorizedObjectResult>();
+            var unauthorized = result.Should().BeOfType<UnauthorizedObjectResult>().Subject;
+            var response = unauthorized.Value.Should().BeOfType<ApiError>().Subject;
+            response.Code.Should().Be("INVALID_CREDENTIALS");
+            response.Field.Should().Be("password");
         }
 
         [Fact]

@@ -152,7 +152,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                   onChange={handlePasswordChange}
                   disabled={changePasswordMutation.isPending}
                   required
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder.password')}
                 />
                 {errors.currentPassword && (
                   <p className="text-error text-xs px-2 font-semibold">
@@ -178,7 +178,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                   onChange={handlePasswordChange}
                   disabled={changePasswordMutation.isPending}
                   required
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder.password')}
                 />
                 {errors.newPassword && (
                   <p className="text-error text-xs px-2 font-semibold">
@@ -207,7 +207,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                   onChange={handlePasswordChange}
                   disabled={changePasswordMutation.isPending}
                   required
-                  placeholder="••••••••"
+                  placeholder={t('auth.placeholder.password')}
                 />
                 {errors.confirmPassword && (
                   <p className="text-error text-xs px-2 font-semibold">

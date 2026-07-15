@@ -61,7 +61,7 @@ function LogFlow({
   durationDays,
   isSaving = false
 }) {
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -217,7 +217,7 @@ function LogFlow({
               onActiveStartDateChange={onMonthChange}
               calendarType="gregory"
               showNeighboringMonth={false}
-              locale={dateLocale}
+              locale={locale}
               formatShortWeekday={formatCalendarWeekday}
               tileClassName={({ date, view }) =>
                 view === 'month' ? tileClassName({ date }) : null

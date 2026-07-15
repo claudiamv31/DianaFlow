@@ -2,6 +2,7 @@ import { FaEdit } from 'react-icons/fa';
 import { formatMonthDay, formatDateLocal } from '../../../utils/calendarUtils';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { useLocale } from '../../../i18n/LocaleContext';
+import { translateGuidance } from '../../../i18n/guidance';
 
 const formatPhaseDay = (cycleInfo, t) => {
   if (!cycleInfo?.phaseDay || cycleInfo.phaseDay <= 0) {
@@ -26,7 +27,7 @@ const DailyInsigths = ({
   setIsDailyLogActive,
   isPeriod
 }) => {
-  const { t, locale, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   const isToday = cycleInfo?.date === formatDateLocal(new Date());
   const hasCycleDay = cycleInfo?.cycleDay && cycleInfo.cycleDay > 0;
   const phaseDayLabel = cycleInfo?.phase
@@ -49,7 +50,7 @@ const DailyInsigths = ({
         <div className="flex justify-between items-start mb-6">
           <div>
             <p className="font-label font-bold text-xs !text-primary uppercase tracking-widest mb-1">
-              {cycleInfo?.date && formatMonthDay(cycleInfo.date, dateLocale)}
+              {cycleInfo?.date && formatMonthDay(cycleInfo.date, locale)}
             </p>
             <h3 className="font-headline font-bold text-2xl text-on-surface">
               {t('calendar.cycleDay', {
@@ -98,11 +99,7 @@ const DailyInsigths = ({
             {t('calendar.dailyInsight')}
           </p>
           <p className="text-sm text-on-surface-variant">
-            {locale === 'en' && cycleInfo?.dailyInsight
-              ? cycleInfo.dailyInsight
-              : cycleInfo?.phase
-                ? t(`calendar.insight.${cycleInfo.phase}`)
-                : t('calendar.insightFallback')}
+            {translateGuidance(t, cycleInfo?.dailyInsightKey, 'insight')}
           </p>
         </div>
         <div className="flex flex-col gap-4">

@@ -69,7 +69,7 @@ namespace backend.Modulos.Cycles.Services
                     IsFertile = cycleInfo.IsFertile,
                     IsOvulation = cycleInfo.IsOvulation,
                     FertilityLevel = cycleInfo.FertilityLevel?.ToLower() ?? "low",
-                    Phase = phaseInfo.Phase.ToString(),
+                    Phase = CyclePhaseCodes.ToApiCode(phaseInfo.Phase),
                     PhaseDay = phaseInfo.PhaseDay,
                     PhaseLength = phaseInfo.PhaseLength,
                     Flow = periodDay?.Flow,
@@ -112,7 +112,7 @@ namespace backend.Modulos.Cycles.Services
                 averageCycleLength,
                 date,
                 GetPeriodLength(latestPeriod, averagePeriodLength));
-            var message = await _cycleService.GetCachedDailyInsightAsync(userId, phaseInfo.Phase, date);
+            var insightKey = _cycleService.GetDailyGuidanceKey(userId, phaseInfo.Phase, date);
 
             var cycleInfo = _cycleService.CalculateCycleInfo(latestPeriod, date, averageCycleLength);
 
@@ -125,10 +125,10 @@ namespace backend.Modulos.Cycles.Services
                 IsOvulation = cycleInfo.IsOvulation,
                 IsFertile = cycleInfo.IsFertile,
                 FertilityLevel = cycleInfo.FertilityLevel?.ToLower() ?? "low",
-                Phase = phaseInfo.Phase.ToString(),
+                Phase = CyclePhaseCodes.ToApiCode(phaseInfo.Phase),
                 PhaseDay = phaseInfo.PhaseDay,
                 PhaseLength = phaseInfo.PhaseLength,
-                DailyInsight = message,
+                DailyInsightKey = insightKey,
                 Flow = periodDay?.Flow,
                 PeriodDaysId = periodDay?.Id
             };

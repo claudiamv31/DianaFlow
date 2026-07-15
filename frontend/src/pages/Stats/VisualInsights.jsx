@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocale } from '../../i18n/LocaleContext';
 
 const VisualInsights = ({ summary }) => {
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   const periods = summary?.periods || [];
 
   // Parse and prepare period data. If the user has fewer than 6 logged periods,
@@ -48,7 +48,7 @@ const VisualInsights = ({ summary }) => {
     const parts = dateStr.split('-');
     if (parts.length < 2) return '';
     const date = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
-    return new Intl.DateTimeFormat(dateLocale, { month: 'short' }).format(date);
+    return new Intl.DateTimeFormat(locale, { month: 'short' }).format(date);
   };
 
   return (

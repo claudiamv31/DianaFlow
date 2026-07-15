@@ -9,7 +9,7 @@ import { useLocale } from '../../i18n/LocaleContext';
 const HistoryPeriod = ({ latestPeriods }) => {
   const queryClient = useQueryClient();
   const [selectedPeriod, setSelectedPeriod] = useState(null);
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
 
   const saveLogMutation = useMutation({
     mutationFn: async (payload) => {
@@ -51,7 +51,7 @@ const HistoryPeriod = ({ latestPeriods }) => {
     if (parts.length < 3) return { month: '', day: '', formatted: '' };
     const monthIdx = parseInt(parts[1], 10) - 1;
     const day = parts[2];
-    const month = new Intl.DateTimeFormat(dateLocale, {
+    const month = new Intl.DateTimeFormat(locale, {
       month: 'short'
     }).format(new Date(Number(parts[0]), monthIdx, 1));
     return {

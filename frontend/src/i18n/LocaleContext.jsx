@@ -1,63 +1,60 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { translations } from './translations';
+import { useTranslation } from 'react-i18next';
+import i18n from './instance';
 import {
   DEFAULT_LOCALE,
   getLocaleDefinition,
-  locales,
-  LOCALE_STORAGE_KEY
+  isSupportedLocale,
+  LOCALE_STORAGE_KEY,
+  matchSupportedLocale
 } from './locales';
 
-const translate = (locale, key, variables = {}) => {
-  const template =
-    translations[locale]?.[key] ?? translations[DEFAULT_LOCALE]?.[key] ?? key;
+const getInitialLocale = () => {
+  const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY);
+  if (isSupportedLocale(storedLocale)) return storedLocale;
 
-  return Object.entries(variables).reduce(
-    (message, [name, value]) =>
-      message.replaceAll(`{{${name}}}`, String(value)),
-    template
-  );
+  return matchSupportedLocale(window.navigator.languages || [window.navigator.language]);
 };
 
 const LocaleContext = createContext({
   locale: DEFAULT_LOCALE,
   setLocale: () => {},
-  t: (key, variables) => translate(DEFAULT_LOCALE, key, variables),
-  dateLocale: getLocaleDefinition(DEFAULT_LOCALE).dateLocale
+  t: i18n.t.bind(i18n),
+  formatDate: (value, options) =>
+    new Intl.DateTimeFormat(DEFAULT_LOCALE, options).format(value),
+  formatNumber: (value, options) =>
+    new Intl.NumberFormat(DEFAULT_LOCALE, options).format(value)
 });
 
-const getInitialLocale = () => {
-  const storedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-  return locales.some(({ id }) => id === storedLocale)
-    ? storedLocale
-    : DEFAULT_LOCALE;
-};
-
 export const LocaleProvider = ({ children }) => {
-  const [locale, setLocale] = useState(getInitialLocale);
+  const [locale, setLocaleState] = useState(getInitialLocale);
+  const { t } = useTranslation();
 
   useEffect(() => {
+    i18n.changeLanguage(locale);
     window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
     document.documentElement.lang = locale;
+    document.documentElement.dir = getLocaleDefinition(locale).direction;
   }, [locale]);
 
-  const t = useCallback(
-    (key, variables = {}) => translate(locale, key, variables),
-    [locale]
-  );
+  const setLocale = useCallback((nextLocale) => {
+    if (isSupportedLocale(nextLocale)) setLocaleState(nextLocale);
+  }, []);
 
   const value = useMemo(
     () => ({
       locale,
       setLocale,
       t,
-      dateLocale: getLocaleDefinition(locale).dateLocale
+      formatDate: (date, options) =>
+        new Intl.DateTimeFormat(locale, options).format(date),
+      formatNumber: (number, options) =>
+        new Intl.NumberFormat(locale, options).format(number)
     }),
-    [locale, t]
+    [locale, setLocale, t]
   );
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 };
 
-export const useLocale = () => {
-  return useContext(LocaleContext);
-};
+export const useLocale = () => useContext(LocaleContext);

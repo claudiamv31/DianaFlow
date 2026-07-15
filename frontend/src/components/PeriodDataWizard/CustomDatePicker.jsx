@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocale } from '../../i18n/LocaleContext';
 
 const CustomDatePicker = ({ value, onChange, maxDate }) => {
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   const [showCalendar, setShowCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(
     value ? new Date(value) : new Date()
@@ -11,7 +11,7 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
   const triggerRef = useRef(null);
 
   const monthNames = Array.from({ length: 12 }, (_, month) =>
-    new Intl.DateTimeFormat(dateLocale, { month: 'long' }).format(
+    new Intl.DateTimeFormat(locale, { month: 'long' }).format(
       new Date(2024, month, 1)
     )
   );
@@ -58,7 +58,7 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
   const formatDisplayDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString + 'T00:00:00');
-    return date.toLocaleDateString(dateLocale, {
+    return date.toLocaleDateString(locale, {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
@@ -153,7 +153,7 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
             {/* Days of Week */}
             <div className="grid grid-cols-7 gap-0.5 md:gap-2 mb-1 md:mb-3">
               {Array.from({ length: 7 }, (_, day) =>
-                new Intl.DateTimeFormat(dateLocale, { weekday: 'short' }).format(
+                new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(
                   new Date(2024, 0, 7 + day)
                 )
               ).map((day) => (

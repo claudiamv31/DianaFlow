@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using backend.Modulos.Cycles.DTOs;
 using backend.Modulos.Cycles.Services;
 using backend.Modulos.Periods.DTOs;
+using backend.Api;
 
 namespace backend.Modulos.Cycles.Controllers
 {
@@ -24,18 +25,18 @@ namespace backend.Modulos.Cycles.Controllers
         {
             try{
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 var result = await _calendarService.GetCalendarAsync(userId, year, month);
 
                 if(result == null)
-                    return NotFound("No periods found.");
+                    return NotFound(new ApiError(ApiErrorCodes.PeriodsNotFound));
 
                 return Ok(result);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
 
@@ -44,7 +45,7 @@ namespace backend.Modulos.Cycles.Controllers
         public async Task<IActionResult> GetCalendar([FromQuery] DateOnly date)
         {
             var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+            if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
             var result = await _calendarService.GetCalendarDayAsync(userId, date);
 
@@ -58,7 +59,7 @@ namespace backend.Modulos.Cycles.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
                     
                 var result = await _calendarService.UpdateCalendar(userId, dto);
 
@@ -66,9 +67,9 @@ namespace backend.Modulos.Cycles.Controllers
                     ? StatusCode(201, new { message = "Período creado", status = "created" })
                     : Ok(new { message = "Período actualizado", status = "updated" });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Error interno: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.CalendarUpdateFailed));
             }
 
         }   

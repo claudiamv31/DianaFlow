@@ -264,7 +264,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   onChange={handleFieldChange}
                   disabled={profileLoading || updateProfileMutation.isPending}
                   required
-                  placeholder="your@email.com"
+                  placeholder={t('auth.placeholder.email')}
                 />
                 {errors.email && (
                   <p className="text-error text-xs px-2 font-semibold">

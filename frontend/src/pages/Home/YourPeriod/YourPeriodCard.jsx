@@ -1,13 +1,9 @@
 import { useLocale } from '../../../i18n/LocaleContext';
+import { translateGuidance } from '../../../i18n/guidance';
 
 const YourPeriodCard = ({ period }) => {
-  const { t, locale } = useLocale();
-  const focusText =
-    locale === 'en' && period?.dailyFocus
-      ? period.dailyFocus
-      : period?.currentPhase
-        ? t(`home.phase.${period.currentPhase}`)
-        : t('focus.default');
+  const { t } = useLocale();
+  const focusText = translateGuidance(t, period?.dailyFocusKey, 'focus');
 
   return (
     // Replaced 'md:col-span-2' with 'w-full' to fix the mobile layout width

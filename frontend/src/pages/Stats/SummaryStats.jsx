@@ -2,7 +2,7 @@ import { formatDateShort } from '../../utils/calendarUtils';
 import { useLocale } from '../../i18n/LocaleContext';
 
 const SummaryStats = ({ summary }) => {
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   if (!summary) return null;
 
   return (
@@ -51,7 +51,7 @@ const SummaryStats = ({ summary }) => {
           </span>
           <div className="flex items-baseline gap-1">
             <span className="text-3xl font-headline font-bold text-primary/100">
-              {formatDateShort(summary.nextPeriodStart, dateLocale)}
+              {formatDateShort(summary.nextPeriodStart, locale)}
             </span>
           </div>
         </div>

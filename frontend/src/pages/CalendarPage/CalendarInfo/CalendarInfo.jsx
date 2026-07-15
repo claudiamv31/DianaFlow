@@ -15,7 +15,7 @@ const CalendarInfo = ({
   currentPeriod,
   setPeriodDays
 }) => {
-  const { t, dateLocale } = useLocale();
+  const { t, locale } = useLocale();
   const options = {
     year: 'numeric',
     month: 'long',
@@ -90,7 +90,7 @@ const CalendarInfo = ({
       ) : (
         <div className="day-info">
           <p>
-            <strong>{date.toLocaleDateString(dateLocale, options)}</strong>
+            <strong>{date.toLocaleDateString(locale, options)}</strong>
           </p>
           <p>{t('calendar.cycleDay', { count: cycleInfo.cycleDay })}</p>
           <p>{t(`phase.${cycleInfo.phase}`)}</p>

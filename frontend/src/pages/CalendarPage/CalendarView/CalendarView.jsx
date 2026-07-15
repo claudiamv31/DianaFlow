@@ -21,7 +21,7 @@ const CalendarView = ({
   setCurrentPeriod,
   nextPeriod
 }) => {
-  const { dateLocale } = useLocale();
+  const { locale } = useLocale();
   const tileClassName = ({ date, activeStartDate }) => {
     const dateString = formatDateLocal(date);
     const today = formatDateLocal(new Date());
@@ -102,7 +102,7 @@ const CalendarView = ({
         onActiveStartDateChange={onMonthChange}
         calendarType="gregory"
         showNeighboringMonth={true}
-        locale={dateLocale}
+        locale={locale}
         formatShortWeekday={formatCalendarWeekday}
         tileClassName={({ date, view, activeStartDate }) =>
           view === 'month' ? tileClassName({ date, activeStartDate }) : null
