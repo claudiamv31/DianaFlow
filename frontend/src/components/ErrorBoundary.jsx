@@ -1,14 +1,18 @@
 import React from 'react';
 import ErrorScreen from './ErrorScreen';
+import { getErrorMessageKey } from '../api/AppError';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, message: '' };
+    this.state = { hasError: false, messageKey: null };
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true, message: error.message || 'Something went wrong' };
+    return {
+      hasError: true,
+      messageKey: getErrorMessageKey(error, 'error.generic')
+    };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -17,7 +21,7 @@ class ErrorBoundary extends React.Component {
   }
 
   handleRetry = () => {
-    this.setState({ hasError: false, message: '' });
+    this.setState({ hasError: false, messageKey: null });
     if (this.props.onRetry) {
       this.props.onRetry();
     } else {
@@ -28,7 +32,10 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <ErrorScreen message={this.state.message} onRetry={this.handleRetry} />
+        <ErrorScreen
+          messageKey={this.state.messageKey}
+          onRetry={this.handleRetry}
+        />
       );
     }
     return this.props.children;

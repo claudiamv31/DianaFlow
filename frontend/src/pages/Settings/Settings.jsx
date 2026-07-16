@@ -6,6 +6,8 @@ import ChangePasswordModal from './ChangePasswordModal/ChangePasswordModal';
 import { useGetProfile } from '../../hooks/useProfileHooks';
 import { API_URL } from '../../config';
 import defaultProfilePic from '../../assets/default-profile-pic.png';
+import { useLocale } from '../../i18n/LocaleContext';
+import LanguageSelector from '../../components/LanguageSelector';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ const Settings = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const { data: profileData } = useGetProfile();
+  const { t } = useLocale();
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser) => {
@@ -38,7 +41,7 @@ const Settings = () => {
     navigate('/login');
   };
 
-  const displayName = profileData?.name || user?.name || 'User';
+  const displayName = profileData?.name || user?.name || t('common.user');
   const displayEmail = profileData?.email || user?.email || '';
 
   const rawAvatarUrl = profileData?.avatarUrl || user?.avatarUrl;
@@ -55,7 +58,7 @@ const Settings = () => {
         <div className="relative mb-6">
           <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-[0_12px_32px_rgba(52,50,47,0.04)]">
             <img
-              alt="User Profile"
+              alt={t('settings.profileAlt')}
               className="w-full h-full object-cover"
               src={avatarUrl}
             />
@@ -76,12 +79,31 @@ const Settings = () => {
           {displayName}
         </h1>
         <p className="font-body text-on-surface-variant font-medium text-sm">
-          {displayEmail || 'No email set'}
+          {displayEmail || t('common.noEmail')}
         </p>
       </section>
 
       {/* Settings Grid / Menu Items */}
       <div className="space-y-4">
+        <section className="bg-surface-container-low p-2 rounded-2xl">
+          <div className="flex w-full items-center justify-between gap-3 rounded-[1rem] bg-surface-container-lowest p-4">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tertiary-container">
+                <span
+                  className="material-symbols-outlined text-on-tertiary-container"
+                  aria-hidden="true"
+                >
+                  language
+                </span>
+              </div>
+              <span className="truncate font-label font-semibold text-on-surface">
+                {t('settings.language')}
+              </span>
+            </div>
+            <LanguageSelector variant="settings" />
+          </div>
+        </section>
+
         {/* Profile Settings Group */}
         <div className="bg-surface-container-low p-2 rounded-2xl">
           <button
@@ -98,7 +120,7 @@ const Settings = () => {
                 </span>
               </div>
               <span className="font-label font-semibold text-on-surface">
-                Edit Profile
+                {t('settings.editProfile')}
               </span>
             </div>
             <span
@@ -122,7 +144,7 @@ const Settings = () => {
                 </span>
               </div>
               <span className="font-label font-semibold text-on-surface">
-                Change Password
+                {t('settings.changePassword')}
               </span>
             </div>
             <span
@@ -192,15 +214,14 @@ const Settings = () => {
             logout
           </span>
           <span className="font-label font-bold text-error uppercase tracking-widest text-[11px]">
-            Log Out
+            {t('settings.logOut')}
           </span>
         </button>
       </div>
 
       {/* Editorial Quote / Insight Toast */}
       <div className="mt-12 p-6 rounded-2xl bg-tertiary-container/30 border border-tertiary-container/50 text-center italic text-on-tertiary-container font-body text-sm leading-relaxed">
-        "Embrace the shifting tides of your body with kindness. You are not just
-        tracking numbers; you are listening to your own rhythm."
+        “{t('settings.quote')}”
       </div>
 
       {/* Edit Profile Modal */}

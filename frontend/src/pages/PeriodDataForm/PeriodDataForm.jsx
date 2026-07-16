@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
 import { buildPeriodPayload } from '../../utils/periodPayload';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const PeriodDataForm = () => {
   const [daysOfPeriod, setDaysPeriod] = useState(5);
@@ -13,6 +14,7 @@ const PeriodDataForm = () => {
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
+  const { t } = useLocale();
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser) => {
@@ -46,7 +48,7 @@ const PeriodDataForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>How many days does your period usually last?</label>
+      <label>{t('wizard.periodQuestion')}</label>
       <input
         type="number"
         min={1}
@@ -55,7 +57,7 @@ const PeriodDataForm = () => {
         onChange={(e) => setDaysPeriod(e.target.value)}
       />
 
-      <label>How many days does your cycle usually last?</label>
+      <label>{t('setup.cycleDaysQuestion')}</label>
       <input
         type="number"
         min={15}
@@ -64,7 +66,7 @@ const PeriodDataForm = () => {
         onChange={(e) => setDaysCycle(e.target.value)}
       />
 
-      <label>What is the date of your last period?</label>
+      <label>{t('setup.lastPeriodQuestion')}</label>
       <input
         type="date"
         value={lastDayPeriod}
@@ -72,7 +74,7 @@ const PeriodDataForm = () => {
         onChange={(e) => setLastDayPeriod(e.target.value)}
       />
 
-      <button type="submit">Accept</button>
+      <button type="submit">{t('setup.accept')}</button>
     </form>
   );
 };

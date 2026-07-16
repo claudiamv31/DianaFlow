@@ -4,23 +4,24 @@ import {
   faClover,
   faDroplet
 } from '@fortawesome/free-solid-svg-icons';
+import { useLocale } from '../../../i18n/LocaleContext';
 
 const fertilityDetails = {
   high: {
-    value: 'Peak',
-    description: 'Highest fertility estimate',
+    valueKey: 'fertility.peak',
+    descriptionKey: 'fertility.highDescription',
     valueClassName: 'text-fertility',
     iconClassName: 'bg-fertility/10 text-fertility'
   },
   medium: {
-    value: 'Fertile',
-    description: 'Elevated fertility estimate',
+    valueKey: 'fertility.fertile',
+    descriptionKey: 'fertility.mediumDescription',
     valueClassName: 'text-fertility',
     iconClassName: 'bg-fertility/10 text-fertility'
   },
   low: {
-    value: 'Low',
-    description: 'Lower fertility estimate',
+    valueKey: 'fertility.low',
+    descriptionKey: 'fertility.lowDescription',
     valueClassName: 'text-[var(--text-color)]',
     iconClassName: 'bg-fertility/10 text-fertility'
   }
@@ -64,29 +65,33 @@ const CurrentCycleCard = ({
   cycleLength,
   fertilityLevel
 }) => {
+  const { t } = useLocale();
   const displayFertilityLevel =
     estimateFertilityLevel(cycleDay, cycleLength) || fertilityLevel;
   const fertility = getFertilityDetails(displayFertilityLevel);
 
   const cycleDetails = [
     {
-      label: 'Period Duration',
-      value: periodDuration != null ? `${periodDuration} days` : '--',
+      label: t('cycle.periodDuration'),
+      value:
+        periodDuration != null
+          ? t('cycle.durationValue', { count: periodDuration })
+          : '--',
       icon: faDroplet,
       valueClassName: 'text-[var(--text-color)]',
       iconClassName: 'bg-primary/10 text-primary/100'
     },
     {
-      label: 'Day of Cycle',
-      value: cycleDay != null ? `Day ${cycleDay}` : '--',
+      label: t('cycle.dayOfCycle'),
+      value: cycleDay != null ? t('cycle.dayValue', { count: cycleDay }) : '--',
       icon: faCalendarDays,
       valueClassName: 'text-[var(--text-color)]',
       iconClassName: 'bg-secondary/10 text-secondary/100'
     },
     {
-      label: 'Fertility Level',
-      value: fertility.value,
-      description: fertility.description,
+      label: t('cycle.fertilityLevel'),
+      value: t(fertility.valueKey),
+      description: t(fertility.descriptionKey),
       icon: faClover,
       valueClassName: fertility.valueClassName,
       iconClassName: fertility.iconClassName
@@ -96,12 +101,12 @@ const CurrentCycleCard = ({
   return (
     <div className="flex-1 w-full">
       <h2 className="text-base font-bold mb-4 text-[var(--text-color)]">
-        Current Cycle
+        {t('cycle.current')}
       </h2>
 
       <div className="bg-[var(--accent-color)] rounded-3xl p-4 sm:p-5">
         <p className="text-[0.7rem] pl-2 text-[var(--label-color)] uppercase tracking-widest mb-4">
-          Cycle Details
+          {t('cycle.details')}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="list">

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using backend.Modulos.Profile.Services;
 using backend.Modulos.Profile.DTOs;
+using backend.Api;
 
 namespace backend.Modulos.Profile.Controllers
 {
@@ -30,11 +31,11 @@ namespace backend.Modulos.Profile.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized(new { message = "Not authorized" });
+                return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
             var profile = await _profileService.GetProfileByUserIdAsync(userId);
             if (profile == null)
-                return NotFound(new { message = "User not found" });
+                return NotFound(new ApiError(ApiErrorCodes.UserNotFound));
 
             return Ok(new
             {
@@ -57,17 +58,17 @@ namespace backend.Modulos.Profile.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized(new { message = "Not authorized" });
+                return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
             // Validate input
             if (string.IsNullOrWhiteSpace(dto.Name))
-                return BadRequest(new { message = "The name is required" });
+                return BadRequest(new ApiError(ApiErrorCodes.NameRequired, "name"));
 
             if (string.IsNullOrWhiteSpace(dto.Email))
-                return BadRequest(new { message = "The email is required" });
+                return BadRequest(new ApiError(ApiErrorCodes.EmailRequired, "email"));
 
             if (!IsValidEmail(dto.Email))
-                return BadRequest(new { message = "The email format is invalid" });
+                return BadRequest(new ApiError(ApiErrorCodes.EmailInvalid, "email"));
 
             try
             {
@@ -87,13 +88,13 @@ namespace backend.Modulos.Profile.Controllers
                     }
                 });
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ApiError(ApiErrorCodes.EmailAlreadyInUse, "email"));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { message = "Error updating profile", error = ex.Message });
+                return StatusCode(500, new ApiError(ApiErrorCodes.ProfileUpdateFailed));
             }
         }
 
@@ -105,10 +106,10 @@ namespace backend.Modulos.Profile.Controllers
         {
             var userId = GetCurrentUserId();
             if (userId == Guid.Empty)
-                return Unauthorized(new { message = "Not authorized" });
+                return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
             if (file == null || file.Length == 0)
-                return BadRequest(new { message = "Please select an image" });
+                return BadRequest(new ApiError(ApiErrorCodes.AvatarRequired, "avatar"));
 
             try
             {
@@ -120,17 +121,17 @@ namespace backend.Modulos.Profile.Controllers
                     Message = "Avatar uploaded successfully"
                 });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ApiError(ApiErrorCodes.AvatarInvalid, "avatar"));
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ApiError(ApiErrorCodes.AvatarInvalid, "avatar"));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { message = "Error uploading avatar", error = ex.Message });
+                return StatusCode(500, new ApiError(ApiErrorCodes.AvatarUploadFailed));
             }
         }
 

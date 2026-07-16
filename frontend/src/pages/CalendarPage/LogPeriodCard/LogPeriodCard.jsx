@@ -2,8 +2,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays } from '@fortawesome/free-solid-svg-icons';
 import Button from '../../../components/Button';
 import { useEffect } from 'react';
+import { useLocale } from '../../../i18n/LocaleContext';
 
 const LogPeriodCard = ({ isEditingPeriod, setIsEditingPeriod }) => {
+  const { t } = useLocale();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -37,7 +39,7 @@ const LogPeriodCard = ({ isEditingPeriod, setIsEditingPeriod }) => {
               icon={faCalendarDays}
               className="text-primary/80"
             />
-            Logging a period?
+            {t('calendar.logPrompt')}
           </h2>
           <button
             className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
@@ -52,8 +54,7 @@ const LogPeriodCard = ({ isEditingPeriod, setIsEditingPeriod }) => {
         {/* Content - Adjusted mobile padding */}
         <div className="px-5 md:px-8 pb-4 overflow-y-auto flex-1">
           <p className="text-on-surface-variant text-sm mb-8">
-            Keeping your data updated helps us refine your future predictions
-            and cycle insights.
+            {t('calendar.logPromptDescription')}
           </p>
         </div>
 
@@ -64,10 +65,10 @@ const LogPeriodCard = ({ isEditingPeriod, setIsEditingPeriod }) => {
               className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
               onClick={handleClose}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <Button className="w-full" variant="primary" onClick={handleSave}>
-              Save
+              {t('common.save')}
             </Button>
           </div>
         </div>

@@ -3,23 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Cycles.DTOs;
-using backend.Data;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.EntityFrameworkCore;
 using backend.Modulos.Cycles.Enums;
 
 namespace backend.Modulos.Cycles.Services
 {
     public class CycleService
     {
-        private readonly AppDbContext _context;
-        private readonly IMemoryCache _cache;
-
-        public CycleService(AppDbContext context, IMemoryCache cache)
-        {
-            _context = context;
-            _cache = cache;
-        }
         public int CalculateAverageCycleLength(List<PeriodDto> periods)
         {
             if (periods == null || periods.Count < 2) return 28; // Default
@@ -188,49 +177,12 @@ namespace backend.Modulos.Cycles.Services
             };
         }
 
-        public async Task<string> GetCachedDailyInsightAsync(Guid userId, ECyclePhase phase, DateOnly requestedDate, EPhaseMessageType messageType = EPhaseMessageType.Short)
-        {
-            // La llave única ahora usa la fecha que seleccionó la usuaria en el calendario
-            string cacheKey = $"DailyInsight_{userId}_{requestedDate:yyyyMMdd}_{messageType}";
-
-            if (!_cache.TryGetValue(cacheKey, out string? cachedMessage))
-            {
-                var messages = await GetPhaseMessagesAsync(phase, messageType);
-
-                cachedMessage = messages.Any()
-                    ? messages[Random.Shared.Next(messages.Count)]
-                    : "Listen to your body today.";
-
-                // Guardamos en caché para que si vuelve a tocar ese mismo día en la misma sesión, cargue al instante
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromHours(2)); 
-
-                _cache.Set(cacheKey, cachedMessage, cacheEntryOptions);
-            }
-
-            return cachedMessage ?? "Listen to your body today.";
-        }
-
-        private async Task<List<string>> GetPhaseMessagesAsync(ECyclePhase phase, EPhaseMessageType messageType)
-        {
-            string cacheKey = $"PhaseMessages_{phase}_{messageType}";
-
-            if (!_cache.TryGetValue(cacheKey, out List<string>? messages))
-            {
-                messages = await _context.PhaseMessages
-                    .AsNoTracking()
-                    .Where(m => m.Phase == phase && m.MessageType == messageType && m.Message != null && m.Message != "")
-                    .Select(m => m.Message!)
-                    .ToListAsync();
-
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(12));
-
-                _cache.Set(cacheKey, messages, cacheEntryOptions);
-            }
-
-            return messages ?? new List<string>();
-        }
+        public string GetDailyGuidanceKey(
+            Guid userId,
+            ECyclePhase phase,
+            DateOnly requestedDate,
+            GuidanceType messageType = GuidanceType.DailyInsight) =>
+            GuidanceSelector.SelectKey(userId, requestedDate, phase, messageType);
 
         private static (int Start, int End, int OvulationDay) GetFertileWindow(int cycleLength, int minimumStartDay = 1)
         {

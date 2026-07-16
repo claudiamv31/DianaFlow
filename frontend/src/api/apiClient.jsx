@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { API_URL } from '../config';
 import { getClientTimeZone } from '../utils/timeZone';
+import { AppError } from './AppError';
 
 const ACCESS_TOKEN_KEY = 'jwtToken';
 const REQUEST_TIMEOUT_MS = 45000;
@@ -176,17 +177,17 @@ apiClient.interceptors.response.use(
 
     if (error.code === 'ECONNABORTED') {
       return Promise.reject(
-        new Error('DianaFlow is still waking up. Please try again in a moment.')
+        new AppError('network.waking')
       );
     }
     if (isBrowserNetworkError(error)) {
       return Promise.reject(
-        new Error('No connection with the server. Please check your connection.')
+        new AppError('network.offline')
       );
     }
     if (isColdStartStatus(error.response.status)) {
       return Promise.reject(
-        new Error('DianaFlow is still waking up. Please try again in a moment.')
+        new AppError('network.waking')
       );
     }
     return Promise.reject(error);
@@ -253,7 +254,7 @@ apiClient.login = async (email, password) => {
   if (response.status === 200) {
     storeAuthTokens(response.data);
   } else {
-    throw new Error('Error logging in');
+    throw new AppError('auth.error.login');
   }
   return response.data;
 };
@@ -261,7 +262,7 @@ apiClient.login = async (email, password) => {
 apiClient.signUp = async (userData) => {
   const response = await apiClient.post('/users/sign-up', userData);
   if (!response.ok) {
-    throw new Error('Error signing up');
+    throw new AppError('auth.error.signup');
   }
   return response.data;
 };

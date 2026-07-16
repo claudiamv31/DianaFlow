@@ -6,11 +6,13 @@ import PeriodDataWizard from '../../components/PeriodDataWizard/PeriodDataWizard
 import toast from 'react-hot-toast';
 import { buildPeriodPayload } from '../../utils/periodPayload';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const PeriodSetup = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useLocale();
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser) => {
@@ -23,7 +25,7 @@ const PeriodSetup = () => {
 
   const handleWizardComplete = async (formData) => {
     if (!user) {
-      toast.error('No user logged in');
+      toast.error(t('setup.noUser'));
       return;
     }
 
@@ -34,13 +36,13 @@ const PeriodSetup = () => {
       );
 
       await apiClient.post('/periods', payload);
-      toast.success('Cycle saved successfully!');
+      toast.success(t('setup.saved'));
 
       // Redirect to home
       navigate('/');
     } catch (error) {
       console.error('❌ Error saving cycle:', error);
-      toast.error('Error saving cycle. Please try again.');
+      toast.error(t('setup.saveError'));
     }
   };
 

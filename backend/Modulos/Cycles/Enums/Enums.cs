@@ -1,3 +1,5 @@
+namespace backend.Modulos.Cycles.Enums;
+
 public enum ECyclePhase
 {
     Menstruation,
@@ -14,8 +16,8 @@ public enum CycleRegularityLevel
     VeryIrregular
 }
 
-public enum EPhaseMessageType
+public enum GuidanceType
 {
-    Short = 0,   // Used in the calendar daily insight
-    Focus = 1    // Used in the "Your Focus" card on the home page
+    DailyInsight = 0,
+    DailyFocus = 1
 }

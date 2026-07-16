@@ -4,6 +4,7 @@ import PrimaryButton from '../../../components/PrimaryButton';
 import { refreshCycleQueries } from '../../../utils/queryInvalidation';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import './CalendarInfo.css';
+import { useLocale } from '../../../i18n/LocaleContext';
 
 const CalendarInfo = ({
   date,
@@ -14,6 +15,7 @@ const CalendarInfo = ({
   currentPeriod,
   setPeriodDays
 }) => {
+  const { t, locale } = useLocale();
   const options = {
     year: 'numeric',
     month: 'long',
@@ -88,14 +90,13 @@ const CalendarInfo = ({
       ) : (
         <div className="day-info">
           <p>
-            <strong>{date.toLocaleDateString('en-US', options)}</strong>
+            <strong>{date.toLocaleDateString(locale, options)}</strong>
           </p>
-          <p>Day {cycleInfo.cycleDay} of cycle</p>
-          <p>{cycleInfo.phase}</p>
+          <p>{t('calendar.cycleDay', { count: cycleInfo.cycleDay })}</p>
+          <p>{t(`phase.${cycleInfo.phase}`)}</p>
           <p>
-            {cycleInfo.fertilityLevel.charAt(0).toUpperCase() +
-              cycleInfo.fertilityLevel.slice(1)}{' '}
-            possibility of pregnancy
+            {t(`fertility.${cycleInfo.fertilityLevel}`)}{' '}
+            {t('calendar.pregnancyPossibility')}
           </p>
         </div>
       )}
@@ -109,7 +110,7 @@ const CalendarInfo = ({
               setIsEditingPeriod(true);
             }}
           >
-            Update status
+            {t('calendar.updateStatus')}
           </PrimaryButton>
         ) : (
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -119,10 +120,10 @@ const CalendarInfo = ({
                   size="sm"
                   layout="inline"
                   tone="current"
-                  label="Saving period"
+                  label={t('period.saving')}
                 />
               ) : (
-                'Save'
+                t('common.save')
               )}
             </PrimaryButton>
             <PrimaryButton
@@ -133,7 +134,7 @@ const CalendarInfo = ({
               style={{ backgroundColor: '#999' }}
               disabled={isSavingPeriod}
             >
-              Cancel
+              {t('common.cancel')}
             </PrimaryButton>
           </div>
         )}

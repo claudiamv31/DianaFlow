@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Button from '../Button';
 import { formatLongDate } from '../../utils/calendarUtils';
 import LoadingSpinner from '../LoadingSpinner';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const LogTodayModal = ({
   onClose,
@@ -10,6 +11,7 @@ const LogTodayModal = ({
   todayDate,
   isSaving = false
 }) => {
+  const { t, locale } = useLocale();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -52,10 +54,10 @@ const LogTodayModal = ({
         <div className="px-8 pt-10 pb-4 flex items-center justify-between">
           <div>
             <h2 className="font-headline font-bold text-2xl text-[var(--text-color)]">
-              Log Today
+              {t('home.logToday')}
             </h2>
             <p className="text-sm font-semibold tracking-widest uppercase text-[var(--primary-color)] mt-1">
-              {formatLongDate(todayDate || new Date())}
+              {formatLongDate(todayDate || new Date(), locale)}
             </p>
           </div>
           <button
@@ -72,7 +74,7 @@ const LogTodayModal = ({
         {/* Scrollable Content */}
         <div className="px-8 pb-4 overflow-y-auto flex-1">
           <p className="text-gray-500 text-sm mb-8 px-2">
-            Select your flow intensity for today
+            {t('log.selectTodayFlow')}
           </p>
 
           <section className="mb-4">
@@ -97,7 +99,7 @@ const LogTodayModal = ({
                 <span
                   className={`font-label text-xs uppercase tracking-tighter ${addClassTextSelected(0)}`}
                 >
-                  None
+                  {t('common.none')}
                 </span>
               </div>
 
@@ -121,7 +123,7 @@ const LogTodayModal = ({
                 <span
                   className={`font-label text-xs uppercase tracking-tighter ${addClassTextSelected(1)}`}
                 >
-                  Light
+                  {t('common.light')}
                 </span>
               </div>
 
@@ -153,7 +155,7 @@ const LogTodayModal = ({
                 <span
                   className={`font-label text-xs uppercase tracking-tighter ${addClassTextSelected(2)}`}
                 >
-                  Medium
+                  {t('common.medium')}
                 </span>
               </div>
 
@@ -177,7 +179,7 @@ const LogTodayModal = ({
                 <span
                   className={`font-label text-xs uppercase tracking-tighter ${addClassTextSelected(3)}`}
                 >
-                  Heavy
+                  {t('common.heavy')}
                 </span>
               </div>
             </div>
@@ -192,7 +194,7 @@ const LogTodayModal = ({
               onClick={onClose}
               disabled={isSaving}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <Button
               className="w-full"
@@ -205,10 +207,10 @@ const LogTodayModal = ({
                   size="sm"
                   layout="inline"
                   tone="current"
-                  label="Saving log"
+                  label={t('log.saving')}
                 />
               ) : (
-                'Save Log'
+                t('log.save')
               )}
             </Button>
           </div>

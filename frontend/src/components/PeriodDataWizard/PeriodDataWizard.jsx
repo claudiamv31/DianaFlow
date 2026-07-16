@@ -2,8 +2,10 @@ import { useState } from 'react';
 import Button from '../Button';
 import CustomDatePicker from './CustomDatePicker';
 import './PeriodDataWizard.css';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const PeriodDataWizard = ({ onComplete }) => {
+  const { t } = useLocale();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     daysOfPeriod: 5,
@@ -15,29 +17,28 @@ const PeriodDataWizard = ({ onComplete }) => {
   const steps = [
     {
       id: 'period-duration',
-      question: 'How many days does your period usually last?',
-      description: 'This helps us track your cycle accurately',
+      question: t('wizard.periodQuestion'),
+      description: t('wizard.periodDescription'),
       field: 'daysOfPeriod',
       type: 'number',
       min: 1,
       max: 15,
-      unit: 'days'
+      unit: t('common.days')
     },
     {
       id: 'cycle-duration',
-      question: 'How many days is your cycle?',
-      description:
-        'Count from the first day of your period to the first day of the next one',
+      question: t('wizard.cycleQuestion'),
+      description: t('wizard.cycleDescription'),
       field: 'daysOfCycle',
       type: 'number',
       min: 15,
       max: 60,
-      unit: 'days'
+      unit: t('common.days')
     },
     {
       id: 'last-period-date',
-      question: 'When was the first day of your last period?',
-      description: 'We need this to calculate your cycle',
+      question: t('wizard.lastPeriodQuestion'),
+      description: t('wizard.lastPeriodDescription'),
       field: 'lastDayPeriod',
       type: 'date'
     }
@@ -103,10 +104,13 @@ const PeriodDataWizard = ({ onComplete }) => {
         <div className="px-8 pt-10 pb-4 flex items-center justify-between border-b border-surface-container-high">
           <div>
             <h2 className="font-headline font-bold text-2xl text-on-surface">
-              Setup Your Cycle
+              {t('wizard.title')}
             </h2>
             <p className="text-xs text-on-surface-variant mt-1">
-              Step {currentStep + 1} of {steps.length}
+              {t('wizard.step', {
+                current: currentStep + 1,
+                total: steps.length
+              })}
             </p>
           </div>
           <div className="flex gap-2">
@@ -210,7 +214,7 @@ const PeriodDataWizard = ({ onComplete }) => {
               onClick={handlePrevious}
               disabled={isFirstStep}
             >
-              Previous
+              {t('common.previous')}
             </button>
             <Button
               className="w-full"
@@ -218,7 +222,7 @@ const PeriodDataWizard = ({ onComplete }) => {
               onClick={handleNext}
               disabled={!isStepValid() || isSubmitting}
             >
-              {isLastStep ? 'Complete' : 'Next'}
+              {isLastStep ? t('common.complete') : t('common.next')}
             </Button>
           </div>
         </div>

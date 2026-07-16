@@ -1,5 +1,9 @@
+import { useLocale } from '../../../i18n/LocaleContext';
+import { translateGuidance } from '../../../i18n/guidance';
+
 const YourPeriodCard = ({ period }) => {
-  const focusText = period?.dailyFocus || 'Listen to your body today.';
+  const { t } = useLocale();
+  const focusText = translateGuidance(t, period?.dailyFocusKey, 'focus');
 
   return (
     // Replaced 'md:col-span-2' with 'w-full' to fix the mobile layout width
@@ -13,7 +17,7 @@ const YourPeriodCard = ({ period }) => {
             self_improvement
           </span>
           <h3 className="font-headline text-lg font-bold text-on-surface">
-            Your Focus
+            {t('focus.title')}
           </h3>
         </div>
         <p className="text-on-surface-variant text-sm mb-4">{focusText}</p>

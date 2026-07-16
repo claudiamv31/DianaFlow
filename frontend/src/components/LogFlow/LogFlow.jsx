@@ -1,9 +1,14 @@
 import { useMemo, useState, useEffect } from 'react';
 import Button from '../Button';
 import Calendar from 'react-calendar';
-import { formatDateLocal, parseLocalDate } from '../../utils/calendarUtils';
+import {
+  formatCalendarWeekday,
+  formatDateLocal,
+  parseLocalDate
+} from '../../utils/calendarUtils';
 import './LogFlow.css';
 import LoadingSpinner from '../LoadingSpinner';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const DEFAULT_PERIOD_DURATION = 5;
 const SAME_PERIOD_GAP_BUFFER_DAYS = 2;
@@ -56,6 +61,7 @@ function LogFlow({
   durationDays,
   isSaving = false
 }) {
+  const { t, locale } = useLocale();
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     return () => {
@@ -182,7 +188,7 @@ function LogFlow({
         {/* Header */}
         <div className="px-5 sm:px-8 pt-6 sm:pt-10 pb-4 flex items-center justify-between">
           <h2 className="font-headline font-bold text-2xl text-on-surface">
-            Log your flow
+            {t('log.flowTitle')}
           </h2>
           <button
             className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
@@ -198,7 +204,7 @@ function LogFlow({
         {/* Scrollable Content */}
         <div className="log-flow-content px-5 sm:px-8 pb-4 overflow-y-auto flex-1">
           <p className="text-on-surface-variant text-sm mb-6 px-2">
-            Select your period dates
+            {t('log.selectPeriodDates')}
           </p>
 
           <div className="log-flow-calendar-wrap mb-4 flex justify-center">
@@ -211,13 +217,8 @@ function LogFlow({
               onActiveStartDateChange={onMonthChange}
               calendarType="gregory"
               showNeighboringMonth={false}
-              locale="en-US"
-              formatShortWeekday={(locale, date) =>
-                date
-                  .toLocaleDateString(locale, { weekday: 'short' })
-                  .slice(0, 1)
-                  .toUpperCase()
-              }
+              locale={locale}
+              formatShortWeekday={formatCalendarWeekday}
               tileClassName={({ date, view }) =>
                 view === 'month' ? tileClassName({ date }) : null
               }
@@ -233,7 +234,7 @@ function LogFlow({
               onClick={onClose}
               disabled={isSaving}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <Button
               className="w-full"
@@ -246,10 +247,10 @@ function LogFlow({
                   size="sm"
                   layout="inline"
                   tone="current"
-                  label="Saving entry"
+                  label={t('log.savingEntry')}
                 />
               ) : (
-                'Save Entry'
+                t('log.saveEntry')
               )}
             </Button>
           </div>

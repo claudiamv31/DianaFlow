@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using backend.Modulos.Periods.Models;
 using backend.Modulos.Periods.DTOs;
 using backend.Modulos.Periods.Services;
+using backend.Api;
 
 
 namespace backend.Modulos.Periods.Controllers
@@ -27,28 +28,28 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 if (dto.SelectedDays == null || !dto.SelectedDays.Any())
-                    return BadRequest("Debe seleccionar al menos un día.");
+                    return BadRequest(new ApiError(ApiErrorCodes.PeriodDaysRequired, "selectedDays"));
 
                 var sortedDays = dto.SelectedDays.OrderBy(d => d.Date).ToList();
                 var startDate = sortedDays.First().Date;
                 var endDate = sortedDays.Last().Date;
 
                 if (startDate == default)
-                    return BadRequest("La fecha de inicio es requerida.");
+                    return BadRequest(new ApiError(ApiErrorCodes.PeriodStartRequired, "startDate"));
                             
                 if (endDate < startDate)
-                    return BadRequest("La fecha de fin no puede ser menor a la de inicio.");
+                    return BadRequest(new ApiError(ApiErrorCodes.PeriodStartRequired, "endDate"));
 
                 await _periodService.AddPeriodAsync(userId,dto);
 
                 return Created("", new { message = "Periodo guardado correctamente" });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
 
@@ -61,7 +62,7 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 object? result = null;
                 
@@ -80,9 +81,9 @@ namespace backend.Modulos.Periods.Controllers
 
                 return Ok(result);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
 
@@ -95,17 +96,17 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 var period = await _periodService.GetLatestPeriodAsync(userId);
                 if (period == null)
-                    return NotFound("No periods found.");
+                    return NotFound(new ApiError(ApiErrorCodes.PeriodsNotFound));
 
                 return Ok(period);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
 
@@ -115,17 +116,17 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 var period = await _periodService.GetNextPeriodPredictionAsync(userId);
                 if (period == null)
-                    return NotFound("No period found.");
+                    return NotFound(new ApiError(ApiErrorCodes.PeriodNotFound));
 
                 return Ok(period);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
         
@@ -140,7 +141,7 @@ namespace backend.Modulos.Periods.Controllers
                          ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             
             Console.WriteLine("UserId in GetHome: " + (userIdString ?? "NULL"));  
-            if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+            if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
             var result = await _periodService.GetLatestForHomeAsync(userId);
             
@@ -156,21 +157,21 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 if(dto.PeriodId == null)
-                    return BadRequest("Period ID is required.");
+                    return BadRequest(new ApiError(ApiErrorCodes.PeriodIdRequired, "periodId"));
 
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 var updated = await _periodService.UpdatePeriod(userId, dto);
 
                 if (!updated)
-                    return NotFound("Period not found.");
+                    return NotFound(new ApiError(ApiErrorCodes.PeriodNotFound));
 
                 return Ok(dto);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
 
@@ -183,21 +184,21 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 if (dto.Date == default)
-                    return BadRequest("Date is required.");
+                    return BadRequest(new ApiError(ApiErrorCodes.DateRequired, "date"));
 
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 var updated = await _periodService.UpdatePeriodDayAsync(userId, dto);
 
                 if (!updated)
-                    return StatusCode(500, "Could not update period day.");
+                    return StatusCode(500, new ApiError(ApiErrorCodes.PeriodUpdateFailed));
 
                 return Ok(new { message = "Daily log updated successfully", data = dto });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
 
@@ -210,18 +211,18 @@ namespace backend.Modulos.Periods.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 var deleted = await _periodService.DeletePeriodAsync(userId, id);
 
                 if (!deleted)
-                    return NotFound("Period not found.");
+                    return NotFound(new ApiError(ApiErrorCodes.PeriodNotFound));
 
                 return NoContent(); // 204
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
     }

@@ -8,9 +8,12 @@ import SummaryStats from './SummaryStats';
 import HistoryPeriod from './HistoryPeriods';
 import VisualInsights from './VisualInsights';
 import Card from '../../components/Card/Card.jsx';
+import { useLocale } from '../../i18n/LocaleContext';
+import { getErrorMessageKey } from '../../api/AppError';
 
 const StatsPage = () => {
   const [user, setUser] = useState(null);
+  const { t } = useLocale();
 
   useEffect(() => {
     const unsubscribe = checkUser((currentUser) => {
@@ -34,11 +37,12 @@ const StatsPage = () => {
     enabled: !!user
   });
 
-  if (isLoading) return <LoadingSpinner label="Loading DianaFlow..." showLabel />;
+  if (isLoading)
+    return <LoadingSpinner label={t('common.loadingApp')} showLabel />;
   if (error)
     return (
       <ErrorScreen
-        message={error.message}
+        messageKey={getErrorMessageKey(error, 'error.loadingPage')}
         onRetry={() => {
           refetchSummary();
         }}
@@ -47,31 +51,30 @@ const StatsPage = () => {
 
   const getEmpatheticInsight = (summaryData) => {
     if (!summaryData || !summaryData.periods || summaryData.periods.length < 2) {
-      return "Welcome! Once you log at least two cycles, we will begin analyzing your trends and consistency here.";
+      return t('stats.insightWelcome');
     }
 
     const regularity = summaryData.regularity;
 
     if (regularity >= 85) {
-      return `Your cycle regularity is excellent (${regularity}% consistency). This month, consider prioritizing iron-rich foods as your luteal phase approaches.`;
+      return t('stats.insightExcellent', { regularity });
     } else if (regularity >= 70) {
-      return `Your cycle is moderately consistent (${regularity}% regularity). Minor variations are completely normal and can be influenced by stress, sleep, or travel.`;
+      return t('stats.insightModerate', { regularity });
     } else {
-      return `Your cycle is showing some variations (${regularity}% regularity). Tracking daily energy levels and flow can help you understand your unique biological rhythm.`;
+      return t('stats.insightVariable', { regularity });
     }
   };
 
   return (
     <div className="mx-5 my-10">
       <p className="text-primary/100 font-headline font-bold tracking-tight text-lg pt-4">
-        Analysis
+        {t('stats.analysis')}
       </p>
       <h1 className="font-headline font-extrabold text-4xl tracking-tighter text-on-surface">
-        Your Cycle Sanctuary
+        {t('stats.title')}
       </h1>
       <p className="text-on-surface-variant max-w-md pt-2 pb-4">
-        Detailed insights into your patterns and biological rhythms over the
-        last six months.
+        {t('stats.description')}
       </p>
       <SummaryStats summary={summary} />
       <div className="mt-8 flex flex-col gap-6">
@@ -81,7 +84,7 @@ const StatsPage = () => {
           </div>
           <div className="w-full md:w-[20%]">
             <Card
-              title="Empathetic Insight"
+              title={t('stats.insightTitle')}
               description={getEmpatheticInsight(summary)}
               icon={true}
             />

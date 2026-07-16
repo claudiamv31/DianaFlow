@@ -12,6 +12,12 @@ export const formatDateMexican = (date) => {
   return `${day}/${month}/${year}`;
 };
 
+export const formatCalendarWeekday = (locale, date) =>
+  date
+    .toLocaleDateString(locale, { weekday: 'short' })
+    .slice(0, 1)
+    .toLocaleUpperCase(locale);
+
 export const parseLocalDate = (dateString) => {
   if (!dateString) return null;
 
@@ -36,9 +42,9 @@ export const parseLocalDate = (dateString) => {
   return new Date(dateString);
 };
 
-export const formatLongDate = (date) => {
+export const formatLongDate = (date, locale = 'en-US') => {
   const dateObj = parseLocalDate(date);
-  return dateObj?.toLocaleDateString('en-US', {
+  return dateObj?.toLocaleDateString(locale, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -46,25 +52,25 @@ export const formatLongDate = (date) => {
   });
 };
 
-export const formatMonthDay = (date) => {
+export const formatMonthDay = (date, locale = 'en-US') => {
   const dateObj = parseLocalDate(date);
-  return dateObj?.toLocaleDateString('en-US', {
+  return dateObj?.toLocaleDateString(locale, {
     month: 'long',
     day: 'numeric'
   });
 };
 
-export const formatDateShort = (date) => {
+export const formatDateShort = (date, locale = 'en-US') => {
   const dateObj = parseLocalDate(date);
-  return dateObj?.toLocaleDateString('en-US', {
+  return dateObj?.toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric'
   });
 };
 
-export const formatDateDayMonthYear = (date) => {
+export const formatDateDayMonthYear = (date, locale = 'en-US') => {
   const dateObj = parseLocalDate(date);
-  return dateObj?.toLocaleDateString('en-US', {
+  return dateObj?.toLocaleDateString(locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric'

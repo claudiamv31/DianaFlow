@@ -2,8 +2,10 @@ import { Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { checkUser } from '../../database/authService';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useLocale } from '../../i18n/LocaleContext';
 
 export function PrivateRoute({ children }) {
+  const { t } = useLocale();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +22,7 @@ export function PrivateRoute({ children }) {
       <LoadingSpinner
         layout="screen"
         size="lg"
-        label="Loading DianaFlow..."
+        label={t('common.loadingApp')}
         showLabel
       />
     );
@@ -30,6 +32,7 @@ export function PrivateRoute({ children }) {
 }
 
 export function PublicRoute({ children }) {
+  const { t } = useLocale();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +49,7 @@ export function PublicRoute({ children }) {
       <LoadingSpinner
         layout="screen"
         size="lg"
-        label="Loading DianaFlow..."
+        label={t('common.loadingApp')}
         showLabel
       />
     );

@@ -8,8 +8,11 @@ import {
   faGear
 } from '@fortawesome/free-solid-svg-icons';
 import './Menu.css';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const Menu = () => {
+  const { t } = useLocale();
+
   return (
     <div className="menu-container">
       <nav className="nav-links">
@@ -21,7 +24,7 @@ const Menu = () => {
           }
         >
           <FontAwesomeIcon icon={faHouse} className="nav-icon" />
-          Home
+          {t('nav.home')}
         </NavLink>
         <span className="divider"></span>
         <NavLink
@@ -31,7 +34,7 @@ const Menu = () => {
           }
         >
           <FontAwesomeIcon icon={faCalendar} className="nav-icon" />
-          Calendar
+          {t('nav.calendar')}
         </NavLink>
         <span className="divider"></span>
         <NavLink
@@ -41,7 +44,7 @@ const Menu = () => {
           }
         >
           <FontAwesomeIcon icon={faArrowTrendUp} className="nav-icon" />
-          Stats
+          {t('nav.stats')}
         </NavLink>
         <NavLink
           to="/configuration"
@@ -50,7 +53,7 @@ const Menu = () => {
           }
         >
           <FontAwesomeIcon icon={faGear} className="nav-icon" />
-          Settings
+          {t('nav.settings')}
         </NavLink>
       </nav>
     </div>

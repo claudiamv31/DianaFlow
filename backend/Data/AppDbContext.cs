@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using backend.Modulos.User.Models; 
 using backend.Modulos.Profile.Models;
 using backend.Modulos.Periods.Models;
-using backend.Modulos.Cycles.Enums;
 
 namespace backend.Data
 {
@@ -14,7 +13,6 @@ namespace backend.Data
 
         public DbSet<Periods> Periods { get; set; }
         public DbSet<PeriodDays> PeriodDays { get; set; }
-        public DbSet<PhaseMessages> PhaseMessages { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -55,9 +53,6 @@ namespace backend.Data
             modelBuilder.Entity<PeriodDays>()
                 .HasIndex(pd => pd.Date);
 
-            modelBuilder.Entity<PhaseMessages>()
-                .HasIndex(m => new { m.Phase, m.MessageType });
-            
             modelBuilder.Entity<Profile>()
                 .HasOne(p => p.User)
                 .WithOne(u => u.Profile)

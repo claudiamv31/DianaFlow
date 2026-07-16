@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const CustomDatePicker = ({ value, onChange, maxDate }) => {
+  const { t, locale } = useLocale();
   const [showCalendar, setShowCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(
     value ? new Date(value) : new Date()
@@ -8,10 +10,11 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
   const [calendarPosition, setCalendarPosition] = useState({ top: 0, left: 0 });
   const triggerRef = useRef(null);
 
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  const monthNames = Array.from({ length: 12 }, (_, month) =>
+    new Intl.DateTimeFormat(locale, { month: 'long' }).format(
+      new Date(2024, month, 1)
+    )
+  );
 
   const daysInMonth = (date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -55,10 +58,11 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
   const formatDisplayDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString + 'T00:00:00');
-    const month = date.toLocaleString('en-US', { month: 'short' });
-    const day = date.getDate();
-    const year = date.getFullYear();
-    return `${month} ${day}, ${year}`;
+    return date.toLocaleDateString(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
   };
 
   useEffect(() => {
@@ -103,7 +107,7 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
         onClick={() => setShowCalendar(!showCalendar)}
       >
         <span className={value ? 'text-on-surface' : 'text-on-surface-variant'}>
-          {value ? formatDisplayDate(value) : 'Select a date'}
+          {value ? formatDisplayDate(value) : t('common.selectDate')}
         </span>
         <span className="material-symbols-outlined text-primary/100 group-hover:scale-110 transition-transform">
           calendar_today
@@ -148,7 +152,11 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
 
             {/* Days of Week */}
             <div className="grid grid-cols-7 gap-0.5 md:gap-2 mb-1 md:mb-3">
-              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+              {Array.from({ length: 7 }, (_, day) =>
+                new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(
+                  new Date(2024, 0, 7 + day)
+                )
+              ).map((day) => (
                 <div
                   key={day}
                   className="text-center text-xs font-bold text-on-surface-variant uppercase"
@@ -203,7 +211,7 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
               onClick={() => setShowCalendar(false)}
               className="w-full mt-2 md:mt-4 h-8 md:h-10 flex items-center justify-center font-headline font-bold text-xs md:text-sm text-primary/100 hover:bg-surface-container-high transition-all rounded-full"
             >
-              Done
+              {t('common.done')}
             </button>
           </div>
         </>

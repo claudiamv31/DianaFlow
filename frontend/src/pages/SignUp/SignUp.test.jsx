@@ -46,11 +46,11 @@ describe('SignUp', () => {
       'aria-invalid',
       'true'
     );
-    expect(screen.getByPlaceholderText(/jane@sanctuary.com/i)).toHaveAttribute(
+    expect(screen.getByPlaceholderText(/name@example.com/i)).toHaveAttribute(
       'aria-invalid',
       'true'
     );
-    expect(screen.getByPlaceholderText('••••••••')).toHaveAttribute(
+    expect(screen.getByPlaceholderText('Enter your password')).toHaveAttribute(
       'aria-invalid',
       'true'
     );
@@ -68,11 +68,11 @@ describe('SignUp', () => {
     await userEvent.type(screen.getByPlaceholderText('Jane'), 'Jane');
     await userEvent.type(screen.getByPlaceholderText('Doe'), 'Doe');
     await userEvent.type(
-      screen.getByPlaceholderText(/jane@sanctuary.com/i),
+      screen.getByPlaceholderText(/name@example.com/i),
       'jane@example.com'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('••••••••'),
+      screen.getByPlaceholderText('Enter your password'),
       'secure-password'
     );
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
@@ -96,8 +96,9 @@ describe('SignUp', () => {
     );
   });
 
-  test('shows the backend error message when sign up fails', async () => {
+  test('shows a localized fallback when sign up fails', async () => {
     apiClient.post.mockRejectedValue({
+      code: 'ERR_BAD_REQUEST',
       response: {
         data: {
           message: 'The email is alredy in use.'
@@ -109,17 +110,17 @@ describe('SignUp', () => {
     await userEvent.type(screen.getByPlaceholderText('Jane'), 'Jane');
     await userEvent.type(screen.getByPlaceholderText('Doe'), 'Doe');
     await userEvent.type(
-      screen.getByPlaceholderText(/jane@sanctuary.com/i),
+      screen.getByPlaceholderText(/name@example.com/i),
       'jane@example.com'
     );
     await userEvent.type(
-      screen.getByPlaceholderText('••••••••'),
+      screen.getByPlaceholderText('Enter your password'),
       'secure-password'
     );
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
 
     expect(
-      await screen.findByText('The email is alredy in use.')
+      await screen.findByText('Error creating account')
     ).toBeInTheDocument();
   });
 });

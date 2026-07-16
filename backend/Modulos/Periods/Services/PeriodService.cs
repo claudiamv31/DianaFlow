@@ -170,13 +170,13 @@ namespace backend.Modulos.Periods.Services
                     CycleLength = cycleLength,
                     Status = "completed", // Previous cycles are completed
                     CycleDay = 0,
-                    Consistency = GetRegularityLevel(cycleLength),
+                    Consistency = CycleRegularityCodes.ToApiCode(GetRegularityLevel(cycleLength)),
                     Days = previous.EndDate.HasValue ? (previous.EndDate.Value.DayNumber - previous.StartDate.DayNumber + 1) : periodLength
                 };
             }
 
             var currentPhase = _cycleService.GetCyclePhase(latest.StartDate, cycleLength, today);
-            var dailyFocus = await _cycleService.GetCachedDailyInsightAsync(userId, currentPhase, today, EPhaseMessageType.Focus);
+            var dailyFocusKey = _cycleService.GetDailyGuidanceKey(userId, currentPhase, today, GuidanceType.DailyFocus);
 
             return new PeriodHomeDto
             {
@@ -187,10 +187,10 @@ namespace backend.Modulos.Periods.Services
                 DurationDays = periodLength,
                 DaysUntilNextPeriod = actualCycleStatus.Days,
                 IsActive = actualCycleStatus.Status == "active_period",
-                CurrentPhase = currentPhase,
+                CurrentPhase = CyclePhaseCodes.ToApiCode(currentPhase),
                 PreviousCycle = previousCycleStatus,
                 CycleStatus = actualCycleStatus,
-                DailyFocus = dailyFocus,
+                DailyFocusKey = dailyFocusKey,
                 SelectedDays = latest.SelectedDays
             };
         }
@@ -395,13 +395,13 @@ namespace backend.Modulos.Periods.Services
             return avg > 0 ? avg : 5;
         }
 
-        private CycleRegularityLevel GetRegularityLevel(int cycleLength)
+        private backend.Modulos.Cycles.Enums.CycleRegularityLevel GetRegularityLevel(int cycleLength)
         {
-            if (cycleLength == 0) return CycleRegularityLevel.Unknown;
-            if (cycleLength < 21) return CycleRegularityLevel.Irregular;
-            if (cycleLength < 35) return CycleRegularityLevel.Regular;
-            if (cycleLength <= 42) return CycleRegularityLevel.Irregular;
-            return CycleRegularityLevel.VeryIrregular;
+            if (cycleLength == 0) return backend.Modulos.Cycles.Enums.CycleRegularityLevel.Unknown;
+            if (cycleLength < 21) return backend.Modulos.Cycles.Enums.CycleRegularityLevel.Irregular;
+            if (cycleLength < 35) return backend.Modulos.Cycles.Enums.CycleRegularityLevel.Regular;
+            if (cycleLength <= 42) return backend.Modulos.Cycles.Enums.CycleRegularityLevel.Irregular;
+            return backend.Modulos.Cycles.Enums.CycleRegularityLevel.VeryIrregular;
         }
 
         private PeriodDto MapToDto(backend.Modulos.Periods.Models.Periods entity, List<backend.Modulos.Periods.Models.PeriodDays>? days = null)
@@ -417,13 +417,7 @@ namespace backend.Modulos.Periods.Services
 
                 if (flowGroup != null)
                 {
-                    predominantFlow = flowGroup.Key switch
-                    {
-                        1 => "Light Flow",
-                        2 => "Medium Flow",
-                        3 => "Heavy Flow",
-                        _ => null
-                    };
+                    predominantFlow = FlowIntensityCodes.ToApiCode(flowGroup.Key);
                 }
             }
 

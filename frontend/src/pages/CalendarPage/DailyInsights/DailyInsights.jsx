@@ -1,25 +1,24 @@
 import { FaEdit } from 'react-icons/fa';
 import { formatMonthDay, formatDateLocal } from '../../../utils/calendarUtils';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import { useLocale } from '../../../i18n/LocaleContext';
+import { translateGuidance } from '../../../i18n/guidance';
+import { calendarPhaseDayTranslationKey } from '../../../i18n/domainCodes';
 
-const phaseDayLabels = {
-  Menstruation: 'Menstruation day',
-  Follicular: 'Follicular phase day',
-  Ovulation: 'Ovulation window day',
-  Luteal: 'Luteal phase day'
-};
-
-const formatPhaseDay = (cycleInfo) => {
+const formatPhaseDay = (cycleInfo, t) => {
   if (!cycleInfo?.phaseDay || cycleInfo.phaseDay <= 0) {
-    return 'Not enough data';
+    return t('calendar.notEnoughData');
   }
 
   const hasPhaseLength =
     cycleInfo.phaseLength && cycleInfo.phaseDay <= cycleInfo.phaseLength;
 
   return hasPhaseLength
-    ? `Day ${cycleInfo.phaseDay} of ${cycleInfo.phaseLength}`
-    : `Day ${cycleInfo.phaseDay}`;
+    ? t('calendar.dayOf', {
+        day: cycleInfo.phaseDay,
+        total: cycleInfo.phaseLength
+      })
+    : t('cycle.dayValue', { count: cycleInfo.phaseDay });
 };
 
 const DailyInsigths = ({
@@ -29,10 +28,10 @@ const DailyInsigths = ({
   setIsDailyLogActive,
   isPeriod
 }) => {
+  const { t, locale } = useLocale();
   const isToday = cycleInfo?.date === formatDateLocal(new Date());
   const hasCycleDay = cycleInfo?.cycleDay && cycleInfo.cycleDay > 0;
-  const phaseName = cycleInfo?.phase || 'Cycle';
-  const phaseDayLabel = phaseDayLabels[cycleInfo?.phase] || 'Phase day';
+  const phaseDayLabel = t(calendarPhaseDayTranslationKey(cycleInfo?.phase));
 
   if (isLoading) {
     return (
@@ -50,16 +49,17 @@ const DailyInsigths = ({
         <div className="flex justify-between items-start mb-6">
           <div>
             <p className="font-label font-bold text-xs !text-primary uppercase tracking-widest mb-1">
-              {cycleInfo?.date && formatMonthDay(cycleInfo.date)}
+              {cycleInfo?.date && formatMonthDay(cycleInfo.date, locale)}
             </p>
             <h3 className="font-headline font-bold text-2xl text-on-surface">
-              {phaseName &&
-                `Cycle Day ${hasCycleDay ? cycleInfo.cycleDay : '--'}`}
+              {t('calendar.cycleDay', {
+                count: hasCycleDay ? cycleInfo.cycleDay : '--'
+              })}
             </h3>
           </div>
           {isToday && (
             <span className="!bg-secondary/10 !text-secondary px-3 py-1 rounded-full text-xs font-bold">
-              Today
+              {t('calendar.today')}
             </span>
           )}
         </div>
@@ -71,11 +71,11 @@ const DailyInsigths = ({
                 {phaseDayLabel}
               </p>
               <p className="font-headline font-bold text-xl text-on-surface">
-                {formatPhaseDay(cycleInfo)}
+                {formatPhaseDay(cycleInfo, t)}
               </p>
               {cycleInfo?.isOvulation && (
                 <p className="text-xs font-semibold !text-secondary mt-1">
-                  Estimated ovulation day
+                  {t('calendar.estimatedOvulation')}
                 </p>
               )}
             </div>
@@ -83,12 +83,11 @@ const DailyInsigths = ({
 
           <div>
             <p className="text-xs font-label font-semibold uppercase tracking-widest text-on-surface-variant">
-              Fertility probability
+              {t('calendar.fertilityProbability')}
             </p>
             <p className="font-headline font-bold text-xl text-on-surface">
               {hasCycleDay
-                ? cycleInfo.fertilityLevel.toString().charAt(0).toUpperCase() +
-                  cycleInfo.fertilityLevel.toString().slice(1)
+                ? t(`fertility.${cycleInfo.fertilityLevel}`)
                 : '--'}
             </p>
           </div>
@@ -96,11 +95,10 @@ const DailyInsigths = ({
 
         <div className="mb-6 p-4 bg-white/60 rounded-lg border-l-4 !border-secondary">
           <p className="text-sm font-semibold !text-secondary mb-1 uppercase tracking-tight">
-            Daily Insight
+            {t('calendar.dailyInsight')}
           </p>
           <p className="text-sm text-on-surface-variant">
-            {cycleInfo?.dailyInsight ||
-              'Track your cycle to get personalized insights'}
+            {translateGuidance(t, cycleInfo?.dailyInsightKey, 'insight')}
           </p>
         </div>
         <div className="flex flex-col gap-4">
@@ -112,14 +110,14 @@ const DailyInsigths = ({
               <span className="material-symbols-outlined text-xl">
                 <FaEdit />
               </span>
-              Log Today
+              {t('home.logToday')}
             </button>
           )}
           <button
             className="w-full py-3 rounded-full border !border-primary/30 !text-primary/70 font-headline font-semibold text-xs hover:!bg-primary/5 transition-colors uppercase tracking-wider"
             onClick={() => setIsEditingPeriod(true)}
           >
-            {isPeriod ? 'Edit Period Dates' : 'Log a New Period'}
+            {isPeriod ? t('calendar.editPeriodDates') : t('home.logPeriod')}
           </button>
         </div>
       </div>

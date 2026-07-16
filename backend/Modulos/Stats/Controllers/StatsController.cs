@@ -3,6 +3,7 @@ using backend.Modulos.Stats.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using backend.Api;
 
 namespace backend.Modulos.Stats.Controllers
 {
@@ -24,17 +25,17 @@ namespace backend.Modulos.Stats.Controllers
             try
             {
                 var userIdString = HttpContext.User.FindFirst("sub")?.Value ?? HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized();
+                if (!Guid.TryParse(userIdString, out Guid userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
 
                 var stats = await _statsService.GetStatsByUserId(userId);
                 if (stats == null)
-                    return NotFound("No statistics found.");
+                    return NotFound(new ApiError(ApiErrorCodes.StatsNotFound));
 
                 return Ok(stats);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(new { error = ex.Message });
+                return StatusCode(500, new ApiError(ApiErrorCodes.InternalError));
             }
         }
     }

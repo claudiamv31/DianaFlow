@@ -5,9 +5,11 @@ import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { refreshCycleQueries } from '../../utils/queryInvalidation';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { useLocale } from '../../i18n/LocaleContext';
 
 const ArchivePage = () => {
   const queryClient = useQueryClient();
+  const { t, locale } = useLocale();
   const [periods, setPeriods] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -18,7 +20,7 @@ const ArchivePage = () => {
   const handleSave = async (payload) => {
     try {
       await apiClient.put('/periods', payload);
-      toast.success('Period updated successfully', { icon: '🌸' });
+      toast.success(t('archive.updated'), { icon: '🌸' });
 
       if (!payload.SelectedDays || payload.SelectedDays.length === 0) {
         setPeriods((prev) => prev.filter((p) => p.id !== payload.PeriodId));
@@ -40,7 +42,7 @@ const ArchivePage = () => {
       setSelectedPeriod(null);
     } catch (err) {
       console.error('Error updating period:', err);
-      toast.error('Could not update period. Please try again.', { icon: '⚠️' });
+      toast.error(t('archive.updateError'), { icon: '⚠️' });
     }
   };
 
@@ -89,21 +91,6 @@ const ArchivePage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, loading]);
 
-  const monthsShort = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec'
-  ];
-
   const formatPeriodRange = (startDateStr, endDateStr) => {
     const parseDate = (dateStr) => {
       if (!dateStr) return null;
@@ -119,16 +106,21 @@ const ArchivePage = () => {
     const start = parseDate(startDateStr);
     if (!start) return '';
 
-    const startFormatted = `${monthsShort[start.monthIdx]} ${start.day}`;
+    const formatDatePart = ({ year, monthIdx, day }) =>
+      new Intl.DateTimeFormat(locale, {
+        month: 'short',
+        day: 'numeric'
+      }).format(new Date(year, monthIdx, day));
+    const startFormatted = formatDatePart(start);
 
     if (!endDateStr) {
-      return `${startFormatted} - Present`;
+      return `${startFormatted} - ${t('history.present')}`;
     }
 
     const end = parseDate(endDateStr);
     if (!end) return startFormatted;
 
-    return `${startFormatted} - ${monthsShort[end.monthIdx]} ${end.day}`;
+    return `${startFormatted} - ${formatDatePart(end)}`;
   };
 
   const groupPeriodsByYear = (periodsList) => {
@@ -162,10 +154,10 @@ const ArchivePage = () => {
         {/* Editorial Header */}
         <header className="mb-10">
           <h1 className="text-headline-sm font-headline font-bold text-3xl text-primary-dim mb-2">
-            Journey History
+            {t('archive.title')}
           </h1>
           <p className="text-on-surface-variant font-body text-body-md leading-relaxed">
-            A sanctuary for your past cycles. Reflect on your body's rhythm and insights over the seasons.
+            {t('archive.description')}
           </p>
         </header>
 
@@ -173,7 +165,7 @@ const ArchivePage = () => {
 
         {periods.length === 0 && !loading && (
           <p className="text-on-surface-variant text-sm text-center py-8">
-            No periods logged yet.
+            {t('archive.none')}
           </p>
         )}
 
@@ -192,7 +184,9 @@ const ArchivePage = () => {
                   const cardBgClass = isCurrent
                     ? 'bg-surface-container-lowest border border-primary/20'
                     : 'bg-surface-container-low';
-                  const durationText = period.duration ? `${period.duration} Days` : 'Active';
+                  const durationText = period.duration
+                    ? t('cycle.durationValue', { count: period.duration })
+                    : t('archive.active');
 
                   return (
                     <div
@@ -204,7 +198,7 @@ const ArchivePage = () => {
                         <div>
                           {isCurrent && (
                             <p className="text-label-sm font-label font-medium text-primary uppercase tracking-widest mb-1">
-                              Current Cycle
+                              {t('cycle.current')}
                             </p>
                           )}
                           <h3 className="text-lg font-headline font-bold text-on-surface">
@@ -228,7 +222,7 @@ const ArchivePage = () => {
                             <span className="material-symbols-outlined text-[18px]">
                               water_drop
                             </span>
-                            <span>{period.predominantFlow}</span>
+                            <span>{t(`flow.${period.predominantFlow}`)}</span>
                           </div>
                         </div>
                       )}
