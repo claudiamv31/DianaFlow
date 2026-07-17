@@ -35,6 +35,11 @@ p {
   z-index: 0;
 }
 
+:root[data-theme='dark'] .home-hero::before {
+  background-image: url('../../assets/homepage-dark.png');
+  opacity: 0.52;
+}
+
 .home-hero > * {
   position: relative;
   z-index: 1;
@@ -57,6 +62,14 @@ p {
   gap: 0.4rem;
   padding: 1.5rem;
   text-align: center;
+}
+
+:root[data-theme='dark'] .home-orb {
+  background: rgb(30 32 34 / 0.72);
+  border-color: var(--glass-highlight);
+  box-shadow:
+    0 24px 64px rgb(0 0 0 / 0.28),
+    inset 0 1px 0 var(--glass-highlight);
 }
 
 .home-orb .text-phase {

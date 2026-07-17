@@ -12,7 +12,7 @@
       rel="stylesheet"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#fdf8f5" />
     <meta name="description" content="DianaFlow" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/icon.png" />
     <!--
@@ -30,6 +30,42 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>DianaFlow</title>
+    <script>
+      (function () {
+        var preference = 'system';
+        try {
+          var storedPreference = localStorage.getItem('dianaflow.theme');
+          if (
+            storedPreference === 'system' ||
+            storedPreference === 'light' ||
+            storedPreference === 'dark'
+          ) {
+            preference = storedPreference;
+          }
+        } catch (error) {
+          preference = 'system';
+        }
+
+        var resolvedTheme = preference;
+        if (preference === 'system') {
+          resolvedTheme =
+            typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light';
+        }
+
+        document.documentElement.dataset.theme = resolvedTheme;
+        document.documentElement.dataset.themePreference = preference;
+        document.documentElement.style.colorScheme = resolvedTheme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute(
+            'content',
+            resolvedTheme === 'dark' ? '#121416' : '#fdf8f5'
+          );
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

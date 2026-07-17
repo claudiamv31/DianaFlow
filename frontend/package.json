@@ -60,7 +60,7 @@
               "[0-9!-/:-@[-`{-~]+",
               "[A-Z_-]+",
               "[\\s•—“”]+",
-              "(account_circle|add|block|calendar_today|chevron_left|chevron_right|close|edit|expand_more|language|lock_reset|logout|opacity|person_outline|photo_camera|remove|self_improvement|water_drop)"
+              "(account_circle|add|block|brightness_6|calendar_today|chevron_left|chevron_right|close|edit|expand_more|language|lock_reset|logout|opacity|person_outline|photo_camera|remove|self_improvement|water_drop)"
             ]
           }
         }

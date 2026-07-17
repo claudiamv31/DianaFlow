@@ -29,14 +29,14 @@ const LogTodayModal = ({
     if (currentFlowIntensity === intensity) {
       return 'border-[var(--primary-color)] bg-[var(--primary-color)]/10 flex items-center justify-center !text-[var(--primary-color)]';
     }
-    return 'border-gray-200 text-gray-500 hover:bg-gray-50';
+    return 'border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-high';
   };
 
   const addClassTextSelected = (intensity) => {
     if (currentFlowIntensity === intensity) {
       return 'text-[var(--primary-color)] font-bold';
     }
-    return 'text-gray-500';
+    return 'text-on-surface-variant';
   };
 
   return (
@@ -47,7 +47,7 @@ const LogTodayModal = ({
       }}
     >
       <div
-        className="bg-white w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative border border-gray-100"
+        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative border border-outline-variant/20"
         style={{ maxHeight: '90vh', borderRadius: '2.5rem' }}
       >
         {/* Header */}
@@ -65,7 +65,7 @@ const LogTodayModal = ({
             onClick={onClose}
             disabled={isSaving}
           >
-            <span className="material-symbols-outlined text-gray-600 group-active:scale-90 transition-transform">
+            <span className="material-symbols-outlined text-on-surface-variant group-active:scale-90 transition-transform">
               close
             </span>
           </button>
@@ -73,7 +73,7 @@ const LogTodayModal = ({
 
         {/* Scrollable Content */}
         <div className="px-8 pb-4 overflow-y-auto flex-1">
-          <p className="text-gray-500 text-sm mb-8 px-2">
+          <p className="text-on-surface-variant text-sm mb-8 px-2">
             {t('log.selectTodayFlow')}
           </p>
 
@@ -187,10 +187,10 @@ const LogTodayModal = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="px-8 pb-8 pt-4 bg-white mt-auto">
+        <div className="px-8 pb-8 pt-4 bg-surface-container-lowest mt-auto">
           <div className="grid grid-cols-2 gap-4 px-2">
             <button
-              className="h-14 w-full flex items-center justify-center font-headline font-bold text-gray-500 hover:bg-gray-100 transition-all rounded-full active:scale-95"
+              className="h-14 w-full flex items-center justify-center font-headline font-bold text-on-surface-variant hover:bg-surface-container-high transition-all rounded-full active:scale-95"
               onClick={onClose}
               disabled={isSaving}
             >

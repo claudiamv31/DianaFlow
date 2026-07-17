@@ -93,7 +93,7 @@ const DailyInsigths = ({
           </div>
         </div>
 
-        <div className="mb-6 p-4 bg-white/60 rounded-lg border-l-4 !border-secondary">
+        <div className="mb-6 p-4 bg-surface-container-lowest/60 rounded-lg border-l-4 !border-secondary">
           <p className="text-sm font-semibold !text-secondary mb-1 uppercase tracking-tight">
             {t('calendar.dailyInsight')}
           </p>

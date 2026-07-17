@@ -18,7 +18,7 @@
 }
 
 .calendar-save-btn:hover {
-  background-color: #4b2e64;
+  background-color: rgb(var(--color-secondary-dim));
 }
 
 .calendar-save-btn {

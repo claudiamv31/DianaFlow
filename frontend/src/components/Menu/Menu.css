@@ -11,6 +11,11 @@
   padding: 0.5rem 0;
 }
 
+:root[data-theme='dark'] .menu-container {
+  border-top-color: var(--glass-highlight);
+  box-shadow: 0 -8px 24px rgb(0 0 0 / 0.24);
+}
+
 .nav-links {
   display: flex;
   justify-content: space-around;

@@ -15,3 +15,7 @@ _Avoid_: Daily message, phase message
 **Daily Focus**:
 Action-oriented, non-diagnostic wellness guidance based on the current day's Cycle Phase Estimate. It must defer to the user's observed experience rather than present phase-based generalizations as certainty.
 _Avoid_: Focus message, daily message
+
+**Theme Preference**:
+The user's selected appearance behavior: System follows the device color scheme, while Light and Dark override it. System is the initial default and resolves to Light when the device preference cannot be detected.
+_Avoid_: Theme, mode

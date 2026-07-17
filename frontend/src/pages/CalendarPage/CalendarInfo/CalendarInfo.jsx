@@ -131,7 +131,7 @@ const CalendarInfo = ({
                 setPeriodDays([]);
                 setIsEditingPeriod(false);
               }}
-              style={{ backgroundColor: '#999' }}
+              style={{ backgroundColor: 'rgb(var(--color-outline))' }}
               disabled={isSavingPeriod}
             >
               {t('common.cancel')}

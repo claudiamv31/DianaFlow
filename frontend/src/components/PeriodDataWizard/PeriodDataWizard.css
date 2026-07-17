@@ -28,7 +28,7 @@ input[type='date']::-moz-calendar-picker-indicator {
 
 /* Custom date input appearance */
 input[type='date'] {
-  accent-color: #904958;
+  accent-color: var(--primary-color);
 }
 
 /* Webkit-based browsers (Chrome, Safari, Edge) */
@@ -42,19 +42,19 @@ input[type='date']::-webkit-inner-spin-button {
 /* Focus state styling */
 input[type='date']:focus {
   outline: none;
-  box-shadow: inset 0 0 0 2px #904958;
+  box-shadow: inset 0 0 0 2px var(--primary-color);
 }
 
 /* Placeholder styling */
 input[type='date']:invalid {
-  color: #b5b1ad;
+  color: rgb(var(--color-outline));
 }
 
 input[type='date']::placeholder {
-  color: #b5b1ad;
+  color: rgb(var(--color-outline));
 }
 
 /* Style for when value is set */
 input[type='date']:valid {
-  color: #34322f;
+  color: var(--text-color);
 }

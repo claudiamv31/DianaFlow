@@ -1,3 +1,29 @@
+const semanticColorNames = [
+  'primary', 'on-secondary-container', 'outline', 'outline-variant',
+  'secondary-container', 'error-dim', 'primary-dim', 'on-primary-container',
+  'surface', 'on-primary-fixed', 'tertiary', 'error',
+  'surface-container-lowest', 'on-secondary', 'on-surface-variant',
+  'surface-container-high', 'background', 'on-tertiary', 'on-error',
+  'on-primary', 'inverse-on-surface', 'surface-container-highest',
+  'on-tertiary-container', 'primary-fixed', 'error-container',
+  'surface-bright', 'surface-container', 'primary-container', 'secondary-dim',
+  'surface-dim', 'secondary-fixed', 'surface-variant', 'tertiary-fixed',
+  'inverse-primary', 'on-background', 'surface-container-low',
+  'on-tertiary-fixed-variant', 'on-primary-fixed-variant',
+  'tertiary-fixed-dim', 'tertiary-dim', 'secondary', 'fertility',
+  'primary-fixed-dim', 'on-surface', 'on-secondary-fixed-variant',
+  'tertiary-container', 'on-error-container', 'inverse-surface',
+  'surface-tint', 'on-secondary-fixed', 'secondary-fixed-dim',
+  'on-tertiary-fixed'
+];
+
+const semanticColors = Object.fromEntries(
+  semanticColorNames.map((name) => [
+    name,
+    `rgb(var(--color-${name}) / <alpha-value>)`
+  ])
+);
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -5,60 +31,7 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        "primary": "#904958",
-        "on-secondary-container": "#584b76",
-        "outline": "#7d7a77",
-        "outline-variant": "#b5b1ad",
-        "secondary-container": "#e9ddff",
-        "error-dim": "#70030f",
-        "primary-dim": "#823d4c",
-        "on-primary-container": "#662736",
-        "surface": "#fdf8f5",
-        "on-primary-fixed": "#4c1322",
-        "tertiary": "#695e4c",
-        "error": "#ac3434",
-        "surface-container-lowest": "#ffffff",
-        "on-secondary": "#fdf7ff",
-        "on-surface-variant": "#615f5b",
-        "surface-container-high": "#ece7e3",
-        "background": "#fdf8f5",
-        "on-tertiary": "#fff8f1",
-        "on-error": "#fff7f6",
-        "on-primary": "#fff7f7",
-        "inverse-on-surface": "#a09c9a",
-        "surface-container-highest": "#e7e2dd",
-        "on-tertiary-container": "#635947",
-        "primary-fixed": "#ffa9b9",
-        "error-container": "#f56965",
-        "surface-bright": "#fdf8f5",
-        "surface-container": "#f2ede9",
-        "primary-container": "#ffa9b9",
-        "secondary-dim": "#594c77",
-        "surface-dim": "#ded9d4",
-        "secondary-fixed": "#e9ddff",
-        "surface-variant": "#e7e2dd",
-        "tertiary-fixed": "#ffefd7",
-        "inverse-primary": "#ffa5b6",
-        "on-background": "#34322f",
-        "surface-container-low": "#f8f3ef",
-        "on-tertiary-fixed-variant": "#6e6351",
-        "on-primary-fixed-variant": "#71303f",
-        "tertiary-fixed-dim": "#f0e0ca",
-        "tertiary-dim": "#5c5240",
-        "secondary": "#655884",
-        "fertility": "#358d95",
-        "primary-fixed-dim": "#f29bab",
-        "on-surface": "#34322f",
-        "on-secondary-fixed-variant": "#615580",
-        "tertiary-container": "#ffefd7",
-        "on-error-container": "#65000b",
-        "inverse-surface": "#0f0e0d",
-        "surface-tint": "#904958",
-        "on-secondary-fixed": "#453862",
-        "secondary-fixed-dim": "#ddcdff",
-        "on-tertiary-fixed": "#514736"
-      },
+      colors: semanticColors,
       borderRadius: {
         DEFAULT: "1rem",
         lg: "2rem",
