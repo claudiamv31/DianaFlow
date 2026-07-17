@@ -1,15 +1,15 @@
 .loading-spinner {
   --spinner-size: 2.75rem;
   --spinner-thickness: 0.34rem;
-  --spinner-track: rgba(144, 73, 88, 0.14);
-  --spinner-highlight: var(--secondary-color);
+  --spinner-track: rgb(var(--color-primary) / 0.14);
+  --spinner-highlight: rgb(var(--color-primary-gradient-start));
 
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: 0.9rem;
-  color: var(--primary-color);
+  color: rgb(var(--color-primary));
 }
 
 .loading-spinner--page {
@@ -50,7 +50,7 @@
 }
 
 .loading-spinner--current {
-  --spinner-track: rgba(255, 255, 255, 0.32);
+  --spinner-track: rgb(var(--color-glass-surface) / 0.32);
   --spinner-highlight: currentColor;
 
   color: inherit;
@@ -65,7 +65,7 @@
 
 .loading-spinner__label {
   max-width: min(22rem, calc(100vw - 2rem));
-  color: var(--text-muted, #6f5f66);
+  color: rgb(var(--color-on-surface-variant));
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.35;

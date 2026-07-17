@@ -57,7 +57,7 @@ const Settings = () => {
       {/* User Info Section */}
       <section className="flex flex-col items-center mb-12">
         <div className="relative mb-6">
-          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-[0_12px_32px_rgba(52,50,47,0.04)]">
+          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-subtle">
             <img
               alt={t('settings.profileAlt')}
               className="w-full h-full object-cover"
@@ -66,7 +66,7 @@ const Settings = () => {
           </div>
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="absolute bottom-0 right-0 bg-primary/100 p-2 rounded-full text-on-primary shadow-[0_12px_32px_rgba(52,50,47,0.04)] active:scale-90 transition-transform"
+            className="absolute bottom-0 right-0 bg-primary/100 p-2 rounded-full text-on-primary shadow-subtle active:scale-90 transition-transform"
           >
             <span
               className="material-symbols-outlined text-sm"

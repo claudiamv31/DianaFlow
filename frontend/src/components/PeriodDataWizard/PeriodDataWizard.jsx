@@ -97,7 +97,7 @@ const PeriodDataWizard = ({ onComplete }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300">
       <div
-        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
+        className="bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col relative"
         style={{ maxHeight: '90vh', borderRadius: '3rem' }}
       >
         {/* Header with Step Indicator */}

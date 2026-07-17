@@ -6,7 +6,7 @@
   border: none;
   border-radius: 1.5rem;
   background-color: theme('colors.surface-container-lowest');
-  box-shadow: 0 20px 50px rgba(117, 63, 96, 0.08);
+  box-shadow: 0 20px 50px rgb(var(--color-primary) / 0.08);
   line-height: 1;
 }
 
@@ -41,14 +41,14 @@
   min-width: 2.75rem;
   border-radius: 999px;
   background: transparent;
-  color: var(--text-color);
+  color: rgb(var(--color-on-surface));
   font-weight: 700;
   transition: background 0.2s ease;
 }
 
 .calendar-view .react-calendar__navigation button:enabled:hover,
 .calendar-view .react-calendar__navigation button:enabled:focus {
-  background: rgba(144, 73, 88, 0.1);
+  background: rgb(var(--color-primary) / 0.1);
 }
 
 .calendar-view .react-calendar__navigation button:disabled {
@@ -59,7 +59,7 @@
 .calendar-view .react-calendar__navigation__label {
   flex: 1 1 auto;
   min-width: 0;
-  color: var(--text-color);
+  color: rgb(var(--color-on-surface));
   font-size: 1rem;
   font-weight: 800;
 }
@@ -99,7 +99,7 @@
   height: var(--calendar-day-size);
   padding: 0;
   background: transparent;
-  color: var(--text-color);
+  color: rgb(var(--color-on-surface));
   font-size: clamp(0.85rem, 1.8vw, 1.1rem);
   font-weight: 700;
   text-align: center;
@@ -125,7 +125,7 @@
 
 .calendar-view .react-calendar__tile:enabled:hover::before,
 .calendar-view .react-calendar__tile:enabled:focus::before {
-  border-color: rgba(101, 88, 132, 0.7);
+  border-color: rgb(var(--color-secondary) / 0.7);
 }
 
 .calendar-view .react-calendar__tile--active,
@@ -147,15 +147,15 @@
 }
 
 .calendar-view .react-calendar__tile.calendar-day-period::before {
-  border-color: rgba(144, 73, 88, 0.7);
-  background: rgba(144, 73, 88, 0.2);
+  border-color: rgb(var(--color-primary) / 0.7);
+  background: rgb(var(--color-primary) / 0.2);
 }
 
 .calendar-view .react-calendar__tile.calendar-day-predicted::before {
   border-width: 2px;
   border-style: dashed;
-  border-color: rgba(144, 73, 88, 0.5);
-  background: rgba(144, 73, 88, 0.05);
+  border-color: rgb(var(--color-primary) / 0.5);
+  background: rgb(var(--color-primary) / 0.05);
 }
 
 .calendar-view .react-calendar__month-view__days__day--neighboringMonth {

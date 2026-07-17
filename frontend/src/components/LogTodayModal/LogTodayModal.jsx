@@ -27,14 +27,14 @@ const LogTodayModal = ({
 
   const addClassIfSelected = (intensity) => {
     if (currentFlowIntensity === intensity) {
-      return 'border-[var(--primary-color)] bg-[var(--primary-color)]/10 flex items-center justify-center !text-[var(--primary-color)]';
+      return 'border-primary bg-primary/10 flex items-center justify-center !text-primary';
     }
     return 'border-outline-variant/30 text-on-surface-variant hover:bg-surface-container-high';
   };
 
   const addClassTextSelected = (intensity) => {
     if (currentFlowIntensity === intensity) {
-      return 'text-[var(--primary-color)] font-bold';
+      return 'text-primary font-bold';
     }
     return 'text-on-surface-variant';
   };
@@ -47,16 +47,16 @@ const LogTodayModal = ({
       }}
     >
       <div
-        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative border border-outline-variant/20"
+        className="bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col relative border border-outline-variant/20"
         style={{ maxHeight: '90vh', borderRadius: '2.5rem' }}
       >
         {/* Header */}
         <div className="px-8 pt-10 pb-4 flex items-center justify-between">
           <div>
-            <h2 className="font-headline font-bold text-2xl text-[var(--text-color)]">
+            <h2 className="font-headline font-bold text-2xl text-on-surface">
               {t('home.logToday')}
             </h2>
-            <p className="text-sm font-semibold tracking-widest uppercase text-[var(--primary-color)] mt-1">
+            <p className="text-sm font-semibold tracking-widest uppercase text-primary mt-1">
               {formatLongDate(todayDate || new Date(), locale)}
             </p>
           </div>

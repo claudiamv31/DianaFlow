@@ -4,18 +4,18 @@ export default function Button({
   children,
   onClick,
   type = 'button',
-  variant = 'primary', // 'primary', 'outline', 'secondary'
+  variant = 'primary',
   className = '',
   disabled = false,
   ...props
 }) {
   const baseStyle =
-    'py-3 px-6 rounded-full font-headline font-semibold text-base transition-all duration-200 flex items-center justify-center gap-2 select-none active:scale-[0.98] outline-none';
+    'flex items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-l from-primary-gradient-start to-primary px-6 py-3 font-headline text-base font-semibold text-on-primary outline-none transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:scale-100 disabled:opacity-50 dark:bg-none dark:bg-primary-container dark:shadow-action dark:hover:brightness-[0.94]';
 
   const variants = {
-    primary: 'main-btn text-on-primary shadow-lg shadow-primary/20 hover:bg-primary-dim disabled:opacity-50 disabled:scale-100',
-    outline: 'main-btn text-primary/70 hover:bg-primary/5 disabled:opacity-50 disabled:scale-100',
-    secondary: 'main-btn text-on-surface hover:bg-surface-container-high/80 disabled:opacity-50 disabled:scale-100'
+    primary: 'shadow-lg shadow-primary/20',
+    outline: '',
+    secondary: ''
   };
 
   return (

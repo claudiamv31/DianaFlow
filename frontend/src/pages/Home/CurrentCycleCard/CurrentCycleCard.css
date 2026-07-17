@@ -10,7 +10,7 @@
 }
 
 .current-cycle-info {
-  background-color: var(--accent-color);
+  background-color: rgb(var(--color-accent-surface));
   border-radius: 1.5rem;
   padding: 1.2rem 1rem;
 }
@@ -18,7 +18,7 @@
 .current-cycle-label {
   font-size: 0.7rem;
   padding-left: 0.5rem;
-  color: var(--label-color);
+  color: rgb(var(--color-on-surface-variant));
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 1rem !important;
@@ -44,18 +44,18 @@
 }
 
 .duration-icon {
-  background-color: rgba(144, 73, 88, 0.10);
+  background-color: rgb(var(--color-primary) / 0.10);
 }
 
 .day-icon {
-  background-color: rgba(107, 84, 148, 0.10);
+  background-color: rgb(var(--color-secondary) / 0.10);
 }
 
 .current-cycle-meta {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--label-color);
+  color: rgb(var(--color-on-surface-variant));
   opacity: 0.7;
   margin-bottom: 0.15rem !important;
 }
@@ -63,5 +63,5 @@
 .current-cycle-value {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--text-color);
+  color: rgb(var(--color-on-surface));
 }

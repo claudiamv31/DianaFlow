@@ -28,7 +28,7 @@ const contrastRatio = (first, second) => {
 
 test('the selected calendar day uses a readable semantic foreground', () => {
   const calendarCss = readSource('./CalendarView.css');
-  const themeCss = readSource('../../../index.css');
+  const themeCss = readSource('../../../styles/tokens.css');
   const darkThemeCss = themeCss.match(/:root\[data-theme='dark'\]\s*\{([\s\S]*?)\n\}/)[1];
   const selectedRule = calendarCss.match(
     /\.calendar-view \.react-calendar__tile\.calendar-day-selected\s*\{([^}]*)\}/

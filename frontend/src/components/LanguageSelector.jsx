@@ -7,7 +7,7 @@ const LanguageSelector = ({ variant = 'compact' }) => {
 
   return (
     <label
-      className={`relative inline-flex items-center text-sm text-[var(--label-color)] ${
+      className={`relative inline-flex items-center text-sm text-on-surface-variant ${
         isSettings ? 'shrink-0' : 'gap-2'
       }`}
     >

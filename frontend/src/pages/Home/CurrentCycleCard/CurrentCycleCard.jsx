@@ -22,7 +22,7 @@ const fertilityDetails = {
   low: {
     valueKey: 'fertility.low',
     descriptionKey: 'fertility.lowDescription',
-    valueClassName: 'text-[var(--text-color)]',
+    valueClassName: 'text-on-surface',
     iconClassName: 'bg-fertility/10 text-fertility'
   }
 };
@@ -78,14 +78,14 @@ const CurrentCycleCard = ({
           ? t('cycle.durationValue', { count: periodDuration })
           : '--',
       icon: faDroplet,
-      valueClassName: 'text-[var(--text-color)]',
+      valueClassName: 'text-on-surface',
       iconClassName: 'bg-primary/10 text-primary/100'
     },
     {
       label: t('cycle.dayOfCycle'),
       value: cycleDay != null ? t('cycle.dayValue', { count: cycleDay }) : '--',
       icon: faCalendarDays,
-      valueClassName: 'text-[var(--text-color)]',
+      valueClassName: 'text-on-surface',
       iconClassName: 'bg-secondary/10 text-secondary/100'
     },
     {
@@ -100,12 +100,12 @@ const CurrentCycleCard = ({
 
   return (
     <div className="flex-1 w-full">
-      <h2 className="text-base font-bold mb-4 text-[var(--text-color)]">
+      <h2 className="text-base font-bold mb-4 text-on-surface">
         {t('cycle.current')}
       </h2>
 
-      <div className="bg-[var(--accent-color)] rounded-3xl p-4 sm:p-5">
-        <p className="text-[0.7rem] pl-2 text-[var(--label-color)] uppercase tracking-widest mb-4">
+      <div className="bg-accent-surface rounded-3xl p-4 sm:p-5">
+        <p className="text-[0.7rem] pl-2 text-on-surface-variant uppercase tracking-widest mb-4">
           {t('cycle.details')}
         </p>
 
@@ -122,7 +122,7 @@ const CurrentCycleCard = ({
                 <FontAwesomeIcon icon={item.icon} />
               </div>
               <div className="min-w-0">
-                <p className="text-[0.65rem] uppercase tracking-widest text-[var(--label-color)] opacity-70 mb-1">
+                <p className="text-[0.65rem] uppercase tracking-widest text-on-surface-variant opacity-70 mb-1">
                   {item.label}
                 </p>
                 <p
@@ -131,7 +131,7 @@ const CurrentCycleCard = ({
                   {item.value}
                 </p>
                 {item.description && (
-                  <p className="mt-1 text-xs leading-snug text-[var(--label-color)]">
+                  <p className="mt-1 text-xs leading-snug text-on-surface-variant">
                     {item.description}
                   </p>
                 )}

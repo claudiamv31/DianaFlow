@@ -31,7 +31,7 @@ const LogPeriodCard = ({ isEditingPeriod, setIsEditingPeriod }) => {
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      <div className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative max-h-[90vh] rounded-[2rem] md:rounded-[3rem]">
+      <div className="bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col relative max-h-[90vh] rounded-[2rem] md:rounded-[3rem]">
         {/* Header - Adjusted mobile padding */}
         <div className="px-5 md:px-8 pt-8 md:pt-10 pb-4 flex items-center justify-between">
           <h2 className="font-headline font-bold text-xl md:text-2xl text-on-surface flex items-center gap-2">

@@ -71,7 +71,7 @@ const EditLog = ({ onClose, selectedDate, cycleInfo, isPeriodActive }) => {
       }}
     >
       <div
-        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
+        className="bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col relative"
         style={{ maxHeight: '90vh', borderRadius: '3rem' }}
       >
         {/* Header */}
