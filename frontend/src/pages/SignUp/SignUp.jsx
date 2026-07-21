@@ -102,21 +102,21 @@ const SignUp = () => {
 
       {/* Sign‑Up Container */}
       <div className="w-full max-w-[460px] z-10 flex flex-col items-center">
-        <h1 className="text-4xl font-headline font-bold text-[#6D3B47] mb-1">
+        <h1 className="text-4xl font-headline font-bold text-primary mb-1">
           DianaFlow
         </h1>
-        <p className="text-sm text-[#716164] mb-8">
+        <p className="text-sm text-on-surface-variant mb-8">
           {t('auth.tagline.signup')}
         </p>
 
-        <div className="w-full bg-[#FCF8F5]/80 backdrop-blur-md rounded-[3rem] shadow-[0_16px_48px_rgba(109,59,71,0.06)] border border-white/40 p-8 md:p-10 flex flex-col">
+        <div className="auth-card w-full bg-surface-container-lowest/80 backdrop-blur-md rounded-[3rem] border border-outline-variant/20 p-8 md:p-10 flex flex-col">
           <form
             onSubmit={handleSignUp}
             noValidate
             className="flex flex-col gap-4"
           >
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-[#6D3B47] uppercase tracking-wider px-1">
+              <label className="text-xs font-semibold text-primary uppercase tracking-wider px-1">
                 {t('auth.name')}
               </label>
               <div className="relative">
@@ -134,10 +134,10 @@ const SignUp = () => {
                   }
                   className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
                     getMissingLabel('name') ? 'pr-28' : 'pr-6'
-                  } text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                  } text-sm text-on-surface placeholder:text-outline transition-all ${
                     fieldErrors.name
                       ? 'auth-input-error'
-                      : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
+                      : 'bg-surface-container-high/60 focus:ring-2 focus:ring-primary/30'
                   }`}
                 />
                 {getMissingLabel('name') && (
@@ -149,14 +149,14 @@ const SignUp = () => {
               {fieldErrors.name && !getMissingLabel('name') && (
                 <p
                   id="signup-name-error"
-                  className="px-1 text-xs font-semibold text-[#B33F4A]"
+                  className="px-1 text-xs font-semibold text-error"
                 >
                   {t(fieldErrors.name)}
                 </p>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-[#6D3B47] uppercase tracking-wider px-1">
+              <label className="text-xs font-semibold text-primary uppercase tracking-wider px-1">
                 {t('auth.lastName')}
               </label>
               <div className="relative">
@@ -174,10 +174,10 @@ const SignUp = () => {
                   }
                   className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
                     getMissingLabel('lastName') ? 'pr-28' : 'pr-6'
-                  } text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                  } text-sm text-on-surface placeholder:text-outline transition-all ${
                     fieldErrors.lastName
                       ? 'auth-input-error'
-                      : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
+                      : 'bg-surface-container-high/60 focus:ring-2 focus:ring-primary/30'
                   }`}
                 />
                 {getMissingLabel('lastName') && (
@@ -189,14 +189,14 @@ const SignUp = () => {
               {fieldErrors.lastName && !getMissingLabel('lastName') && (
                 <p
                   id="signup-last-name-error"
-                  className="px-1 text-xs font-semibold text-[#B33F4A]"
+                  className="px-1 text-xs font-semibold text-error"
                 >
                   {t(fieldErrors.lastName)}
                 </p>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-[#6D3B47] uppercase tracking-wider px-1">
+              <label className="text-xs font-semibold text-primary uppercase tracking-wider px-1">
                 {t('auth.email')}
               </label>
               <div className="relative">
@@ -214,10 +214,10 @@ const SignUp = () => {
                   }
                   className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
                     getMissingLabel('email') ? 'pr-28' : 'pr-6'
-                  } text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                  } text-sm text-on-surface placeholder:text-outline transition-all ${
                     fieldErrors.email
                       ? 'auth-input-error'
-                      : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
+                      : 'bg-surface-container-high/60 focus:ring-2 focus:ring-primary/30'
                   }`}
                 />
                 {getMissingLabel('email') && (
@@ -229,14 +229,14 @@ const SignUp = () => {
               {fieldErrors.email && !getMissingLabel('email') && (
                 <p
                   id="signup-email-error"
-                  className="px-1 text-xs font-semibold text-[#B33F4A]"
+                  className="px-1 text-xs font-semibold text-error"
                 >
                   {t(fieldErrors.email)}
                 </p>
               )}
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-[#6D3B47] uppercase tracking-wider px-1">
+              <label className="text-xs font-semibold text-primary uppercase tracking-wider px-1">
                 {t('auth.password')}
               </label>
               <div className="relative">
@@ -254,10 +254,10 @@ const SignUp = () => {
                   }
                   className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
                     getMissingLabel('password') ? 'pr-28' : 'pr-6'
-                  } text-sm text-[#34322f] placeholder-[#B5B1AD] transition-all ${
+                  } text-sm text-on-surface placeholder:text-outline transition-all ${
                     fieldErrors.password
                       ? 'auth-input-error'
-                      : 'bg-[#ECE7E3]/60 focus:ring-2 focus:ring-[#B97A89]/30'
+                      : 'bg-surface-container-high/60 focus:ring-2 focus:ring-primary/30'
                   }`}
                 />
                 {getMissingLabel('password') && (
@@ -269,14 +269,14 @@ const SignUp = () => {
               {fieldErrors.password && !getMissingLabel('password') && (
                 <p
                   id="signup-password-error"
-                  className="px-1 text-xs font-semibold text-[#B33F4A]"
+                  className="px-1 text-xs font-semibold text-error"
                 >
                   {t(fieldErrors.password)}
                 </p>
               )}
             </div>
             {fieldErrors.form && (
-              <p className="rounded-2xl border border-[#F0B9BE] bg-[#FFF6F5] px-4 py-3 text-center text-xs font-semibold text-[#B33F4A]">
+              <p className="rounded-2xl border border-error/30 bg-error-container/10 px-4 py-3 text-center text-xs font-semibold text-error">
                 {t(fieldErrors.form)}
               </p>
             )}
@@ -300,17 +300,17 @@ const SignUp = () => {
           </form>
         </div>
 
-        <div className="text-center mt-8 text-sm text-[#716164]">
+        <div className="text-center mt-8 text-sm text-on-surface-variant">
           {t('auth.hasAccount')}{' '}
           <Link
             to="/login"
-            className="font-bold text-[#904958] hover:underline"
+            className="font-bold text-primary hover:underline"
           >
             {t('auth.logIn')}
           </Link>
         </div>
 
-        <div className="flex justify-center gap-6 mt-12 text-xs text-[#716164]/70">
+        <div className="flex justify-center gap-6 mt-12 text-xs text-on-surface-variant/70">
           <a href="#privacy" className="hover:underline">
             {t('auth.privacy')}
           </a>

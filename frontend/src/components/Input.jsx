@@ -1,5 +1,3 @@
-import './Input.css';
-
 export default function Input({
   label,
   type = 'text',
@@ -7,19 +5,23 @@ export default function Input({
   value,
   onChange,
   icon,
-  buttonText,
-  onButtonClick
 }) {
   return (
-    <div className="mb-3 custom-input-wrapper">
-      {label && <label className="form-label">{label}</label>}
+    <div className="mb-3 w-full">
+      {label && (
+        <label className="font-semibold text-on-surface">{label}</label>
+      )}
 
-      <div className="input-group">
-        {icon && <span className="input-group-text input-icon">{icon}</span>}
+      <div className="flex w-full overflow-hidden rounded-[0.75rem] border-2 border-primary transition-[border-color,box-shadow] duration-300 focus-within:ring-[0.2rem] focus-within:ring-secondary-container/40">
+        {icon && (
+          <span className="flex items-center border-r border-primary bg-transparent px-3 text-primary">
+            {icon}
+          </span>
+        )}
 
         <input
           type={type}
-          className="form-control custom-input"
+          className="block w-full flex-1 border-0 bg-transparent px-3 py-2 text-sm outline-none focus:border-primary focus:outline-none focus:ring-0"
           placeholder={placeholder}
           value={value}
           onChange={(e) => {

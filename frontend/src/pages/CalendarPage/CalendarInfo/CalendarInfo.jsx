@@ -1,9 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../../../api/apiClient';
-import PrimaryButton from '../../../components/PrimaryButton';
+import Button from '../../../components/Button';
 import { refreshCycleQueries } from '../../../utils/queryInvalidation';
 import LoadingSpinner from '../../../components/LoadingSpinner';
-import './CalendarInfo.css';
 import { useLocale } from '../../../i18n/LocaleContext';
 
 const CalendarInfo = ({
@@ -84,26 +83,29 @@ const CalendarInfo = ({
     deletePeriodMutation.isPending || upsertPeriodMutation.isPending;
 
   return (
-    <div className="calendar-info">
+    <div className="my-4 flex w-60 basis-60 flex-col rounded-[0.625rem] bg-surface-container-lowest p-4 shadow-[-6px_0_20px_rgb(var(--color-shadow)/0.05)]">
       {!cycleInfo ? (
         <LoadingSpinner layout="center" size="md" />
       ) : (
-        <div className="day-info">
-          <p>
+        <div className="w-full">
+          <p className="m-0">
             <strong>{date.toLocaleDateString(locale, options)}</strong>
           </p>
-          <p>{t('calendar.cycleDay', { count: cycleInfo.cycleDay })}</p>
-          <p>{t(`phase.${cycleInfo.phase}`)}</p>
-          <p>
+          <p className="m-0">
+            {t('calendar.cycleDay', { count: cycleInfo.cycleDay })}
+          </p>
+          <p className="m-0">{t(`phase.${cycleInfo.phase}`)}</p>
+          <p className="m-0">
             {t(`fertility.${cycleInfo.fertilityLevel}`)}{' '}
             {t('calendar.pregnancyPossibility')}
           </p>
         </div>
       )}
 
-      <div className="update-button">
+      <div className="mt-auto w-full text-center">
         {!isEditingPeriod ? (
-          <PrimaryButton
+          <Button
+            className="mx-auto w-[70%]"
             disabled={isSavingPeriod}
             onClick={(e) => {
               e.preventDefault();
@@ -111,10 +113,14 @@ const CalendarInfo = ({
             }}
           >
             {t('calendar.updateStatus')}
-          </PrimaryButton>
+          </Button>
         ) : (
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <PrimaryButton onClick={handleSavePeriod} disabled={isSavingPeriod}>
+          <div className="flex gap-2.5">
+            <Button
+              className="w-[70%]"
+              onClick={handleSavePeriod}
+              disabled={isSavingPeriod}
+            >
               {isSavingPeriod ? (
                 <LoadingSpinner
                   size="sm"
@@ -125,17 +131,18 @@ const CalendarInfo = ({
               ) : (
                 t('common.save')
               )}
-            </PrimaryButton>
-            <PrimaryButton
+            </Button>
+            <Button
+              className="w-[70%]"
+              variant="secondary"
               onClick={() => {
                 setPeriodDays([]);
                 setIsEditingPeriod(false);
               }}
-              style={{ backgroundColor: '#999' }}
               disabled={isSavingPeriod}
             >
               {t('common.cancel')}
-            </PrimaryButton>
+            </Button>
           </div>
         )}
       </div>

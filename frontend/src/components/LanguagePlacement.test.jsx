@@ -5,6 +5,7 @@ import Settings from '../pages/Settings/Settings';
 import Login from '../pages/Login/Login';
 import SignUp from '../pages/SignUp/SignUp';
 import { LocaleProvider } from '../i18n/LocaleContext';
+import { ThemeProvider } from '../theme/ThemeContext';
 
 jest.mock('../database/authService', () => ({
   checkUser: (callback) => {
@@ -32,7 +33,9 @@ jest.mock('../hooks/useProfileHooks', () => ({
 const renderWithAppContext = (component) =>
   render(
     <MemoryRouter>
-      <LocaleProvider>{component}</LocaleProvider>
+      <ThemeProvider>
+        <LocaleProvider>{component}</LocaleProvider>
+      </ThemeProvider>
     </MemoryRouter>
   );
 
@@ -44,7 +47,19 @@ describe('language selector placement', () => {
   test('is available from Settings', () => {
     renderWithAppContext(<Settings />);
 
-    expect(screen.getByRole('combobox', { name: 'Language' })).toBeVisible();
+    const languageSelector = screen.getByRole('combobox', { name: 'Language' });
+    expect(languageSelector).toBeVisible();
+    expect(screen.getByRole('combobox', { name: 'Theme' })).toBeVisible();
+
+    const languageIcon = screen.getByTestId('language-setting-icon');
+    expect(languageIcon).toHaveClass('text-primary');
+    expect(screen.getByTestId('language-setting-icon-container')).toHaveClass(
+      'bg-primary-container/20'
+    );
+
+    const settingsQuote = screen.getByText(/Embrace the shifting tides/);
+    expect(settingsQuote).toHaveClass('bg-surface-container-high');
+    expect(settingsQuote).toHaveClass('text-on-surface-variant');
   });
 
   test('is not displayed in the authenticated header', () => {

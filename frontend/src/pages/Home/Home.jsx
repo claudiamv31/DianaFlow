@@ -195,7 +195,7 @@ function Home() {
 
           {/* Dynamic Phase Message */}
           {currentPhase && (
-            <p className="text-sm italic text-gray-600 max-w-md text-center mt-2 px-4 animate-fade-in">
+            <p className="text-sm italic text-on-surface-variant max-w-md text-center mt-2 px-4 animate-fade-in">
               “{t(`home.phase.${currentPhase}`)}”
             </p>
           )}

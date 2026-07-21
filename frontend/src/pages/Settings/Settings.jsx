@@ -8,6 +8,7 @@ import { API_URL } from '../../config';
 import defaultProfilePic from '../../assets/default-profile-pic.png';
 import { useLocale } from '../../i18n/LocaleContext';
 import LanguageSelector from '../../components/LanguageSelector';
+import ThemeSelector from '../../components/ThemeSelector';
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const Settings = () => {
       {/* User Info Section */}
       <section className="flex flex-col items-center mb-12">
         <div className="relative mb-6">
-          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-[0_12px_32px_rgba(52,50,47,0.04)]">
+          <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-surface-container-lowest shadow-subtle">
             <img
               alt={t('settings.profileAlt')}
               className="w-full h-full object-cover"
@@ -65,7 +66,7 @@ const Settings = () => {
           </div>
           <button
             onClick={() => setIsEditModalOpen(true)}
-            className="absolute bottom-0 right-0 bg-primary/100 p-2 rounded-full text-on-primary shadow-[0_12px_32px_rgba(52,50,47,0.04)] active:scale-90 transition-transform"
+            className="absolute bottom-0 right-0 bg-primary/100 p-2 rounded-full text-on-primary shadow-subtle active:scale-90 transition-transform"
           >
             <span
               className="material-symbols-outlined text-sm"
@@ -88,10 +89,14 @@ const Settings = () => {
         <section className="bg-surface-container-low p-2 rounded-2xl">
           <div className="flex w-full items-center justify-between gap-3 rounded-[1rem] bg-surface-container-lowest p-4">
             <div className="flex min-w-0 items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tertiary-container">
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-container/20"
+                data-testid="language-setting-icon-container"
+              >
                 <span
-                  className="material-symbols-outlined text-on-tertiary-container"
+                  className="material-symbols-outlined text-primary"
                   aria-hidden="true"
+                  data-testid="language-setting-icon"
                 >
                   language
                 </span>
@@ -101,6 +106,25 @@ const Settings = () => {
               </span>
             </div>
             <LanguageSelector variant="settings" />
+          </div>
+        </section>
+
+        <section className="bg-surface-container-low p-2 rounded-2xl">
+          <div className="flex w-full items-center justify-between gap-3 rounded-[1rem] bg-surface-container-lowest p-4">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-container/20">
+                <span
+                  className="material-symbols-outlined text-primary"
+                  aria-hidden="true"
+                >
+                  {'brightness_6'}
+                </span>
+              </div>
+              <span className="truncate font-label font-semibold text-on-surface">
+                {t('settings.theme')}
+              </span>
+            </div>
+            <ThemeSelector />
           </div>
         </section>
 
@@ -220,7 +244,7 @@ const Settings = () => {
       </div>
 
       {/* Editorial Quote / Insight Toast */}
-      <div className="mt-12 p-6 rounded-2xl bg-tertiary-container/30 border border-tertiary-container/50 text-center italic text-on-tertiary-container font-body text-sm leading-relaxed">
+      <div className="mt-12 p-6 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-center italic text-on-surface-variant font-body text-sm leading-relaxed">
         “{t('settings.quote')}”
       </div>
 

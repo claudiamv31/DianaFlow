@@ -50,7 +50,7 @@ const PeriodSetup = () => {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm">
         <div
-          className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col items-center justify-center"
+          className="bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col items-center justify-center"
           style={{ height: '300px', borderRadius: '3rem' }}
         >
           <LoadingSpinner layout="center" size="lg" />

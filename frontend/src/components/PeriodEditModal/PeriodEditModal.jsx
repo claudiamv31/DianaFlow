@@ -81,7 +81,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
       }}
     >
       <div
-        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
+        className="bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col relative"
         style={{ maxHeight: '90vh', borderRadius: '3rem' }}
       >
         {/* Header */}
@@ -132,7 +132,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
               </label>
               <div className="flex items-center gap-4 bg-surface-container-low rounded-full p-2 h-14">
                 <button
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
                   type="button"
                   onClick={() => setBleedingDays((d) => Math.max(1, d - 1))}
                   disabled={isSaving}
@@ -154,7 +154,7 @@ const PeriodEditModal = ({ period, onClose, onSave }) => {
                   }
                 />
                 <button
-                  className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
                   type="button"
                   onClick={() => setBleedingDays((d) => Math.min(15, d + 1))}
                   disabled={isSaving}

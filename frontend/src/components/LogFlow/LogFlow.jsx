@@ -183,7 +183,7 @@ function LogFlow({
       }}
     >
       <div
-        className="log-flow-dialog bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
+        className="log-flow-dialog bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col relative"
       >
         {/* Header */}
         <div className="px-5 sm:px-8 pt-6 sm:pt-10 pb-4 flex items-center justify-between">

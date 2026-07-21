@@ -42,7 +42,7 @@
 
 .calendar-page .subtitle {
   font-size: 1.2rem;
-  color: var(--label-color);
+  color: rgb(var(--color-on-surface-variant));
   margin: 0;
 }
 

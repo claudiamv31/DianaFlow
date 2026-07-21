@@ -3,11 +3,11 @@
   overflow: hidden;
   padding: 2rem 2rem 2.5rem;
   border-radius: 1.5rem;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgb(var(--color-glass-surface) / 0.2);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgb(var(--color-glass-surface) / 0.3);
+  box-shadow: 0 8px 32px rgb(var(--color-shadow) / 0.1);
   margin: 1rem 1.5rem;
 }
 
@@ -21,7 +21,7 @@
 .log-title {
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--on-surface);
+  color: rgb(var(--color-on-surface));
   display: flex;
   align-items: center;
 }
@@ -30,13 +30,13 @@
   background: transparent;
   border: none;
   font-size: 1.2rem;
-  color: var(--on-surface);
+  color: rgb(var(--color-on-surface));
   cursor: pointer;
 }
 
 .log-description {
   font-size: 0.9rem;
-  color: var(--on-surface);
+  color: rgb(var(--color-on-surface));
   margin-top: 0.75rem;
   margin-bottom: 1rem;
 }
@@ -53,9 +53,9 @@
   border-radius: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--on-surface);
+  border: 1px solid rgb(var(--color-glass-surface) / 0.3);
+  background: rgb(var(--color-glass-surface) / 0.15);
+  color: rgb(var(--color-on-surface));
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   transition:
@@ -64,19 +64,19 @@
 }
 
 .log-button:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgb(var(--color-glass-surface) / 0.25);
 }
 
 .log-button.primary:hover {
-  background: var(--primary-color-dark, #7a3a48);
+  background: rgb(var(--color-primary-dim));
 }
 
 .log-button.cancel {
   background: transparent;
-  border: 1px solid var(--on-surface);
-  color: var(--on-surface);
+  border: 1px solid rgb(var(--color-on-surface));
+  color: rgb(var(--color-on-surface));
 }
 
 .log-button.cancel:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(var(--color-glass-surface) / 0.1);
 }

@@ -32,4 +32,17 @@ describe('Button', () => {
 
     expect(onClick).not.toHaveBeenCalled();
   });
+
+  test('renders each supported visual variant distinctly', () => {
+    const { rerender } = render(<Button variant="primary">Action</Button>);
+    const button = screen.getByRole('button', { name: /action/i });
+
+    expect(button).toHaveClass('bg-gradient-to-l');
+
+    rerender(<Button variant="outline">Action</Button>);
+    expect(button).toHaveClass('bg-transparent');
+
+    rerender(<Button variant="secondary">Action</Button>);
+    expect(button).toHaveClass('bg-surface-container-high');
+  });
 });

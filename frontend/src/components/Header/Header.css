@@ -9,33 +9,39 @@
   align-items: center;
   padding: 1rem 1rem;
   justify-content: space-between;
-  background-color: var(--tags-content);
+  background-color: rgb(var(--color-navigation-surface));
   z-index: 100;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(var(--color-shadow) / 0.1);
+}
+
+:root[data-theme='dark'] .header {
+  box-shadow:
+    0 6px 24px rgb(var(--color-shadow) / 0.24),
+    inset 0 -1px 0 rgb(var(--color-glass-highlight));
 }
 
 .header li,
 .header a {
   text-decoration: none;
-  color: var(--text-color);
+  color: rgb(var(--color-on-surface));
 }
 
 .header-logo {
   display: flex;
   align-items: center;
-  color: var(--primary-color);
+  color: rgb(var(--color-primary));
 }
 
 .header-logo h1 {
   margin: 0 0 0 5px;
   font-size: 1.6rem;
-  color: var(--primary-color);
+  color: rgb(var(--color-primary));
 }
 
 .moon-icon {
   font-size: 1.4rem;
   transform: rotate(340deg);
-  color: var(--primary-color);
+  color: rgb(var(--color-primary));
 }
 
 .user-icon {
@@ -44,15 +50,15 @@
   width: 1.5rem;
   height: 1.5rem;
   border-radius: 50%;
-  border: 1px solid var(--label-color);
+  border: 1px solid rgb(var(--color-on-surface-variant));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--label-color);
+  color: rgb(var(--color-on-surface-variant));
 }
 
 .profile {
   margin-top: auto;
-  border-top: 1px solid rgb(105 102 102 / 14%);
+  border-top: 1px solid rgb(var(--color-outline) / 14%);
   padding-top: 0.8rem;
 }

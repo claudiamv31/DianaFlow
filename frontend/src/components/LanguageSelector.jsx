@@ -7,7 +7,7 @@ const LanguageSelector = ({ variant = 'compact' }) => {
 
   return (
     <label
-      className={`relative inline-flex items-center text-sm text-[var(--label-color)] ${
+      className={`relative inline-flex items-center text-sm text-on-surface-variant ${
         isSettings ? 'shrink-0' : 'gap-2'
       }`}
     >
@@ -22,7 +22,7 @@ const LanguageSelector = ({ variant = 'compact' }) => {
         className={
           isSettings
             ? 'appearance-none rounded-full bg-transparent py-2 pl-3 pr-8 text-sm font-semibold text-primary/100 focus:outline-none focus:ring-2 focus:ring-primary/20'
-            : 'rounded-full border border-outline-variant/40 bg-white px-3 py-2 text-sm font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30'
+            : 'rounded-full border border-outline-variant/40 bg-surface-container-lowest px-3 py-2 text-sm font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30'
         }
         value={locale}
         onChange={(event) => setLocale(event.target.value)}

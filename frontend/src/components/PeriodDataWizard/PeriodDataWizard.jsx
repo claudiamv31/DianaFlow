@@ -97,7 +97,7 @@ const PeriodDataWizard = ({ onComplete }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-on-surface/10 backdrop-blur-sm transition-opacity duration-300">
       <div
-        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
+        className="bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col relative"
         style={{ maxHeight: '90vh', borderRadius: '3rem' }}
       >
         {/* Header with Step Indicator */}
@@ -145,7 +145,7 @@ const PeriodDataWizard = ({ onComplete }) => {
               <div className="space-y-3">
                 <div className="flex items-center gap-4 bg-surface-container-low rounded-full p-2 h-16">
                   <button
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
                     type="button"
                     onClick={() =>
                       setFormData({
@@ -169,7 +169,7 @@ const PeriodDataWizard = ({ onComplete }) => {
                     onChange={handleInputChange}
                   />
                   <button
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest text-primary/100 hover:bg-primary/10 transition-colors shadow-sm"
                     type="button"
                     onClick={() =>
                       setFormData({

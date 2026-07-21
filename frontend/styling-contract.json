@@ -1,0 +1,96 @@
+{
+  "cssFiles": [
+    {
+      "path": "src/styles/tokens.css",
+      "category": "foundation",
+      "reason": "Defines the semantic light and dark design tokens."
+    },
+    {
+      "path": "src/styles/base.css",
+      "category": "foundation",
+      "reason": "Loads Tailwind and owns document-wide element defaults."
+    },
+    {
+      "path": "src/components/LoadingSpinner.css",
+      "category": "escape-hatch",
+      "reason": "Owns pseudo-elements, masks, keyframes, and reduced-motion behavior."
+    },
+    {
+      "path": "src/components/PeriodDataWizard/PeriodDataWizard.css",
+      "category": "escape-hatch",
+      "reason": "Owns browser-specific date-input selectors."
+    },
+    {
+      "path": "src/components/LogFlow/LogFlow.css",
+      "category": "legacy",
+      "reason": "Contains scoped react-calendar overrides plus modal rules pending separation."
+    },
+    {
+      "path": "src/pages/CalendarPage/CalendarView/CalendarView.css",
+      "category": "legacy",
+      "reason": "Contains scoped react-calendar overrides pending vendor consolidation."
+    },
+    {
+      "path": "src/pages/Home/Home.css",
+      "category": "legacy",
+      "reason": "Contains image pseudo-element and page layout rules pending separation."
+    },
+    {
+      "path": "src/pages/Login/Login.css",
+      "category": "legacy",
+      "reason": "Contains auth artwork pseudo-elements and page rules pending separation."
+    },
+    {
+      "path": "src/components/FloatingCalendar.css",
+      "category": "legacy",
+      "reason": "Application-owned component styles awaiting Tailwind migration."
+    },
+    {
+      "path": "src/components/Header/Header.css",
+      "category": "legacy",
+      "reason": "Application-owned navigation styles awaiting Tailwind migration."
+    },
+    {
+      "path": "src/components/Menu/Menu.css",
+      "category": "legacy",
+      "reason": "Application-owned navigation styles awaiting Tailwind migration."
+    },
+    {
+      "path": "src/pages/CalendarPage/CalendarPage.css",
+      "category": "legacy",
+      "reason": "Application-owned page layout awaiting Tailwind migration."
+    },
+    {
+      "path": "src/pages/CalendarPage/LogPeriodCard/LogPeriodCard.css",
+      "category": "legacy",
+      "reason": "Application-owned component styles awaiting Tailwind migration."
+    },
+    {
+      "path": "src/pages/Home/CircleContent/CircleContent.css",
+      "category": "legacy",
+      "reason": "Application-owned component styles awaiting Tailwind migration."
+    },
+    {
+      "path": "src/pages/Home/CurrentCycleCard/CurrentCycleCard.css",
+      "category": "legacy",
+      "reason": "Application-owned component styles awaiting Tailwind migration."
+    },
+    {
+      "path": "src/pages/SignUp/SignUp.css",
+      "category": "legacy",
+      "reason": "Application-owned auth layout awaiting Tailwind migration."
+    }
+  ],
+  "rawColorExceptions": [
+    {
+      "path": "src/components/LoadingSpinner.css",
+      "values": ["#000"],
+      "reason": "The mask stop requires an opaque technical mask color, not a design color."
+    },
+    {
+      "path": "src/theme/theme.js",
+      "values": ["#121416", "#fdf8f5"],
+      "reason": "Browser theme-color metadata cannot resolve CSS custom properties."
+    }
+  ]
+}

@@ -16,13 +16,13 @@
 .phase-label {
   font-size: 0.75rem;
   text-transform: uppercase;
-  color: #a5a5a5;
+  color: rgb(var(--color-outline));
   letter-spacing: 1px;
 }
 
 .main-status {
   font-size: 1.5rem;
-  color: #333;
+  color: rgb(var(--color-on-surface));
   margin: 8px 0;
   font-weight: 700;
   line-height: 1.1;
@@ -30,5 +30,5 @@
 
 .day-counter {
   font-size: 0.9rem;
-  color: #666;
+  color: rgb(var(--color-on-surface-variant));
 }

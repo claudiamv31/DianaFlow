@@ -52,7 +52,7 @@ const VisualInsights = ({ summary }) => {
   };
 
   return (
-    <div className="bg-surface-container-lowest p-8 rounded-lg shadow-[0_12px_32px_rgba(52,50,47,0.04)] space-y-6 h-full w-full">
+    <div className="bg-surface-container-lowest p-8 rounded-lg shadow-subtle space-y-6 h-full w-full">
         <div className="flex justify-between items-end">
           <div>
             <h3 className="font-headline font-bold text-xl text-on-surface">

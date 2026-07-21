@@ -119,7 +119,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
       }}
     >
       <div
-        className="bg-surface-container-lowest w-full max-w-lg shadow-[0_12px_32px_rgba(52,50,47,0.06)] overflow-hidden flex flex-col relative"
+        className="bg-surface-container-lowest w-full max-w-lg shadow-soft overflow-hidden flex flex-col relative"
         style={{ maxHeight: '90vh', borderRadius: '3rem' }}
       >
         {/* Header */}
@@ -153,7 +153,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
               <div className="flex flex-col items-center mb-2">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-[0_8px_24px_rgba(52,50,47,0.08)] bg-surface-container-low cursor-pointer relative group transition-all"
+                  className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-avatar bg-surface-container-low cursor-pointer relative group transition-all"
                 >
                   {avatarPreview ? (
                     <img

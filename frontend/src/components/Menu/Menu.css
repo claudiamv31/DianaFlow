@@ -4,11 +4,16 @@
   left: 0;
   right: 0;
   width: 100%;
-  background-color: var(--tags-content);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  background-color: rgb(var(--color-navigation-surface));
+  border-top: 1px solid rgb(var(--color-shadow) / 0.1);
+  box-shadow: 0 -2px 8px rgb(var(--color-shadow) / 0.1);
   z-index: 99;
   padding: 0.5rem 0;
+}
+
+:root[data-theme='dark'] .menu-container {
+  border-top-color: rgb(var(--color-glass-highlight));
+  box-shadow: 0 -8px 24px rgb(var(--color-shadow) / 0.24);
 }
 
 .nav-links {
@@ -30,7 +35,7 @@
   gap: 0.3rem;
   padding: 0.5rem 1rem;
   text-decoration: none;
-  color: var(--text-color);
+  color: rgb(var(--color-on-surface));
   font-size: 0.9rem;
   cursor: pointer;
   transition: color 0.3s;
@@ -40,7 +45,7 @@
 
 .nav-link:hover,
 .nav-link.active {
-  color: var(--primary-color);
+  color: rgb(var(--color-primary));
 }
 
 .nav-icon {

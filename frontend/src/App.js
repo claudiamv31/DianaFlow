@@ -14,6 +14,8 @@ import Menu from './components/Menu/Menu.jsx';
 import ArchivePage from './pages/Archive/ArchivePage.jsx';
 import Settings from './pages/Settings/Settings.jsx';
 
+const mainContentClassName = 'mb-20 mt-[60px] pb-24';
+
 function App() {
   return (
     <div>
@@ -54,7 +56,7 @@ function App() {
               <PrivateRoute>
                 <ErrorBoundary>
                   <Header />
-                  <div className="main-content">
+                  <div className={mainContentClassName}>
                     <Home />
                   </div>
                   <Menu />
@@ -63,8 +65,8 @@ function App() {
                     toastOptions={{
                       duration: 4000,
                       style: {
-                        background: '#fff',
-                        color: '#333',
+                        background: 'rgb(var(--color-surface-container-high))',
+                        color: 'rgb(var(--color-on-surface))',
                         borderRadius: '8px',
                         padding: '12px'
                       }
@@ -78,7 +80,7 @@ function App() {
             path="/first-questions"
             element={
               <PrivateRoute>
-                <div className="main-content">
+                <div className={mainContentClassName}>
                   <PeriodDataForm />
                 </div>
               </PrivateRoute>
@@ -90,7 +92,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Header />
-                <div className="main-content">
+                <div className={mainContentClassName}>
                   <CalendarPage />
                 </div>
                 <Menu />
@@ -103,7 +105,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Header />
-                <div className="main-content">
+                <div className={mainContentClassName}>
                   <StatsPage />
                 </div>
                 <Menu />
@@ -116,7 +118,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Header />
-                <div className="main-content">
+                <div className={mainContentClassName}>
                   <ArchivePage />
                 </div>
                 <Menu />
@@ -129,7 +131,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Header />
-                <div className="main-content">
+                <div className={mainContentClassName}>
                   <Settings />
                 </div>
                 <Menu />
