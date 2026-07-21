@@ -58,3 +58,20 @@ test('the dark primary palette stays muted and readable', () => {
   expect(contrastRatio(primary, background)).toBeGreaterThanOrEqual(4.5);
   expect(contrastRatio(onPrimary, primaryContainer)).toBeGreaterThanOrEqual(4.5);
 });
+
+test('dark surfaces use a lifted charcoal hierarchy instead of near-black', () => {
+  const background = parseRgbToken(darkThemeCss, 'background');
+  const lowestContainer = parseRgbToken(
+    darkThemeCss,
+    'surface-container-lowest'
+  );
+  const highContainer = parseRgbToken(darkThemeCss, 'surface-container-high');
+
+  expect(relativeLuminance(background)).toBeGreaterThanOrEqual(0.01);
+  expect(relativeLuminance(lowestContainer)).toBeGreaterThan(
+    relativeLuminance(background)
+  );
+  expect(relativeLuminance(highContainer)).toBeGreaterThan(
+    relativeLuminance(lowestContainer)
+  );
+});
