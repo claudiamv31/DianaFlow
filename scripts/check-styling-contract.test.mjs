@@ -63,7 +63,7 @@ test('rejects a raw design color outside the token source', () => {
 test('rejects raw Tailwind palette colors', () => {
   const root = createFixture({
     componentSource:
-      'export default function Widget() { return <div className="bg-black/20 text-white" />; }\n',
+      'export default function Widget() { return <div className="bg-black/20 text-white hover:bg-gray-100" />; }\n',
     contract: {
       cssFiles: [
         {
@@ -81,6 +81,7 @@ test('rejects raw Tailwind palette colors', () => {
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Raw Tailwind color bg-black\/20/);
   assert.match(result.stderr, /Raw Tailwind color text-white/);
+  assert.match(result.stderr, /Raw Tailwind color bg-gray-100/);
 });
 
 test('rejects CSS registry entries without an approved category and reason', () => {
@@ -103,4 +104,52 @@ test('rejects CSS registry entries without an approved category and reason', () 
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Invalid CSS category "temporary"/);
   assert.match(result.stderr, /Missing CSS reason: src\/components\/Widget\.css/);
+});
+
+test('rejects new legacy CSS registry entries', () => {
+  const root = createFixture({
+    componentSource: 'export default function Widget() {}\n',
+    contract: {
+      cssFiles: [
+        {
+          path: 'src/components/Widget.css',
+          category: 'legacy',
+          reason: 'Attempted new legacy file.'
+        }
+      ],
+      rawColorExceptions: []
+    }
+  });
+
+  const result = runChecker(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(
+    result.stderr,
+    /New legacy CSS entries are prohibited: src\/components\/Widget\.css/
+  );
+});
+
+test('rejects foundation CSS outside the central style files', () => {
+  const root = createFixture({
+    componentSource: 'export default function Widget() {}\n',
+    contract: {
+      cssFiles: [
+        {
+          path: 'src/components/Widget.css',
+          category: 'foundation',
+          reason: 'Attempted component foundation.'
+        }
+      ],
+      rawColorExceptions: []
+    }
+  });
+
+  const result = runChecker(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(
+    result.stderr,
+    /Invalid foundation CSS path: src\/components\/Widget\.css/
+  );
 });

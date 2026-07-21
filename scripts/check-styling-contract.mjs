@@ -31,6 +31,24 @@ const approvedCssCategories = new Set([
   'escape-hatch',
   'legacy'
 ]);
+const foundationCssFiles = new Set([
+  'src/styles/tokens.css',
+  'src/styles/base.css'
+]);
+const legacyCssFiles = new Set([
+  'src/components/FloatingCalendar.css',
+  'src/components/Header/Header.css',
+  'src/components/LogFlow/LogFlow.css',
+  'src/components/Menu/Menu.css',
+  'src/pages/CalendarPage/CalendarPage.css',
+  'src/pages/CalendarPage/CalendarView/CalendarView.css',
+  'src/pages/CalendarPage/LogPeriodCard/LogPeriodCard.css',
+  'src/pages/Home/CircleContent/CircleContent.css',
+  'src/pages/Home/CurrentCycleCard/CurrentCycleCard.css',
+  'src/pages/Home/Home.css',
+  'src/pages/Login/Login.css',
+  'src/pages/SignUp/SignUp.css'
+]);
 
 for (const entry of contract.cssFiles) {
   if (!approvedCssCategories.has(entry.category)) {
@@ -41,6 +59,14 @@ for (const entry of contract.cssFiles) {
 
   if (typeof entry.reason !== 'string' || entry.reason.trim() === '') {
     violations.push(`Missing CSS reason: ${entry.path}`);
+  }
+
+  if (entry.category === 'foundation' && !foundationCssFiles.has(entry.path)) {
+    violations.push(`Invalid foundation CSS path: ${entry.path}`);
+  }
+
+  if (entry.category === 'legacy' && !legacyCssFiles.has(entry.path)) {
+    violations.push(`New legacy CSS entries are prohibited: ${entry.path}`);
   }
 }
 
@@ -83,7 +109,7 @@ for (const filePath of sourceFiles) {
   }
 
   const rawTailwindColorPattern =
-    /\b(?:bg|text|border|ring|divide|from|via|to|fill|stroke|shadow)-(?:black|white)(?:\/[0-9.]+)?\b/g;
+    /\b(?:bg|text|border|ring|divide|from|via|to|fill|stroke|shadow)-(?:black|white|slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)(?:-[0-9]{2,3})?(?:\/[0-9.]+)?\b/g;
 
   for (const match of source.matchAll(rawTailwindColorPattern)) {
     violations.push(`Raw Tailwind color ${match[0]} in ${file}`);

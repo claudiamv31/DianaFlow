@@ -17,7 +17,7 @@ const CycleInsightsCard = ({ previousCycle }) => {
         </p>
 
         {/* Cycle Length & Consistency */}
-        <div className="flex flex-row justify-between mx-4 my-6 text-[0.8rem] text-on-surface-variant">
+        <div className="flex flex-row justify-between mx-4 my-6 text-xs text-on-surface-variant">
           <div>
             <p className="text-2xl font-bold text-primary">
               {t('cycle.durationValue', { count: previousCycle.cycleLength })}
@@ -34,7 +34,7 @@ const CycleInsightsCard = ({ previousCycle }) => {
 
         {/* Period Info Sub-cards - UPDATED TO WRAP ON SMALL SCREENS */}
         <div className="flex flex-col sm:flex-row gap-4 mx-2 sm:mx-4 mt-6">
-          <div className="flex-1 flex flex-col justify-between text-[0.8rem] text-on-surface-variant py-4 px-3 sm:px-4 bg-navigation-surface rounded-2xl">
+          <div className="flex-1 flex flex-col justify-between text-xs text-on-surface-variant py-4 px-3 sm:px-4 bg-navigation-surface rounded-2xl">
             <FontAwesomeIcon
               icon={faCalendarDays}
               className="text-2xl mb-2 text-primary"
@@ -45,7 +45,7 @@ const CycleInsightsCard = ({ previousCycle }) => {
             <p>{t('cycle.periodDuration')}</p>
           </div>
 
-          <div className="flex-1 flex flex-col justify-between text-[0.8rem] text-on-surface-variant py-4 px-3 sm:px-4 bg-navigation-surface rounded-2xl">
+          <div className="flex-1 flex flex-col justify-between text-xs text-on-surface-variant py-4 px-3 sm:px-4 bg-navigation-surface rounded-2xl">
             <FontAwesomeIcon
               icon={faClover}
               className="text-2xl mb-2 text-secondary"

@@ -61,7 +61,7 @@ const LogTodayModal = ({
             </p>
           </div>
           <button
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors group"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-variant transition-colors group"
             onClick={onClose}
             disabled={isSaving}
           >
