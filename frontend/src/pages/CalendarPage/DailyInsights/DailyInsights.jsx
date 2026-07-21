@@ -104,7 +104,7 @@ const DailyInsigths = ({
         <div className="flex flex-col gap-4">
           {isPeriod && (
             <button
-              className="w-full py-3 rounded-full !bg-primary text-white font-headline font-bold text-base shadow-lg !shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-full !bg-primary text-on-primary font-headline font-bold text-base shadow-lg !shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
               onClick={() => setIsDailyLogActive(true)}
             >
               <span className="material-symbols-outlined text-xl">

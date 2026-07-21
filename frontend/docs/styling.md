@@ -17,7 +17,7 @@ Do not let Tailwind and plain CSS own the same property on the same element. Do 
 - `src/styles/tokens.css` contains semantic theme variables and non-color design tokens.
 - `src/styles/base.css` contains Tailwind directives and document-wide element defaults.
 - `src/styles/vendor/` contains shared third-party overrides.
-- Component-adjacent CSS contains only a component-owned escape hatch or registered legacy rules awaiting staged migration. Selectors must be scoped beneath the component root.
+- Component-adjacent CSS contains only a component-owned escape hatch or registered legacy rules awaiting staged migration. New escape-hatch selectors must be scoped beneath the component root; a `legacy` entry explicitly records a temporary exception to this rule and must be removed when that component is migrated.
 
 ## Tokens and Tailwind values
 

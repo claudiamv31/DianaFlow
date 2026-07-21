@@ -41,7 +41,7 @@ const LogTodayModal = ({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/20 backdrop-blur-sm transition-opacity duration-300"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-shadow/20 backdrop-blur-sm transition-opacity duration-300"
       onClick={(e) => {
         if (e.target === e.currentTarget && !isSaving) onClose();
       }}

@@ -153,7 +153,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
               <div className="flex flex-col items-center mb-2">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-avatar bg-surface-container-low cursor-pointer relative group transition-all"
+                  className="w-28 h-28 rounded-full overflow-hidden border-4 border-glass-surface shadow-avatar bg-surface-container-low cursor-pointer relative group transition-all"
                 >
                   {avatarPreview ? (
                     <img
@@ -168,8 +168,8 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                       </span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <span className="material-symbols-outlined text-white text-xl">
+                  <div className="absolute inset-0 bg-shadow/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <span className="material-symbols-outlined text-glass-surface text-xl">
                       photo_camera
                     </span>
                   </div>

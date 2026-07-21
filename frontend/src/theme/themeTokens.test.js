@@ -5,7 +5,9 @@ const readSource = (relativePath) =>
   fs.readFileSync(path.join(__dirname, relativePath), 'utf8');
 
 const parseRgbToken = (css, token) => {
-  const match = css.match(new RegExp(`--color-${token}:\\s*(\\d+)\\s+(\\d+)\\s+(\\d+);`));
+  const match = css.match(
+    new RegExp(`--color-${token}:\\s*(\\d+)\\s+(\\d+)\\s+(\\d+);`)
+  );
   return match.slice(1).map(Number);
 };
 
@@ -26,10 +28,15 @@ const contrastRatio = (first, second) => {
   return (lighter + 0.05) / (darker + 0.05);
 };
 
+const themeCss = readSource('../styles/tokens.css');
+const darkThemeCss = themeCss.match(
+  /:root\[data-theme='dark'\]\s*\{([\s\S]*?)\n\}/
+)[1];
+
 test('the selected calendar day uses a readable semantic foreground', () => {
-  const calendarCss = readSource('./CalendarView.css');
-  const themeCss = readSource('../../../styles/tokens.css');
-  const darkThemeCss = themeCss.match(/:root\[data-theme='dark'\]\s*\{([\s\S]*?)\n\}/)[1];
+  const calendarCss = readSource(
+    '../pages/CalendarPage/CalendarView/CalendarView.css'
+  );
   const selectedRule = calendarCss.match(
     /\.calendar-view \.react-calendar__tile\.calendar-day-selected\s*\{([^}]*)\}/
   )[1];
@@ -39,4 +46,15 @@ test('the selected calendar day uses a readable semantic foreground', () => {
   const foreground = parseRgbToken(darkThemeCss, 'on-secondary');
   const background = parseRgbToken(darkThemeCss, 'secondary');
   expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+});
+
+test('the dark primary palette stays muted and readable', () => {
+  const primary = parseRgbToken(darkThemeCss, 'primary');
+  const background = parseRgbToken(darkThemeCss, 'background');
+  const primaryContainer = parseRgbToken(darkThemeCss, 'primary-container');
+  const onPrimary = parseRgbToken(darkThemeCss, 'on-primary');
+
+  expect(relativeLuminance(primary)).toBeLessThanOrEqual(0.45);
+  expect(contrastRatio(primary, background)).toBeGreaterThanOrEqual(4.5);
+  expect(contrastRatio(onPrimary, primaryContainer)).toBeGreaterThanOrEqual(4.5);
 });

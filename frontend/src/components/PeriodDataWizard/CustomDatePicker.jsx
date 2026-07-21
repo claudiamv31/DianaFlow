@@ -188,7 +188,7 @@ const CustomDatePicker = ({ value, onChange, maxDate }) => {
                         disabled={isDisabled}
                         className={`w-full h-full rounded-full font-medium text-[11px] md:text-sm transition-all flex items-center justify-center ${
                           isSelected
-                            ? 'bg-primary/100 text-white font-bold'
+                            ? 'bg-primary/100 text-on-primary font-bold'
                             : isCurrentDay
                             ? 'bg-primary/20 text-primary/100 font-bold'
                             : isDisabled

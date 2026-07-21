@@ -25,6 +25,31 @@ const walk = (directory) =>
   });
 
 const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
+const violations = [];
+const approvedCssCategories = new Set([
+  'foundation',
+  'escape-hatch',
+  'legacy'
+]);
+
+for (const entry of contract.cssFiles) {
+  if (!approvedCssCategories.has(entry.category)) {
+    violations.push(
+      `Invalid CSS category "${entry.category}" for ${entry.path}`
+    );
+  }
+
+  if (typeof entry.reason !== 'string' || entry.reason.trim() === '') {
+    violations.push(`Missing CSS reason: ${entry.path}`);
+  }
+}
+
+for (const entry of contract.rawColorExceptions) {
+  if (typeof entry.reason !== 'string' || entry.reason.trim() === '') {
+    violations.push(`Missing raw color exception reason: ${entry.path}`);
+  }
+}
+
 const approvedCssFiles = new Set(
   contract.cssFiles.map(({ path: approvedPath }) => approvedPath)
 );
@@ -37,7 +62,6 @@ const rawColorExceptions = new Map(
 const sourceFiles = walk(sourceRoot).filter((filePath) =>
   supportedExtensions.has(path.extname(filePath))
 );
-const violations = [];
 
 for (const filePath of sourceFiles) {
   const file = relativePath(filePath);
@@ -56,6 +80,13 @@ for (const filePath of sourceFiles) {
     if (!allowedValues.has(value)) {
       violations.push(`Raw color ${value} in ${file}`);
     }
+  }
+
+  const rawTailwindColorPattern =
+    /\b(?:bg|text|border|ring|divide|from|via|to|fill|stroke|shadow)-(?:black|white)(?:\/[0-9.]+)?\b/g;
+
+  for (const match of source.matchAll(rawTailwindColorPattern)) {
+    violations.push(`Raw Tailwind color ${match[0]} in ${file}`);
   }
 }
 

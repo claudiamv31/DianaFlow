@@ -105,7 +105,7 @@ const CalendarInfo = ({
       <div className="mt-auto w-full text-center">
         {!isEditingPeriod ? (
           <Button
-            className="mx-auto w-[70%]"
+            className="mx-auto w-2/3"
             disabled={isSavingPeriod}
             onClick={(e) => {
               e.preventDefault();
@@ -117,7 +117,7 @@ const CalendarInfo = ({
         ) : (
           <div className="flex gap-2.5">
             <Button
-              className="w-[70%]"
+              className="w-2/3"
               onClick={handleSavePeriod}
               disabled={isSavingPeriod}
             >
@@ -133,7 +133,7 @@ const CalendarInfo = ({
               )}
             </Button>
             <Button
-              className="w-[70%]"
+              className="w-2/3"
               variant="secondary"
               onClick={() => {
                 setPeriodDays([]);

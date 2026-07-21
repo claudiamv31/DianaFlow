@@ -15,7 +15,7 @@ const semanticColorNames = [
   'tertiary-container', 'on-error-container', 'inverse-surface',
   'surface-tint', 'on-secondary-fixed', 'secondary-fixed-dim',
   'on-tertiary-fixed', 'primary-gradient-start', 'accent-surface',
-  'navigation-surface', 'shadow'
+  'navigation-surface', 'shadow', 'glass-surface'
 ];
 
 const semanticColors = Object.fromEntries(
