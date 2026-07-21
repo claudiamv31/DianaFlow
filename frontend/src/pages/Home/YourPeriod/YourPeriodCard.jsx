@@ -7,7 +7,7 @@ const YourPeriodCard = ({ period }) => {
 
   return (
     // Replaced 'md:col-span-2' with 'w-full' to fix the mobile layout width
-    <div className="w-full bg-gradient-to-br from-secondary-container/50 to-tertiary-container/50 rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 mt-4">
+    <div className="w-full bg-gradient-to-br from-secondary-container/50 to-tertiary-container/50 dark:bg-none dark:bg-accent-surface rounded-2xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6 mt-4">
       <div className="flex-1 w-full">
         <div className="flex items-center gap-2 mb-2">
           <span
@@ -20,7 +20,9 @@ const YourPeriodCard = ({ period }) => {
             {t('focus.title')}
           </h3>
         </div>
-        <p className="text-on-surface-variant text-sm mb-4">{focusText}</p>
+        <p className="text-on-surface-variant dark:text-on-surface text-sm mb-4">
+          {focusText}
+        </p>
       </div>
     </div>
   );

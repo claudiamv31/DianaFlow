@@ -134,12 +134,12 @@
 }
 
 .calendar-view .react-calendar__tile.calendar-day-selected {
-  color: rgb(var(--color-on-secondary));
+  color: rgb(var(--color-on-primary));
 }
 
 .calendar-view .react-calendar__tile.calendar-day-selected::before {
-  border-color: rgb(var(--color-secondary));
-  background: rgb(var(--color-secondary));
+  border-color: rgb(var(--color-primary-container));
+  background: rgb(var(--color-primary-container));
 }
 
 .calendar-view .react-calendar__tile.calendar-day-today::before {

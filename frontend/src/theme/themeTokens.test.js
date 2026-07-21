@@ -33,18 +33,39 @@ const darkThemeCss = themeCss.match(
   /:root\[data-theme='dark'\]\s*\{([\s\S]*?)\n\}/
 )[1];
 
-test('the selected calendar day uses a readable semantic foreground', () => {
+test('the selected calendar day shares the primary action palette', () => {
   const calendarCss = readSource(
     '../pages/CalendarPage/CalendarView/CalendarView.css'
   );
+  const buttonSource = readSource('../components/Button.jsx');
   const selectedRule = calendarCss.match(
     /\.calendar-view \.react-calendar__tile\.calendar-day-selected\s*\{([^}]*)\}/
   )[1];
+  const selectedMarkerRule = calendarCss.match(
+    /\.calendar-view \.react-calendar__tile\.calendar-day-selected::before\s*\{([^}]*)\}/
+  )[1];
 
-  expect(selectedRule).toContain('color: rgb(var(--color-on-secondary));');
+  expect(buttonSource).toContain('dark:bg-primary-container');
+  expect(selectedRule).toContain('color: rgb(var(--color-on-primary));');
+  expect(selectedMarkerRule).toContain(
+    'background: rgb(var(--color-primary-container));'
+  );
 
-  const foreground = parseRgbToken(darkThemeCss, 'on-secondary');
-  const background = parseRgbToken(darkThemeCss, 'secondary');
+  const foreground = parseRgbToken(darkThemeCss, 'on-primary');
+  const background = parseRgbToken(darkThemeCss, 'primary-container');
+  expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
+});
+
+test('the Daily Focus card has a stable dark surface and readable copy', () => {
+  const focusCardSource = readSource(
+    '../pages/Home/YourPeriod/YourPeriodCard.jsx'
+  );
+
+  expect(focusCardSource).toContain('dark:bg-none dark:bg-accent-surface');
+  expect(focusCardSource).toContain('dark:text-on-surface');
+
+  const foreground = parseRgbToken(darkThemeCss, 'on-surface');
+  const background = parseRgbToken(darkThemeCss, 'accent-surface');
   expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
 });
 
