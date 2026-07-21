@@ -12,13 +12,17 @@ const repoRoot = path.resolve(
 );
 const checker = path.join(repoRoot, 'scripts/check-styling-contract.mjs');
 
-const createFixture = ({ componentSource, cssSource = '' }) => {
+const createFixture = ({
+  componentSource,
+  cssSource = '',
+  contract = { cssFiles: [], rawColorExceptions: [] }
+}) => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styling-contract-'));
   const sourceDirectory = path.join(root, 'src/components');
   fs.mkdirSync(sourceDirectory, { recursive: true });
   fs.writeFileSync(
     path.join(root, 'styling-contract.json'),
-    JSON.stringify({ cssFiles: [], rawColorExceptions: [] })
+    JSON.stringify(contract)
   );
   fs.writeFileSync(path.join(sourceDirectory, 'Widget.jsx'), componentSource);
   fs.writeFileSync(path.join(sourceDirectory, 'Widget.css'), cssSource);
@@ -54,4 +58,49 @@ test('rejects a raw design color outside the token source', () => {
     result.stderr,
     /Raw color #904958 in src\/components\/Widget\.css/
   );
+});
+
+test('rejects raw Tailwind palette colors', () => {
+  const root = createFixture({
+    componentSource:
+      'export default function Widget() { return <div className="bg-black/20 text-white" />; }\n',
+    contract: {
+      cssFiles: [
+        {
+          path: 'src/components/Widget.css',
+          category: 'escape-hatch',
+          reason: 'Fixture CSS.'
+        }
+      ],
+      rawColorExceptions: []
+    }
+  });
+
+  const result = runChecker(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Raw Tailwind color bg-black\/20/);
+  assert.match(result.stderr, /Raw Tailwind color text-white/);
+});
+
+test('rejects CSS registry entries without an approved category and reason', () => {
+  const root = createFixture({
+    componentSource: 'export default function Widget() {}\n',
+    contract: {
+      cssFiles: [
+        {
+          path: 'src/components/Widget.css',
+          category: 'temporary',
+          reason: ''
+        }
+      ],
+      rawColorExceptions: []
+    }
+  });
+
+  const result = runChecker(root);
+
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Invalid CSS category "temporary"/);
+  assert.match(result.stderr, /Missing CSS reason: src\/components\/Widget\.css/);
 });
