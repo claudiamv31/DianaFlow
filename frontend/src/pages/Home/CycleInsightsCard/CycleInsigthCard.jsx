@@ -17,44 +17,55 @@ const CycleInsightsCard = ({ previousCycle }) => {
           {t('insights.previousSummary')}
         </p>
 
-        {/* Cycle Length & Consistency */}
-        <div className="flex flex-row justify-between mx-4 my-6 text-[0.8rem] text-on-surface-variant">
-          <div>
-            <p className="text-2xl font-bold text-primary">
+        {/* Previous cycle summary */}
+        <div
+          data-testid="cycle-summary-grid"
+          className="grid grid-cols-2 items-stretch gap-4 mx-2 sm:mx-4 my-6 text-[0.8rem] text-on-surface-variant"
+        >
+          <div
+            data-testid="cycle-summary-item"
+            className="min-w-0 px-3 py-2 sm:px-4"
+          >
+            <p className="text-xl sm:text-2xl leading-tight font-bold text-primary">
               {t('cycle.durationValue', { count: previousCycle.cycleLength })}
             </p>
-            <p>{t('insights.cycleLength')}</p>
+            <p className="mt-1">{t('insights.cycleLength')}</p>
           </div>
-          <div>
-            <p className="text-[1.3rem] font-bold text-secondary">
+          <div
+            data-testid="cycle-summary-item"
+            className="min-w-0 px-3 py-2 sm:px-4"
+          >
+            <p className="text-xl sm:text-2xl leading-tight font-bold text-secondary">
               {t(regularityTranslationKey(previousCycle.consistency))}
             </p>
-            <p>{t('insights.consistency')}</p>
+            <p className="mt-1">{t('insights.consistency')}</p>
           </div>
-        </div>
-
-        {/* Period Info Sub-cards - UPDATED TO WRAP ON SMALL SCREENS */}
-        <div className="flex flex-col sm:flex-row gap-4 mx-2 sm:mx-4 mt-6">
-          <div className="flex-1 flex flex-col justify-between text-[0.8rem] text-on-surface-variant py-4 px-3 sm:px-4 bg-navigation-surface rounded-2xl">
+          <div
+            data-testid="cycle-summary-item"
+            className="min-w-0 flex flex-col justify-between py-4 px-3 sm:px-4 bg-navigation-surface rounded-2xl"
+          >
             <FontAwesomeIcon
               icon={faCalendarDays}
               className="text-2xl mb-2 text-primary"
             />
-            <p className="text-base font-bold text-on-surface">
+            <p className="text-base leading-tight font-bold text-on-surface">
               {t('cycle.durationValue', { count: previousCycle.days })}
             </p>
-            <p>{t('cycle.periodDuration')}</p>
+            <p className="mt-1">{t('cycle.periodDuration')}</p>
           </div>
 
-          <div className="flex-1 flex flex-col justify-between text-[0.8rem] text-on-surface-variant py-4 px-3 sm:px-4 bg-navigation-surface rounded-2xl">
+          <div
+            data-testid="cycle-summary-item"
+            className="min-w-0 flex flex-col justify-between py-4 px-3 sm:px-4 bg-navigation-surface rounded-2xl"
+          >
             <FontAwesomeIcon
               icon={faClover}
               className="text-2xl mb-2 text-secondary"
             />
-            <p className="text-base font-bold text-on-surface">
+            <p className="text-base leading-tight font-bold text-on-surface">
               {formatDateDayMonthYear(previousCycle.startDate, locale)}
             </p>
-            <p>{t('insights.firstDay')}</p>
+            <p className="mt-1">{t('insights.firstDay')}</p>
           </div>
         </div>
       </div>
