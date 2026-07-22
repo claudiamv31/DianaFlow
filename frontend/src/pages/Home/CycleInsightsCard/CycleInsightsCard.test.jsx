@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { LocaleProvider } from '../../../i18n/LocaleContext';
+import { LOCALE_STORAGE_KEY } from '../../../i18n/locales';
 import CycleInsightsCard from './CycleInsigthCard';
 
 describe('CycleInsightsCard', () => {
@@ -23,5 +24,28 @@ describe('CycleInsightsCard', () => {
 
     expect(screen.getByText('Regular')).toBeInTheDocument();
     expect(screen.queryByText('regularity.Regular')).not.toBeInTheDocument();
+  });
+
+  test('aligns all four Spanish summary values on one two-column grid', () => {
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, 'es-MX');
+
+    render(
+      <LocaleProvider>
+        <CycleInsightsCard
+          previousCycle={{
+            cycleLength: 29,
+            consistency: 'regular',
+            days: 6,
+            startDate: '2026-06-22'
+          }}
+        />
+      </LocaleProvider>
+    );
+
+    const summaryGrid = screen.getByTestId('cycle-summary-grid');
+    expect(summaryGrid).toHaveClass('grid', 'grid-cols-2');
+    expect(within(summaryGrid).getAllByTestId('cycle-summary-item')).toHaveLength(
+      4
+    );
   });
 });
