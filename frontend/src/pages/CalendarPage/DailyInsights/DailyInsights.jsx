@@ -114,7 +114,7 @@ const DailyInsigths = ({
             </button>
           )}
           <button
-            className="w-full py-3 rounded-full border !border-primary/30 !text-primary/70 font-headline font-semibold text-xs hover:!bg-primary/5 transition-colors uppercase tracking-wider"
+            className="w-full py-3 rounded-full border border-outline-variant/40 bg-surface-container-lowest/40 text-on-surface-variant font-headline font-semibold text-xs hover:bg-surface-container-high transition-colors uppercase tracking-wider"
             onClick={() => setIsEditingPeriod(true)}
           >
             {isPeriod ? t('calendar.editPeriodDates') : t('home.logPeriod')}

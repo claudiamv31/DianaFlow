@@ -1,51 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logout, checkUser } from '../../database/authService';
+import { logout } from '../../database/authService';
 import EditProfileModal from './EditProfileModal/EditProfileModal';
 import ChangePasswordModal from './ChangePasswordModal/ChangePasswordModal';
 import { useGetProfile } from '../../hooks/useProfileHooks';
 import { API_URL } from '../../config';
-import defaultProfilePic from '../../assets/default-profile-pic.png';
+import defaultProfilePic from '../../assets/default-profile-pic-optimized.jpg';
 import { useLocale } from '../../i18n/LocaleContext';
 import LanguageSelector from '../../components/LanguageSelector';
 import ThemeSelector from '../../components/ThemeSelector';
 
 const Settings = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const { data: profileData } = useGetProfile();
   const { t } = useLocale();
-
-  useEffect(() => {
-    const unsubscribe = checkUser((currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (profileData?.name && profileData?.email) {
-      setUser((prev) => ({
-        ...prev,
-        name: profileData.name,
-        email: profileData.email,
-        lastName: profileData.lastName,
-        avatarUrl: profileData.avatarUrl
-      }));
-    }
-  }, [profileData]);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
-  const displayName = profileData?.name || user?.name || t('common.user');
-  const displayEmail = profileData?.email || user?.email || '';
+  const displayName = profileData?.name || t('common.user');
+  const displayEmail = profileData?.email || '';
 
-  const rawAvatarUrl = profileData?.avatarUrl || user?.avatarUrl;
+  const rawAvatarUrl = profileData?.avatarUrl;
   const avatarUrl = rawAvatarUrl
     ? rawAvatarUrl.startsWith('data:')
       ? rawAvatarUrl

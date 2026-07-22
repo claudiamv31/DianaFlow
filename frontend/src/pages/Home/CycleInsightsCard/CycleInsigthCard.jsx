@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faClover } from '@fortawesome/free-solid-svg-icons';
 import { formatDateDayMonthYear } from '../../../utils/calendarUtils';
 import { useLocale } from '../../../i18n/LocaleContext';
+import { regularityTranslationKey } from '../../../i18n/domainCodes';
 
 const CycleInsightsCard = ({ previousCycle }) => {
   const { t, locale } = useLocale();
@@ -26,7 +27,7 @@ const CycleInsightsCard = ({ previousCycle }) => {
           </div>
           <div>
             <p className="text-[1.3rem] font-bold text-secondary">
-              {t(`regularity.${previousCycle.consistency}`)}
+              {t(regularityTranslationKey(previousCycle.consistency))}
             </p>
             <p>{t('insights.consistency')}</p>
           </div>
