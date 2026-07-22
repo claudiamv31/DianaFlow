@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   useUpdateProfile,
-  useGetProfile
+  useGetProfile,
+  useUploadAvatar
 } from '../../../hooks/useProfileHooks';
 import Button from '../../../components/Button';
 import { API_URL } from '../../../config';
-import defaultProfilePic from '../../../assets/default-profile-pic.png';
+import defaultProfilePic from '../../../assets/default-profile-pic-optimized.jpg';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { getErrorMessageKey } from '../../../api/AppError';
+import { optimizeAvatarImage } from '../../../utils/avatarImage';
 
 const DEFAULT_AVATAR = defaultProfilePic;
 
@@ -16,6 +18,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
   const { t } = useLocale();
   const { data: profileData, isLoading: profileLoading } = useGetProfile();
   const updateProfileMutation = useUpdateProfile();
+  const uploadAvatarMutation = useUploadAvatar();
 
   const fileInputRef = useRef(null);
 
@@ -26,8 +29,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
   });
   // avatarPreview is always a displayable string (data URL or http URL or default)
   const [avatarPreview, setAvatarPreview] = useState(DEFAULT_AVATAR);
-  // avatarBase64 is only set when the user picks a NEW image — it's the raw data URL to send to the API
-  const [avatarBase64, setAvatarBase64] = useState(null);
+  const [avatarFile, setAvatarFile] = useState(null);
   const [errors, setErrors] = useState({});
 
   // Populate form from fetched profile data
@@ -63,17 +65,24 @@ const EditProfileModal = ({ isOpen, onClose }) => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target.result;
-      setAvatarPreview(dataUrl); // show immediately in preview
-      setAvatarBase64(dataUrl); // remember to send on save
-    };
-    reader.readAsDataURL(file);
+    try {
+      const optimizedFile = await optimizeAvatarImage(file);
+      const reader = new FileReader();
+      reader.onload = (event) => setAvatarPreview(event.target.result);
+      reader.readAsDataURL(optimizedFile);
+      setAvatarFile(optimizedFile);
+      setErrors((previous) => ({ ...previous, submit: '' }));
+    } catch {
+      setAvatarFile(null);
+      setErrors((previous) => ({
+        ...previous,
+        submit: 'profile.avatarInvalid'
+      }));
+    }
   };
 
   const validate = () => {
@@ -93,14 +102,15 @@ const EditProfileModal = ({ isOpen, onClose }) => {
     if (!validate()) return;
 
     try {
-      // Single API call — avatar Base64 travels alongside name/email
+      if (avatarFile) {
+        await uploadAvatarMutation.mutateAsync(avatarFile);
+      }
       await updateProfileMutation.mutateAsync({
         name: profileDetails.name,
         lastName: profileDetails.lastName,
-        email: profileDetails.email,
-        ...(avatarBase64 ? { avatarUrl: avatarBase64 } : {})
+        email: profileDetails.email
       });
-      setAvatarBase64(null);
+      setAvatarFile(null);
       onClose();
     } catch (error) {
       setErrors({
@@ -178,6 +188,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   type="file"
                   ref={fileInputRef}
                   accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                  aria-label={t('profile.changePicture')}
                   onChange={handleFileSelect}
                   className="hidden"
                 />
@@ -188,7 +199,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 >
                   {t('profile.changePicture')}
                 </button>
-                {avatarBase64 && (
+                {avatarFile && (
                   <span className="text-[11px] text-on-surface-variant mt-1">
                     {t('profile.newPhoto')}
                   </span>
@@ -216,7 +227,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   name="name"
                   value={profileDetails.name}
                   onChange={handleFieldChange}
-                  disabled={profileLoading || updateProfileMutation.isPending}
+                  disabled={profileLoading || updateProfileMutation.isPending || uploadAvatarMutation.isPending}
                   required
                   placeholder={t('profile.namePlaceholder')}
                 />
@@ -242,7 +253,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   name="lastName"
                   value={profileDetails.lastName}
                   onChange={handleFieldChange}
-                  disabled={profileLoading || updateProfileMutation.isPending}
+                  disabled={profileLoading || updateProfileMutation.isPending || uploadAvatarMutation.isPending}
                   placeholder={t('profile.lastNamePlaceholder')}
                 />
               </div>
@@ -262,7 +273,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                   name="email"
                   value={profileDetails.email}
                   onChange={handleFieldChange}
-                  disabled={profileLoading || updateProfileMutation.isPending}
+                  disabled={profileLoading || updateProfileMutation.isPending || uploadAvatarMutation.isPending}
                   required
                   placeholder={t('auth.placeholder.email')}
                 />
@@ -282,7 +293,7 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 type="button"
                 className="h-14 w-full flex items-center justify-center font-headline font-bold text-primary/100 hover:bg-surface-container-high transition-all rounded-full active:scale-95"
                 onClick={onClose}
-                disabled={updateProfileMutation.isPending}
+                disabled={updateProfileMutation.isPending || uploadAvatarMutation.isPending}
               >
                 {t('common.cancel')}
               </button>
@@ -290,9 +301,9 @@ const EditProfileModal = ({ isOpen, onClose }) => {
                 type="submit"
                 variant="primary"
                 className="w-full h-14"
-                disabled={updateProfileMutation.isPending || profileLoading}
+                disabled={updateProfileMutation.isPending || uploadAvatarMutation.isPending || profileLoading}
               >
-                {updateProfileMutation.isPending ? (
+                {updateProfileMutation.isPending || uploadAvatarMutation.isPending ? (
                   <LoadingSpinner
                     size="sm"
                     layout="inline"

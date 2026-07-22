@@ -10,12 +10,15 @@ export default function Button({
   ...props
 }) {
   const baseStyle =
-    'flex items-center justify-center gap-2 rounded-full border border-transparent bg-gradient-to-l from-primary-gradient-start to-primary px-6 py-3 font-headline text-base font-semibold text-on-primary outline-none transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:scale-100 disabled:opacity-50 dark:bg-none dark:bg-primary-container dark:shadow-action dark:hover:brightness-[0.94]';
+    'flex items-center justify-center gap-2 rounded-full px-6 py-3 font-headline text-base font-semibold outline-none transition-all duration-200 active:scale-[0.98] disabled:scale-100 disabled:opacity-50';
 
   const variants = {
-    primary: 'shadow-lg shadow-primary/20',
-    outline: '',
-    secondary: ''
+    primary:
+      'border border-transparent bg-gradient-to-l from-primary-gradient-start to-primary text-on-primary shadow-lg shadow-primary/20 hover:brightness-110 dark:bg-none dark:bg-primary-container dark:shadow-action dark:hover:brightness-[0.94]',
+    outline:
+      'border border-primary/30 bg-transparent text-primary hover:bg-primary/5',
+    secondary:
+      'border border-transparent bg-surface-container-high text-on-surface hover:bg-surface-variant'
   };
 
   return (
