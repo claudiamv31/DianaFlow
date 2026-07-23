@@ -1,3 +1,5 @@
+using backend.Modulos.Symptoms.Models;
+
 namespace backend.Modulos.User.Models;
 
 public class User
@@ -9,4 +11,5 @@ public class User
     // Explicitly tell the compiler to use the Model, not the namespace folder
     public backend.Modulos.Profile.Models.Profile Profile { get; set; } = null!;
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+    public ICollection<UserSymptomEntry> SymptomEntries { get; set; } = new List<UserSymptomEntry>();
 }

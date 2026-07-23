@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using backend.Modulos.User.Models; 
 using backend.Modulos.Profile.Models;
 using backend.Modulos.Periods.Models;
+using backend.Modulos.Symptoms.Models;
+
 
 namespace backend.Data
 {
@@ -16,6 +18,8 @@ namespace backend.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Symptom> Symptoms { get; set; }
+        public DbSet<UserSymptomEntry> UserSymptomEntries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -75,6 +79,57 @@ namespace backend.Data
 
             modelBuilder.Entity<RefreshToken>()
                 .HasIndex(rt => new { rt.UserId, rt.IsRevoked });
+
+            modelBuilder.Entity<Symptom>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Code)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(x => x.Name)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(x => x.Category)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.HasIndex(x => x.Code)
+                    .IsUnique();
+            });
+        
+            modelBuilder.Entity<UserSymptomEntry>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Notes)
+                    .HasMaxLength(500);
+
+                entity.HasOne(x => x.User)
+                    .WithMany(x => x.SymptomEntries)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.Symptom)
+                    .WithMany(x => x.Entries)
+                    .HasForeignKey(x => x.SymptomId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new
+                {
+                    x.UserId,
+                    x.Date,
+                    x.SymptomId
+                }).IsUnique();
+
+                entity.HasIndex(x => new
+                {
+                    x.UserId,
+                    x.Date
+                });
+            }); 
         }
     }
 }
