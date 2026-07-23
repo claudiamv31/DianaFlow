@@ -38,5 +38,9 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - run: dotnet restore backend.Tests/backend.Tests.csproj
+      - name: Lint backend
+        run: |
+          dotnet format analyzers backend/backend.csproj --no-restore --verify-no-changes --severity warn
+          dotnet format analyzers backend.Tests/backend.Tests.csproj --no-restore --verify-no-changes --severity warn
       - run: dotnet build backend/backend.csproj --no-restore
       - run: dotnet test backend.Tests/backend.Tests.csproj --no-restore

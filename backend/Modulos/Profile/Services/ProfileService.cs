@@ -112,7 +112,8 @@ namespace backend.Modulos.Profile.Services
             var avatarUrl = $"/uploads/avatars/{uniqueFileName}";
 
             // Optional cleanup: Delete old avatar physical file if it exists to save space
-            if (!string.IsNullOrEmpty(profile.AvatarUrl) && profile.AvatarUrl.StartsWith("/uploads/avatars/"))
+            if (!string.IsNullOrEmpty(profile.AvatarUrl) &&
+                profile.AvatarUrl.StartsWith("/uploads/avatars/", StringComparison.Ordinal))
             {
                 var oldFilePath = Path.Combine(webRootPath, profile.AvatarUrl.TrimStart('/'));
                 if (File.Exists(oldFilePath))
