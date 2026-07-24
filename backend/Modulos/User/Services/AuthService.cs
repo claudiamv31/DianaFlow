@@ -1,6 +1,7 @@
 using backend.Modulos.User.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
@@ -8,28 +9,44 @@ using Microsoft.IdentityModel.Tokens;
 using backend.Modulos.User.Models;
 using backend.Modulos.Profile.Models;
 using backend.Modulos.Profile.Services;
+using backend.Modulos.User.Services;
 
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
     private readonly IPasswordService _passwordService;
+    private readonly IEmailSender _emailSender;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(AppDbContext context, IConfiguration configuration, IPasswordService passwordService)
+    public AuthService(
+        AppDbContext context,
+        IConfiguration configuration,
+        IPasswordService passwordService,
+        IEmailSender emailSender,
+        ILogger<AuthService> logger)
     {
         _context = context;
         _configuration = configuration;
         _passwordService = passwordService;
+        _emailSender = emailSender;
+        _logger = logger;
     }
 
-    public async Task<string?> RegisterAsync(RegisterDto dto)
+    public async Task<RegistrationResult> RegisterAsync(RegisterDto dto)
     {
-        if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
-            return "The email is already in use.";
+        var normalizedEmail = EmailAddressNormalizer.Normalize(dto.Email);
+
+        if (!PasswordPolicy.IsSatisfiedBy(dto.Password))
+            return RegistrationResult.WeakPassword;
+
+        if (await _context.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail))
+            return RegistrationResult.EmailAlreadyInUse;
 
         var user = new User
         {
-            Email = dto.Email,
+            Email = normalizedEmail,
+            NormalizedEmail = normalizedEmail,
             PasswordHash = _passwordService.HashPassword(dto.Password)
         };
 
@@ -42,14 +59,15 @@ public class AuthService : IAuthService
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-        return null; // Null means success
+        return RegistrationResult.Success;
     }
 
     public async Task<AuthTokensDto?> Login(LoginDto dto)
     {
+        var normalizedEmail = EmailAddressNormalizer.Normalize(dto.Email);
         var user = await _context.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Email == dto.Email);
+            .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
         
         if (user == null || !_passwordService.VerifyPassword(dto.Password, user.PasswordHash))
             return null; // Return null if auth fails
@@ -96,25 +114,34 @@ public class AuthService : IAuthService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task ChangePasswordAsync(Guid userId, string currentPassword, string newPassword)
+    public async Task<PasswordChangeResult> ChangePasswordAsync(
+        Guid userId,
+        string currentPassword,
+        string newPassword)
     {
         var user = await _context.Users.FindAsync(userId);
 
         if (user == null)
-            throw new InvalidOperationException("User not found.");
+            return PasswordChangeResult.UserNotFound;
 
         if (!_passwordService.VerifyPassword(
                 currentPassword,
                 user.PasswordHash))
         {
-            throw new UnauthorizedAccessException(
-                "The current password is incorrect.");
+            return PasswordChangeResult.CurrentPasswordIncorrect;
         }
+
+        if (!PasswordPolicy.IsSatisfiedBy(newPassword))
+            return PasswordChangeResult.WeakPassword;
+
+        if (_passwordService.VerifyPassword(newPassword, user.PasswordHash))
+            return PasswordChangeResult.PasswordReused;
 
         user.PasswordHash =
             _passwordService.HashPassword(newPassword);
 
         await _context.SaveChangesAsync();
+        return PasswordChangeResult.Success;
     }
 
     public string GenerateRefreshToken()
@@ -174,5 +201,184 @@ public class AuthService : IAuthService
         }
 
         await _context.SaveChangesAsync();
+    }
+
+    public async Task RequestPasswordResetAsync(string email, string locale)
+    {
+        var normalizedEmail = EmailAddressNormalizer.Normalize(email);
+
+        if (string.IsNullOrWhiteSpace(normalizedEmail))
+            return;
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail);
+
+        if (user == null)
+            return;
+
+        var now = DateTime.UtcNow;
+        var cleanupThreshold = now.AddHours(-24);
+        var obsoleteTokens = await _context.PasswordResetTokens
+            .Where(token =>
+                token.ExpiresAt <= cleanupThreshold ||
+                (token.UsedAt != null && token.UsedAt <= cleanupThreshold))
+            .ToListAsync();
+        _context.PasswordResetTokens.RemoveRange(obsoleteTokens);
+
+        var activeTokens = await _context.PasswordResetTokens
+            .Where(token =>
+                token.UserId == user.Id &&
+                token.UsedAt == null &&
+                token.ExpiresAt > now)
+            .ToListAsync();
+
+        foreach (var activeToken in activeTokens)
+        {
+            activeToken.UsedAt = now;
+        }
+
+        var rawToken = GenerateSecureToken();
+        var expiresAt = now.AddMinutes(15);
+
+        _context.PasswordResetTokens.Add(new PasswordResetToken
+        {
+            TokenHash = HashToken(rawToken),
+            CreatedAt = now,
+            ExpiresAt = expiresAt,
+            UserId = user.Id
+        });
+
+        await _context.SaveChangesAsync();
+
+        var resetLink = BuildPasswordResetLink(rawToken);
+
+        try
+        {
+            await _emailSender.SendPasswordResetEmailAsync(
+                user.Email,
+                resetLink,
+                expiresAt,
+                NormalizeLocale(locale));
+        }
+        catch (Exception ex)
+        {
+            var undeliveredToken = await _context.PasswordResetTokens
+                .FirstOrDefaultAsync(token => token.TokenHash == HashToken(rawToken));
+            if (undeliveredToken is not null && undeliveredToken.UsedAt is null)
+            {
+                undeliveredToken.UsedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+
+            _logger.LogError(
+                ex,
+                "Mailjet could not accept a password reset email for user {UserId}",
+                user.Id);
+        }
+    }
+
+    public async Task<PasswordResetResult> ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        if (dto.NewPassword != dto.ConfirmPassword)
+            return PasswordResetResult.PasswordMismatch;
+
+        if (string.IsNullOrWhiteSpace(dto.NewPassword))
+            return PasswordResetResult.WeakPassword;
+
+        if (!PasswordPolicy.IsSatisfiedBy(dto.NewPassword))
+            return PasswordResetResult.WeakPassword;
+
+        var token = dto.Token?.Trim() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(token))
+            return PasswordResetResult.InvalidOrExpiredToken;
+
+        var tokenHash = HashToken(token);
+        var now = DateTime.UtcNow;
+
+        var passwordResetToken = await _context.PasswordResetTokens
+            .Include(prt => prt.User)
+            .FirstOrDefaultAsync(prt => prt.TokenHash == tokenHash);
+
+        if (passwordResetToken == null ||
+            passwordResetToken.UsedAt != null ||
+            passwordResetToken.ExpiresAt <= now)
+        {
+            return PasswordResetResult.InvalidOrExpiredToken;
+        }
+
+        if (_passwordService.VerifyPassword(dto.NewPassword, passwordResetToken.User.PasswordHash))
+            return PasswordResetResult.PasswordReused;
+
+        passwordResetToken.User.PasswordHash = _passwordService.HashPassword(dto.NewPassword);
+        passwordResetToken.UsedAt = now;
+
+        var refreshTokens = await _context.RefreshTokens
+            .Where(rt => rt.UserId == passwordResetToken.UserId && !rt.IsRevoked)
+            .ToListAsync();
+
+        foreach (var refreshToken in refreshTokens)
+        {
+            refreshToken.IsRevoked = true;
+        }
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return PasswordResetResult.InvalidOrExpiredToken;
+        }
+
+        return PasswordResetResult.Success;
+    }
+
+    public async Task<bool> IsPasswordResetTokenValidAsync(string token)
+    {
+        var normalizedToken = token?.Trim() ?? string.Empty;
+        if (normalizedToken.Length == 0)
+            return false;
+
+        var tokenHash = HashToken(normalizedToken);
+        var now = DateTime.UtcNow;
+
+        return await _context.PasswordResetTokens
+            .AsNoTracking()
+            .AnyAsync(resetToken =>
+                resetToken.TokenHash == tokenHash &&
+                resetToken.UsedAt == null &&
+                resetToken.ExpiresAt > now);
+    }
+
+    private string BuildPasswordResetLink(string token)
+    {
+        var baseUrl = Environment.GetEnvironmentVariable("CLIENT_APP_BASE_URL")
+            ?? _configuration["ClientApp:BaseUrl"]
+            ?? "http://localhost:3000";
+
+        return $"{baseUrl.TrimEnd('/')}/reset-password?token={Uri.EscapeDataString(token)}";
+    }
+
+    private static string GenerateSecureToken()
+    {
+        var bytes = RandomNumberGenerator.GetBytes(32);
+        return Convert.ToBase64String(bytes)
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
+    }
+
+    private static string HashToken(string token)
+    {
+        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(token));
+        return Convert.ToHexString(hashBytes);
+    }
+
+    private static string NormalizeLocale(string? locale)
+    {
+        return string.Equals(locale, "es-MX", StringComparison.OrdinalIgnoreCase)
+            ? "es-MX"
+            : "en-US";
     }
 }

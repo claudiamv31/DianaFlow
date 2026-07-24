@@ -10,6 +10,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using Xunit;
@@ -22,6 +23,7 @@ namespace backend.Tests
         private readonly Mock<IAuthService> _authService;
         private readonly Mock<IProfileService> _profileService;
         private readonly Mock<IWebHostEnvironment> _environment;
+        private readonly IMemoryCache _memoryCache;
         private readonly Guid _userId;
 
         public UsersControllerTests()
@@ -30,6 +32,7 @@ namespace backend.Tests
             _profileService = new Mock<IProfileService>();
             _environment = new Mock<IWebHostEnvironment>();
             _environment.SetupGet(e => e.EnvironmentName).Returns(Environments.Development);
+            _memoryCache = new MemoryCache(new MemoryCacheOptions());
             _userId = Guid.NewGuid();
         }
 
@@ -41,7 +44,11 @@ namespace backend.Tests
                 claims.Add(new Claim("sub", userIdString));
             }
 
-            return new UsersController(_authService.Object, _profileService.Object, _environment.Object)
+            return new UsersController(
+                _authService.Object,
+                _profileService.Object,
+                _environment.Object,
+                _memoryCache)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -94,6 +101,130 @@ namespace backend.Tests
             var response = unauthorized.Value.Should().BeOfType<ApiError>().Subject;
             response.Code.Should().Be("INVALID_CREDENTIALS");
             response.Field.Should().Be("password");
+        }
+
+        [Fact]
+        public async Task ForgotPassword_WithEmail_ReturnsGenericMessage()
+        {
+            var dto = new ForgotPasswordRequestDto
+            {
+                Email = "jane@example.com"
+            };
+            var controller = CreateController();
+
+            var result = await controller.ForgotPassword(dto);
+
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var message = okResult.Value!.GetType().GetProperty("message")!.GetValue(okResult.Value);
+            message.Should().Be("If an account exists for that email, a password reset link has been sent.");
+            _authService.Verify(
+                s => s.RequestPasswordResetAsync(dto.Email, dto.Locale),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task ForgotPassword_WithoutEmail_ReturnsBadRequest()
+        {
+            var controller = CreateController();
+
+            var result = await controller.ForgotPassword(new ForgotPasswordRequestDto());
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+            _authService.Verify(
+                s => s.RequestPasswordResetAsync(It.IsAny<string>(), It.IsAny<string>()),
+                Times.Never);
+        }
+
+        [Fact]
+        public async Task ForgotPassword_AfterThreeRequests_IsSilentlyThrottled()
+        {
+            var dto = new ForgotPasswordRequestDto
+            {
+                Email = "jane@example.com",
+                Locale = "es-MX"
+            };
+            var controller = CreateController();
+
+            for (var request = 0; request < 4; request++)
+                (await controller.ForgotPassword(dto)).Should().BeOfType<OkObjectResult>();
+
+            _authService.Verify(
+                service => service.RequestPasswordResetAsync(dto.Email, dto.Locale),
+                Times.Exactly(3));
+        }
+
+        [Fact]
+        public async Task ResetPassword_WhenSuccessful_ReturnsOk()
+        {
+            var dto = new ResetPasswordDto
+            {
+                Token = "reset-token",
+                NewPassword = "NewPassword1",
+                ConfirmPassword = "NewPassword1"
+            };
+            _authService
+                .Setup(s => s.ResetPasswordAsync(dto))
+                .ReturnsAsync(PasswordResetResult.Success);
+            var controller = CreateController();
+
+            var result = await controller.ResetPassword(dto);
+
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var message = okResult.Value!.GetType().GetProperty("message")!.GetValue(okResult.Value);
+            message.Should().Be("Password updated successfully. You can now sign in.");
+        }
+
+        [Fact]
+        public async Task ResetPassword_WithExpiredToken_ReturnsBadRequest()
+        {
+            var dto = new ResetPasswordDto
+            {
+                Token = "expired-token",
+                NewPassword = "NewPassword1",
+                ConfirmPassword = "NewPassword1"
+            };
+            _authService
+                .Setup(s => s.ResetPasswordAsync(dto))
+                .ReturnsAsync(PasswordResetResult.InvalidOrExpiredToken);
+            var controller = CreateController();
+
+            var result = await controller.ResetPassword(dto);
+
+            var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            badRequest.Value.ShouldHaveApiError(
+                ApiErrorCodes.PasswordResetTokenInvalid,
+                "token");
+        }
+
+        [Fact]
+        public async Task ValidatePasswordResetToken_WithValidToken_ReturnsOk()
+        {
+            _authService
+                .Setup(service => service.IsPasswordResetTokenValidAsync("valid-token"))
+                .ReturnsAsync(true);
+            var controller = CreateController();
+
+            var result = await controller.ValidatePasswordResetToken(
+                new ValidatePasswordResetTokenDto { Token = "valid-token" });
+
+            result.Should().BeOfType<OkResult>();
+        }
+
+        [Fact]
+        public async Task ValidatePasswordResetToken_WithInvalidToken_ReturnsMachineReadableError()
+        {
+            _authService
+                .Setup(service => service.IsPasswordResetTokenValidAsync("invalid-token"))
+                .ReturnsAsync(false);
+            var controller = CreateController();
+
+            var result = await controller.ValidatePasswordResetToken(
+                new ValidatePasswordResetTokenDto { Token = "invalid-token" });
+
+            var badRequest = result.Should().BeOfType<BadRequestObjectResult>().Subject;
+            badRequest.Value.ShouldHaveApiError(
+                ApiErrorCodes.PasswordResetTokenInvalid,
+                "token");
         }
 
         [Fact]
@@ -176,7 +307,7 @@ namespace backend.Tests
                     _userId,
                     dto.CurrentPassword,
                     dto.NewPassword))
-                .ThrowsAsync(new UnauthorizedAccessException());
+                .ReturnsAsync(PasswordChangeResult.CurrentPasswordIncorrect);
             var controller = CreateController(_userId.ToString());
 
             var result = await controller.ChangePassword(dto);

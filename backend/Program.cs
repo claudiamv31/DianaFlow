@@ -11,12 +11,31 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using backend.Api;
 using Microsoft.AspNetCore.Mvc;
+using Mailjet.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 var port = Environment.GetEnvironmentVariable("PORT");
 if (!string.IsNullOrWhiteSpace(port))
 {
     builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
+var jwtKey = builder.Configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+{
+    throw new InvalidOperationException(
+        "JWT signing key is not configured. Set Jwt__Key to at least 32 characters.");
+}
+
+var mailjetApiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY")
+    ?? builder.Configuration["Mailjet:ApiKey"];
+var mailjetSecretKey = Environment.GetEnvironmentVariable("MAILJET_SECRET_KEY")
+    ?? builder.Configuration["Mailjet:SecretKey"];
+if (!builder.Environment.IsDevelopment() &&
+    (string.IsNullOrWhiteSpace(mailjetApiKey) || string.IsNullOrWhiteSpace(mailjetSecretKey)))
+{
+    throw new InvalidOperationException(
+        "Mailjet credentials are not configured. Set MAILJET_API_KEY and MAILJET_SECRET_KEY.");
 }
 
 builder.Services.AddControllers()
@@ -82,12 +101,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddMemoryCache();
 
 // Register Module Services
 builder.Services.AddScoped<PeriodService>();
@@ -96,6 +116,12 @@ builder.Services.AddScoped<CalendarService>();
 builder.Services.AddScoped<StatsService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpClient<IMailjetClient, MailjetClient>(client =>
+{
+    client.SetDefaultSettings();
+    client.UseBasicAuthentication(mailjetApiKey ?? string.Empty, mailjetSecretKey ?? string.Empty);
+});
+builder.Services.AddScoped<IEmailSender, MailjetEmailSender>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<TimeZoneService>();
 

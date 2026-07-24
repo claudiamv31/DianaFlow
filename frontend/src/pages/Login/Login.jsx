@@ -159,6 +159,12 @@ function Login() {
                 <label className="text-xs font-semibold text-primary uppercase tracking-wider">
                   {t('auth.password')}
                 </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  {t('auth.forgotPassword')}
+                </Link>
               </div>
               <div className="relative">
                 <input
@@ -222,7 +228,6 @@ function Login() {
               )}
             </Button>
           </form>
-
         </div>
 
         {/* Bottom Signup Text */}

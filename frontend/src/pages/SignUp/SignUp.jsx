@@ -13,6 +13,7 @@ import { useLocale } from '../../i18n/LocaleContext';
 import LanguageSelector from '../../components/LanguageSelector';
 import { getRequiredFieldLabel } from '../../utils/authValidation';
 import { getErrorMessageKey } from '../../api/AppError';
+import { isStrongPassword } from '../../utils/passwordPolicy';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -35,6 +36,8 @@ const SignUp = () => {
     if (!email.trim())
       validationErrors.email = 'auth.validation.email';
     if (!password) validationErrors.password = 'auth.validation.password';
+    else if (!isStrongPassword(password))
+      validationErrors.password = 'password.weak';
 
     if (Object.keys(validationErrors).length > 0) {
       setFieldErrors(validationErrors);
