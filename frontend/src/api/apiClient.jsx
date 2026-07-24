@@ -38,7 +38,7 @@ const shouldSkipRefresh = (config = {}) => {
   return (
     url.includes('/users/login') ||
     url.includes('/users/refresh') ||
-    url.includes('/users/forgot-password') ||
+    url.includes('/users/password-reset/request') ||
     url.includes('/users/reset-password')
   );
 };
@@ -249,7 +249,7 @@ apiClient.login = async (email, password) => {
 };
 
 apiClient.requestPasswordReset = async (email, locale) => {
-  const response = await apiClient.post('/users/forgot-password', {
+  const response = await apiClient.post('/users/password-reset/request', {
     email,
     locale
   });

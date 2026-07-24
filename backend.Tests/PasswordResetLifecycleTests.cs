@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace backend.Tests;
 
@@ -22,6 +23,7 @@ public sealed class PasswordResetLifecycleTests
             Email = "DIANA@example.com",
             Password = "Original1"
         });
+        ReadSessionVersion(existingSession!.AccessToken).Should().Be(0);
 
         await service.RequestPasswordResetAsync(" diana@example.com ", "es-MX");
         var token = emailSender.LatestToken;
@@ -39,7 +41,10 @@ public sealed class PasswordResetLifecycleTests
             Email = "diana@example.com",
             Password = "Replacement1"
         })).Should().NotBeNull();
-        (await service.RefreshTokenAsync(existingSession!.RefreshToken)).Should().BeNull();
+        (await service.RefreshTokenAsync(existingSession.RefreshToken)).Should().BeNull();
+        var user = await context.Users.SingleAsync();
+        user.SessionVersion.Should().Be(1);
+        (await new SessionVersionValidator(context).IsCurrentAsync(user.Id, 0)).Should().BeFalse();
         emailSender.LatestLocale.Should().Be("es-MX");
     }
 
@@ -130,6 +135,12 @@ public sealed class PasswordResetLifecycleTests
             TimeZone = "America/Mazatlan"
         });
         result.Should().Be(RegistrationResult.Success);
+    }
+
+    private static int ReadSessionVersion(string accessToken)
+    {
+        var token = new JwtSecurityTokenHandler().ReadJwtToken(accessToken);
+        return int.Parse(token.Claims.Single(claim => claim.Type == "session_version").Value);
     }
 
     private sealed class RecordingEmailSender : IEmailSender

@@ -189,7 +189,9 @@ namespace backend.Migrations
                     b.HasIndex("TokenHash")
                         .IsUnique();
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("\"UsedAt\" IS NULL");
 
                     b.ToTable("PasswordResetTokens");
                 });
@@ -211,6 +213,9 @@ namespace backend.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("SessionVersion")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 

@@ -18,6 +18,13 @@ public sealed class NormalizeUserEmailsAndProtectResetTokens : Migration
             type: "text",
             nullable: true);
 
+        migrationBuilder.AddColumn<int>(
+            name: "SessionVersion",
+            table: "Users",
+            type: "integer",
+            nullable: false,
+            defaultValue: 0);
+
         migrationBuilder.Sql(
             """
             DO $$
@@ -58,12 +65,54 @@ public sealed class NormalizeUserEmailsAndProtectResetTokens : Migration
             table: "Users",
             column: "NormalizedEmail",
             unique: true);
+
+        migrationBuilder.Sql(
+            """
+            WITH ranked AS (
+                SELECT "Id",
+                       ROW_NUMBER() OVER (
+                           PARTITION BY "UserId"
+                           ORDER BY "CreatedAt" DESC, "Id" DESC
+                       ) AS position
+                FROM "PasswordResetTokens"
+                WHERE "UsedAt" IS NULL
+            )
+            UPDATE "PasswordResetTokens" AS token
+            SET "UsedAt" = NOW()
+            FROM ranked
+            WHERE token."Id" = ranked."Id"
+              AND ranked.position > 1;
+            """);
+
+        migrationBuilder.DropIndex(
+            name: "IX_PasswordResetTokens_UserId",
+            table: "PasswordResetTokens");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_PasswordResetTokens_UserId",
+            table: "PasswordResetTokens",
+            column: "UserId",
+            unique: true,
+            filter: "\"UsedAt\" IS NULL");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropIndex(
             name: "IX_Users_NormalizedEmail",
+            table: "Users");
+
+        migrationBuilder.DropIndex(
+            name: "IX_PasswordResetTokens_UserId",
+            table: "PasswordResetTokens");
+
+        migrationBuilder.CreateIndex(
+            name: "IX_PasswordResetTokens_UserId",
+            table: "PasswordResetTokens",
+            column: "UserId");
+
+        migrationBuilder.DropColumn(
+            name: "SessionVersion",
             table: "Users");
 
         migrationBuilder.DropColumn(

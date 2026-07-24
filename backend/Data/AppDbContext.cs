@@ -88,6 +88,11 @@ namespace backend.Data
                 .IsUnique();
 
             modelBuilder.Entity<PasswordResetToken>()
+                .HasIndex(prt => prt.UserId)
+                .HasFilter("\"UsedAt\" IS NULL")
+                .IsUnique();
+
+            modelBuilder.Entity<PasswordResetToken>()
                 .Property(prt => prt.UsedAt)
                 .IsConcurrencyToken();
         }

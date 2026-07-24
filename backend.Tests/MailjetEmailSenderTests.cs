@@ -3,7 +3,6 @@ using Mailjet.Client;
 using Mailjet.Client.TransactionalEmails;
 using Mailjet.Client.TransactionalEmails.Response;
 using Newtonsoft.Json.Linq;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
@@ -11,6 +10,29 @@ namespace backend.Tests;
 
 public sealed class MailjetEmailSenderTests
 {
+    [Fact]
+    public async Task SendPasswordResetEmail_UsesTheValidatedDianaFlowSender()
+    {
+        MailjetRequest? capturedRequest = null;
+        var client = new Mock<IMailjetClient>();
+        client
+            .Setup(mailjet => mailjet.PostAsync(It.IsAny<MailjetRequest>()))
+            .Callback<MailjetRequest>(request => capturedRequest = request)
+            .ReturnsAsync(new MailjetResponse(true, 200, SuccessResponse()));
+        var sender = CreateSender(client.Object);
+
+        await sender.SendPasswordResetEmailAsync(
+            "person@example.com",
+            "https://dianaflow.example/reset-password?token=secret",
+            DateTime.UtcNow.AddMinutes(15),
+            "en-US");
+
+        capturedRequest.Should().NotBeNull();
+        var from = capturedRequest!.Body["Messages"]!.First!["From"]!;
+        from["Email"]!.Value<string>().Should().Be("dianaflowapp@gmail.com");
+        from["Name"]!.Value<string>().Should().Be("DianaFlow");
+    }
+
     [Fact]
     public async Task SendPasswordResetEmail_RetriesTransientFailuresTwice()
     {
@@ -69,17 +91,8 @@ public sealed class MailjetEmailSenderTests
 
     private static MailjetEmailSender CreateSender(IMailjetClient client)
     {
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["Mailjet:FromEmail"] = "dianaflowapp@gmail.com",
-                ["Mailjet:FromName"] = "DianaFlow"
-            })
-            .Build();
-
         return new MailjetEmailSender(
             client,
-            configuration,
             NullLogger<MailjetEmailSender>.Instance);
     }
 

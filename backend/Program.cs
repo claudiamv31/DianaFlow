@@ -12,6 +12,7 @@ using System.Text.Json;
 using backend.Api;
 using Microsoft.AspNetCore.Mvc;
 using Mailjet.Client;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 var port = Environment.GetEnvironmentVariable("PORT");
@@ -27,10 +28,8 @@ if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
         "JWT signing key is not configured. Set Jwt__Key to at least 32 characters.");
 }
 
-var mailjetApiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY")
-    ?? builder.Configuration["Mailjet:ApiKey"];
-var mailjetSecretKey = Environment.GetEnvironmentVariable("MAILJET_SECRET_KEY")
-    ?? builder.Configuration["Mailjet:SecretKey"];
+var mailjetApiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY");
+var mailjetSecretKey = Environment.GetEnvironmentVariable("MAILJET_SECRET_KEY");
 if (!builder.Environment.IsDevelopment() &&
     (string.IsNullOrWhiteSpace(mailjetApiKey) || string.IsNullOrWhiteSpace(mailjetSecretKey)))
 {
@@ -103,11 +102,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var userIdValue = context.Principal?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value
+                    ?? context.Principal?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                var sessionVersionValue = context.Principal?.FindFirst("session_version")?.Value;
+                if (!Guid.TryParse(userIdValue, out var userId) ||
+                    !int.TryParse(sessionVersionValue, out var sessionVersion))
+                {
+                    context.Fail("The session claims are invalid.");
+                    return;
+                }
+
+                var validator = context.HttpContext.RequestServices
+                    .GetRequiredService<SessionVersionValidator>();
+                if (!await validator.IsCurrentAsync(userId, sessionVersion))
+                    context.Fail("The session has been revoked.");
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddMemoryCache();
 
 // Register Module Services
 builder.Services.AddScoped<PeriodService>();
@@ -116,6 +134,8 @@ builder.Services.AddScoped<CalendarService>();
 builder.Services.AddScoped<StatsService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<SessionVersionValidator>();
+builder.Services.AddSingleton<IPasswordResetRateLimiter, InMemoryPasswordResetRateLimiter>();
 builder.Services.AddHttpClient<IMailjetClient, MailjetClient>(client =>
 {
     client.SetDefaultSettings();

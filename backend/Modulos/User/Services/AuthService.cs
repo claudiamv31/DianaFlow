@@ -10,9 +10,11 @@ using backend.Modulos.User.Models;
 using backend.Modulos.Profile.Models;
 using backend.Modulos.Profile.Services;
 using backend.Modulos.User.Services;
+using System.Collections.Concurrent;
 
 public class AuthService : IAuthService
 {
+    private static readonly ConcurrentDictionary<Guid, SemaphoreSlim> PasswordResetRequestLocks = new();
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
     private readonly IPasswordService _passwordService;
@@ -101,7 +103,8 @@ public class AuthService : IAuthService
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim("session_version", user.SessionVersion.ToString())
         };
 
         var token = new JwtSecurityToken(
@@ -216,6 +219,24 @@ public class AuthService : IAuthService
         if (user == null)
             return;
 
+        var requestLock = PasswordResetRequestLocks.GetOrAdd(
+            user.Id,
+            _ => new SemaphoreSlim(1, 1));
+        await requestLock.WaitAsync();
+
+        try
+        {
+            await CreateAndSendPasswordResetAsync(user, locale);
+        }
+        finally
+        {
+            requestLock.Release();
+        }
+    }
+
+    private async Task CreateAndSendPasswordResetAsync(User user, string locale)
+    {
+
         var now = DateTime.UtcNow;
         var cleanupThreshold = now.AddHours(-24);
         var obsoleteTokens = await _context.PasswordResetTokens
@@ -225,14 +246,13 @@ public class AuthService : IAuthService
             .ToListAsync();
         _context.PasswordResetTokens.RemoveRange(obsoleteTokens);
 
-        var activeTokens = await _context.PasswordResetTokens
+        var unusedTokens = await _context.PasswordResetTokens
             .Where(token =>
                 token.UserId == user.Id &&
-                token.UsedAt == null &&
-                token.ExpiresAt > now)
+                token.UsedAt == null)
             .ToListAsync();
 
-        foreach (var activeToken in activeTokens)
+        foreach (var activeToken in unusedTokens)
         {
             activeToken.UsedAt = now;
         }
@@ -248,7 +268,18 @@ public class AuthService : IAuthService
             UserId = user.Id
         });
 
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "A concurrent password reset request already created a token for user {UserId}",
+                user.Id);
+            return;
+        }
 
         var resetLink = BuildPasswordResetLink(rawToken);
 
@@ -311,6 +342,7 @@ public class AuthService : IAuthService
             return PasswordResetResult.PasswordReused;
 
         passwordResetToken.User.PasswordHash = _passwordService.HashPassword(dto.NewPassword);
+        passwordResetToken.User.SessionVersion++;
         passwordResetToken.UsedAt = now;
 
         var refreshTokens = await _context.RefreshTokens

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using backend.Modulos.User.DTOs;
 using backend.Modulos.Profile.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using System.Net.Mail;
 using System.Security.Claims;
 using backend.Api;
@@ -14,26 +13,21 @@ namespace backend.Modulos.User.Controllers
     public class UsersController : ControllerBase
     {
         private const string RefreshTokenCookieName = "refreshToken";
-        private const string PasswordResetRequestMessage =
-            "If an account exists for that email, a password reset link has been sent.";
-        private const int PasswordResetRequestLimit = 3;
-        private static readonly TimeSpan PasswordResetRequestWindow = TimeSpan.FromMinutes(15);
-
         private readonly IAuthService _authService;
         private readonly IProfileService _profileService;
         private readonly IWebHostEnvironment _environment;
-        private readonly IMemoryCache _memoryCache;
+        private readonly IPasswordResetRateLimiter _passwordResetRateLimiter;
 
         public UsersController(
             IAuthService authService,
             IProfileService profileService,
             IWebHostEnvironment environment,
-            IMemoryCache memoryCache)
+            IPasswordResetRateLimiter passwordResetRateLimiter)
         {
             _authService = authService;
             _profileService = profileService;
             _environment = environment;
-            _memoryCache = memoryCache;
+            _passwordResetRateLimiter = passwordResetRateLimiter;
         }
 
         [HttpPost("sign-up")]
@@ -43,7 +37,7 @@ namespace backend.Modulos.User.Controllers
 
             return result switch
             {
-                RegistrationResult.Success => Ok(new { message = "User registered successfully" }),
+                RegistrationResult.Success => Ok(),
                 RegistrationResult.WeakPassword => BadRequest(
                     new ApiError(ApiErrorCodes.PasswordWeak, "password")),
                 _ => BadRequest(new ApiError(ApiErrorCodes.EmailAlreadyInUse, "email"))
@@ -63,8 +57,8 @@ namespace backend.Modulos.User.Controllers
             return Ok(new { accessToken = tokens.AccessToken });
         }
 
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequestDto dto)
+        [HttpPost("password-reset/request")]
+        public async Task<IActionResult> RequestPasswordReset(PasswordResetRequestDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Email))
                 return BadRequest(new ApiError(ApiErrorCodes.EmailRequired, "email"));
@@ -72,12 +66,13 @@ namespace backend.Modulos.User.Controllers
             if (!IsValidEmail(dto.Email))
                 return BadRequest(new ApiError(ApiErrorCodes.EmailInvalid, "email"));
 
-            if (!IsPasswordResetRequestLimited(dto.Email))
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            if (_passwordResetRateLimiter.TryAcquire(dto.Email, ipAddress))
             {
                 await _authService.RequestPasswordResetAsync(dto.Email, dto.Locale);
             }
 
-            return Ok(new { message = PasswordResetRequestMessage });
+            return Ok();
         }
 
         [HttpPost("reset-password")]
@@ -87,10 +82,7 @@ namespace backend.Modulos.User.Controllers
 
             return result switch
             {
-                PasswordResetResult.Success => Ok(new
-                {
-                    message = "Password updated successfully. You can now sign in."
-                }),
+                PasswordResetResult.Success => Ok(),
                 PasswordResetResult.PasswordMismatch => BadRequest(
                     new ApiError(ApiErrorCodes.PasswordMismatch, "confirmPassword")),
                 PasswordResetResult.WeakPassword => BadRequest(
@@ -123,7 +115,7 @@ namespace backend.Modulos.User.Controllers
             await _authService.LogoutAsync(userId);
             DeleteRefreshTokenCookie();
 
-            return Ok(new { message = "User logged out successfully" });
+            return Ok();
         }
 
         [Authorize]
@@ -167,7 +159,7 @@ namespace backend.Modulos.User.Controllers
 
             return result switch
             {
-                PasswordChangeResult.Success => Ok(new { message = "Password updated successfully" }),
+                PasswordChangeResult.Success => Ok(),
                 PasswordChangeResult.CurrentPasswordIncorrect => BadRequest(
                     new ApiError(ApiErrorCodes.CurrentPasswordIncorrect, "currentPassword")),
                 PasswordChangeResult.WeakPassword => BadRequest(
@@ -235,24 +227,6 @@ namespace backend.Modulos.User.Controllers
                 SameSite = isDevelopment ? SameSiteMode.Lax : SameSiteMode.None,
                 Path = "/api/users"
             };
-        }
-
-        private bool IsPasswordResetRequestLimited(string email)
-        {
-            var normalizedEmail = email.Trim().ToLowerInvariant();
-            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            var cacheKey = $"password-reset:{ipAddress}:{normalizedEmail}";
-            var requestCount = _memoryCache.Get<int>(cacheKey);
-
-            if (requestCount >= PasswordResetRequestLimit)
-                return true;
-
-            _memoryCache.Set(
-                cacheKey,
-                requestCount + 1,
-                PasswordResetRequestWindow);
-
-            return false;
         }
 
         private static bool IsValidEmail(string email)

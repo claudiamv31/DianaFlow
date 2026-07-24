@@ -24,5 +24,8 @@ public sealed class PasswordResetMigrationTests
         script.Should().Contain("case-insensitive duplicates exist");
         script.Should().Contain("IX_Users_NormalizedEmail");
         script.Should().Contain("LOWER(BTRIM(\"Email\"))");
+        script.Should().Contain("SessionVersion");
+        script.Should().Contain("IX_PasswordResetTokens_UserId");
+        script.Should().Contain("WHERE \"UsedAt\" IS NULL");
     }
 }

@@ -15,19 +15,23 @@ const PasswordResetLayout = ({ subtitle, children, footer }) => {
         <LanguageSelector />
         <ThemeSelector />
       </div>
-      <div className="hidden lg:block absolute left-[8%] top-[55%] -translate-y-1/2 w-[220px] h-[340px] rounded-[2.5rem] overflow-hidden tilted-card-left">
-        <img
-          src={leftCardImg}
-          className="w-full h-full object-cover"
-          alt={t('auth.decorativeWave')}
-        />
+      <div className="hidden lg:block absolute left-[8%] top-[55%] -translate-y-1/2">
+        <div className="w-[220px] h-[340px] rounded-[2.5rem] overflow-hidden tilted-card-left">
+          <img
+            src={leftCardImg}
+            className="w-full h-full object-cover"
+            alt={t('auth.decorativeWave')}
+          />
+        </div>
       </div>
-      <div className="hidden lg:block absolute right-[8%] top-[45%] -translate-y-1/2 w-[260px] h-[390px] rounded-[3rem] overflow-hidden tilted-card-right">
-        <img
-          src={rightCardImg}
-          className="w-full h-full object-cover"
-          alt={t('auth.decorativePetal')}
-        />
+      <div className="hidden lg:block absolute right-[8%] top-[45%] -translate-y-1/2">
+        <div className="w-[260px] h-[390px] rounded-[3rem] overflow-hidden tilted-card-right">
+          <img
+            src={rightCardImg}
+            className="w-full h-full object-cover"
+            alt={t('auth.decorativePetal')}
+          />
+        </div>
       </div>
       <div className="w-full max-w-[460px] z-10 flex flex-col items-center">
         <h1 className="text-4xl font-headline font-bold text-primary mb-1">

@@ -10,7 +10,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 using Moq;
 using Xunit;
@@ -23,7 +22,7 @@ namespace backend.Tests
         private readonly Mock<IAuthService> _authService;
         private readonly Mock<IProfileService> _profileService;
         private readonly Mock<IWebHostEnvironment> _environment;
-        private readonly IMemoryCache _memoryCache;
+        private readonly IPasswordResetRateLimiter _passwordResetRateLimiter;
         private readonly Guid _userId;
 
         public UsersControllerTests()
@@ -32,7 +31,7 @@ namespace backend.Tests
             _profileService = new Mock<IProfileService>();
             _environment = new Mock<IWebHostEnvironment>();
             _environment.SetupGet(e => e.EnvironmentName).Returns(Environments.Development);
-            _memoryCache = new MemoryCache(new MemoryCacheOptions());
+            _passwordResetRateLimiter = new InMemoryPasswordResetRateLimiter();
             _userId = Guid.NewGuid();
         }
 
@@ -48,7 +47,7 @@ namespace backend.Tests
                 _authService.Object,
                 _profileService.Object,
                 _environment.Object,
-                _memoryCache)
+                _passwordResetRateLimiter)
             {
                 ControllerContext = new ControllerContext
                 {
@@ -104,30 +103,28 @@ namespace backend.Tests
         }
 
         [Fact]
-        public async Task ForgotPassword_WithEmail_ReturnsGenericMessage()
+        public async Task PasswordResetRequest_WithEmail_ReturnsGenericSuccess()
         {
-            var dto = new ForgotPasswordRequestDto
+            var dto = new PasswordResetRequestDto
             {
                 Email = "jane@example.com"
             };
             var controller = CreateController();
 
-            var result = await controller.ForgotPassword(dto);
+            var result = await controller.RequestPasswordReset(dto);
 
-            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            var message = okResult.Value!.GetType().GetProperty("message")!.GetValue(okResult.Value);
-            message.Should().Be("If an account exists for that email, a password reset link has been sent.");
+            result.Should().BeOfType<OkResult>();
             _authService.Verify(
                 s => s.RequestPasswordResetAsync(dto.Email, dto.Locale),
                 Times.Once);
         }
 
         [Fact]
-        public async Task ForgotPassword_WithoutEmail_ReturnsBadRequest()
+        public async Task PasswordResetRequest_WithoutEmail_ReturnsBadRequest()
         {
             var controller = CreateController();
 
-            var result = await controller.ForgotPassword(new ForgotPasswordRequestDto());
+            var result = await controller.RequestPasswordReset(new PasswordResetRequestDto());
 
             result.Should().BeOfType<BadRequestObjectResult>();
             _authService.Verify(
@@ -136,9 +133,9 @@ namespace backend.Tests
         }
 
         [Fact]
-        public async Task ForgotPassword_AfterThreeRequests_IsSilentlyThrottled()
+        public async Task PasswordResetRequest_AfterThreeRequests_IsSilentlyThrottled()
         {
-            var dto = new ForgotPasswordRequestDto
+            var dto = new PasswordResetRequestDto
             {
                 Email = "jane@example.com",
                 Locale = "es-MX"
@@ -146,7 +143,7 @@ namespace backend.Tests
             var controller = CreateController();
 
             for (var request = 0; request < 4; request++)
-                (await controller.ForgotPassword(dto)).Should().BeOfType<OkObjectResult>();
+                (await controller.RequestPasswordReset(dto)).Should().BeOfType<OkResult>();
 
             _authService.Verify(
                 service => service.RequestPasswordResetAsync(dto.Email, dto.Locale),
@@ -169,9 +166,7 @@ namespace backend.Tests
 
             var result = await controller.ResetPassword(dto);
 
-            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
-            var message = okResult.Value!.GetType().GetProperty("message")!.GetValue(okResult.Value);
-            message.Should().Be("Password updated successfully. You can now sign in.");
+            result.Should().BeOfType<OkResult>();
         }
 
         [Fact]
