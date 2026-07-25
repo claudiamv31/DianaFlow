@@ -2,6 +2,10 @@ import axios from 'axios';
 import { API_URL } from '../config';
 import { getClientTimeZone } from '../utils/timeZone';
 import { AppError } from './AppError';
+import {
+  getNetworkErrorMessageKey,
+  isColdStartError
+} from './networkError';
 
 const ACCESS_TOKEN_KEY = 'jwtToken';
 const REQUEST_TIMEOUT_MS = 45000;
@@ -38,15 +42,6 @@ const sleep = (delayMs) =>
   new Promise((resolve) => {
     setTimeout(resolve, delayMs);
   });
-
-const isColdStartStatus = (status) => [502, 503, 504].includes(status);
-
-const isBrowserNetworkError = (error) =>
-  !error.response && error.message === 'Network Error';
-
-const isColdStartError = (error) =>
-  error.code === 'ECONNABORTED' ||
-  isColdStartStatus(error.response?.status);
 
 const canRetryColdStart = (config = {}) => {
   const method = (config.method || 'get').toLowerCase();
@@ -175,20 +170,9 @@ apiClient.interceptors.response.use(
       }
     }
 
-    if (error.code === 'ECONNABORTED') {
-      return Promise.reject(
-        new AppError('network.waking')
-      );
-    }
-    if (isBrowserNetworkError(error)) {
-      return Promise.reject(
-        new AppError('network.offline')
-      );
-    }
-    if (isColdStartStatus(error.response.status)) {
-      return Promise.reject(
-        new AppError('network.waking')
-      );
+    const networkErrorMessageKey = getNetworkErrorMessageKey(error);
+    if (networkErrorMessageKey) {
+      return Promise.reject(new AppError(networkErrorMessageKey));
     }
     return Promise.reject(error);
   }

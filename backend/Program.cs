@@ -140,7 +140,16 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = context =>
+    {
+        if (context.Context.Request.Path.StartsWithSegments("/uploads/avatars"))
+        {
+            context.Context.Response.Headers.CacheControl = "public,max-age=31536000,immutable";
+        }
+    }
+});
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }))
     .AllowAnonymous();

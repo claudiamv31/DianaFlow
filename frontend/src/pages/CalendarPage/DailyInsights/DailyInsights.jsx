@@ -104,8 +104,8 @@ const DailyInsigths = ({
         </div>
         <div className="flex flex-col gap-4">
           {isPeriod && (
-            <Button
-              className="w-full"
+            <button
+              className="w-full py-3 rounded-full !bg-primary text-on-primary font-headline font-bold text-base shadow-lg !shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
               onClick={() => setIsDailyLogActive(true)}
             >
               <FaEdit className="text-xl" aria-hidden="true" />
@@ -113,7 +113,7 @@ const DailyInsigths = ({
             </Button>
           )}
           <button
-            className="w-full py-3 rounded-full border !border-primary/30 !text-primary/70 font-headline font-semibold text-xs hover:!bg-primary/5 transition-colors uppercase tracking-wider"
+            className="w-full py-3 rounded-full border border-outline-variant/40 bg-surface-container-lowest/40 text-on-surface-variant font-headline font-semibold text-xs hover:bg-surface-container-high transition-colors uppercase tracking-wider"
             onClick={() => setIsEditingPeriod(true)}
           >
             {isPeriod ? t('calendar.editPeriodDates') : t('home.logPeriod')}

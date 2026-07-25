@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { checkUser } from '../../database/authService';
 import apiClient from '../../api/apiClient';
 import './Home.css';
 import toast from 'react-hot-toast';
@@ -21,16 +20,8 @@ import { normalizePhaseCode, phaseTranslationKey } from '../../i18n/domainCodes'
 function Home() {
   const queryClient = useQueryClient();
   const { t, locale } = useLocale();
-  const [user, setUser] = useState(null);
   const [isLoggingToday, setIsLoggingToday] = useState(false);
   const [isLoggingNewPeriod, setIsLoggingNewPeriod] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = checkUser((currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
 
   const {
     data: statusOfPeriod,
@@ -38,9 +29,8 @@ function Home() {
     isLoading,
     refetch
   } = useQuery({
-    queryKey: ['home', user?.id],
+    queryKey: ['home'],
     queryFn: async () => {
-      if (!user) return null;
       const res = await apiClient.get(`/periods/home`, {
         validateStatus: (status) =>
           (status >= 200 && status < 300) || status === 404
@@ -49,7 +39,6 @@ function Home() {
 
       return res.data;
     },
-    enabled: !!user,
     retry: 2,
     staleTime: 1000 * 60,
     onError: (err) => {

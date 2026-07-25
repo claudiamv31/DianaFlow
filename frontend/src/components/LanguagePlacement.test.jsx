@@ -27,6 +27,7 @@ jest.mock('../api/apiClient', () => ({
 jest.mock('../hooks/useProfileHooks', () => ({
   useGetProfile: () => ({ data: null, isLoading: false }),
   useUpdateProfile: () => ({ isPending: false, mutateAsync: jest.fn() }),
+  useUploadAvatar: () => ({ isPending: false, mutateAsync: jest.fn() }),
   useChangePassword: () => ({ isPending: false, mutateAsync: jest.fn() })
 }));
 

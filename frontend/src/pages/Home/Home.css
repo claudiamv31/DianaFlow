@@ -27,7 +27,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url('../../assets/homepage.png');
+  background-image: url('../../assets/homepage-optimized.jpg');
   background-size: cover;
   background-position: center;
   opacity: 0.25;
@@ -36,7 +36,7 @@
 }
 
 :root[data-theme='dark'] .home-hero::before {
-  background-image: url('../../assets/homepage-dark.png');
+  background-image: url('../../assets/homepage-dark-optimized.jpg');
   opacity: 0.52;
 }
 

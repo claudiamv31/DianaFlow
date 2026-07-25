@@ -19,6 +19,17 @@ export const normalizePhaseCode = (phase) => {
   return PHASE_CODES.includes(normalized) ? normalized : null;
 };
 
+export const normalizeRegularityCode = (regularity) => {
+  const normalized =
+    typeof regularity === 'string'
+      ? regularity.trim().toLowerCase().replaceAll('-', '_').replaceAll(' ', '_')
+      : '';
+  return REGULARITY_CODES.includes(normalized) ? normalized : 'unknown';
+};
+
+export const regularityTranslationKey = (regularity) =>
+  `regularity.${normalizeRegularityCode(regularity)}`;
+
 export const phaseTranslationKey = (phase) => {
   const normalized = normalizePhaseCode(phase);
   return normalized ? `phase.${normalized}` : null;
