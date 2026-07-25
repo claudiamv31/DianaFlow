@@ -69,6 +69,23 @@ public sealed class MailjetEmailSenderTests
     }
 
     [Fact]
+    public void PasswordResetEmailContent_UsesTheLightThemeEmailDesign()
+    {
+        var content = PasswordResetEmailContent.Create(
+            "en-US",
+            "https://dianaflow.example/reset-password?token=secret",
+            new DateTime(2026, 7, 23, 12, 0, 0, DateTimeKind.Utc));
+
+        content.HtmlBody.Should().Contain("background-color:#FDF8F5");
+        content.HtmlBody.Should().Contain("background-color:#904958");
+        content.HtmlBody.Should().Contain("src=\"https://dianaflow.example/icon.png\"");
+        content.HtmlBody.Should().Contain("alt=\"DianaFlow\"");
+        content.HtmlBody.Should().Contain("class=\"reset-button\"");
+        content.HtmlBody.Should().Contain("Choose a new password");
+        content.HtmlBody.Should().Contain("This link expires at 2026-07-23 12:00 UTC and can be used only once.");
+    }
+
+    [Fact]
     public async Task SendPasswordResetEmail_DoesNotRetryPermanentRejection()
     {
         var client = new Mock<IMailjetClient>();
