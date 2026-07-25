@@ -14,6 +14,7 @@ import LanguageSelector from '../../components/LanguageSelector';
 import { getRequiredFieldLabel } from '../../utils/authValidation';
 import { getErrorMessageKey } from '../../api/AppError';
 import { isStrongPassword } from '../../utils/passwordPolicy';
+import PasswordInput from '../../components/PasswordInput';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -242,9 +243,8 @@ const SignUp = () => {
               <label className="text-xs font-semibold text-primary uppercase tracking-wider px-1">
                 {t('auth.password')}
               </label>
-              <div className="relative">
-                <input
-                  type="password"
+              <PasswordInput
+                  id="signup-password"
                   placeholder={t('auth.placeholder.password')}
                   value={password}
                   onChange={(e) => {
@@ -255,20 +255,13 @@ const SignUp = () => {
                   aria-describedby={
                     fieldErrors.password ? 'signup-password-error' : undefined
                   }
-                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 ${
-                    getMissingLabel('password') ? 'pr-28' : 'pr-6'
-                  } text-sm text-on-surface placeholder:text-outline transition-all ${
+                  requiredMessage={getMissingLabel('password')}
+                  className={`auth-input w-full outline-none focus:outline-none rounded-full py-4 pl-6 text-sm text-on-surface placeholder:text-outline transition-all ${
                     fieldErrors.password
                       ? 'auth-input-error'
                       : 'bg-surface-container-high/60 focus:ring-2 focus:ring-primary/30'
                   }`}
-                />
-                {getMissingLabel('password') && (
-                  <span className="auth-input-message">
-                    {getMissingLabel('password')}
-                  </span>
-                )}
-              </div>
+              />
               {fieldErrors.password && !getMissingLabel('password') && (
                 <p
                   id="signup-password-error"

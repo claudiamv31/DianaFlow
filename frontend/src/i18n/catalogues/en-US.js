@@ -279,6 +279,8 @@ const enUS = {
   "password.changeError": "There was an error changing the password",
   "password.change": "Change",
   "password.minimum": "Minimum 8 characters",
+  "password.showPassword": "Show password",
+  "password.hidePassword": "Hide password",
   "setup.noUser": "No user logged in",
   "setup.saved": "Cycle saved successfully!",
   "setup.saveError": "Error saving cycle. Please try again.",

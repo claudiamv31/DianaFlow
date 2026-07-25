@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import { useLocale } from '../../i18n/LocaleContext';
 import PasswordResetLayout, { ResetLinkFooter } from './PasswordResetLayout';
 import { isStrongPassword } from '../../utils/passwordPolicy';
+import PasswordInput from '../../components/PasswordInput';
 
 function ResetPassword() {
   const { t } = useLocale();
@@ -124,9 +125,8 @@ function ResetPassword() {
           <label htmlFor="new-password" className="text-xs font-semibold text-primary uppercase tracking-wider px-1">
             {t('password.new')}
           </label>
-          <input
+          <PasswordInput
             id="new-password"
-            type="password"
             autoComplete="new-password"
             placeholder={t('auth.placeholder.password')}
             value={newPassword}
@@ -136,7 +136,7 @@ function ResetPassword() {
             }}
             aria-invalid={Boolean(fieldErrors.newPassword)}
             aria-describedby={fieldErrors.newPassword ? 'new-password-error' : undefined}
-            className={`auth-input w-full rounded-full py-4 px-6 text-sm text-on-surface placeholder:text-outline transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 ${fieldErrors.newPassword ? 'auth-input-error' : 'bg-surface-container-high/60'}`}
+            className={`auth-input w-full rounded-full py-4 pl-6 text-sm text-on-surface placeholder:text-outline transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 ${fieldErrors.newPassword ? 'auth-input-error' : 'bg-surface-container-high/60'}`}
           />
           {fieldErrors.newPassword && (
             <p id="new-password-error" className="px-1 text-xs font-semibold text-error">
@@ -148,9 +148,8 @@ function ResetPassword() {
           <label htmlFor="confirm-password" className="text-xs font-semibold text-primary uppercase tracking-wider px-1">
             {t('password.confirm')}
           </label>
-          <input
+          <PasswordInput
             id="confirm-password"
-            type="password"
             autoComplete="new-password"
             placeholder={t('auth.placeholder.password')}
             value={confirmPassword}
@@ -160,7 +159,7 @@ function ResetPassword() {
             }}
             aria-invalid={Boolean(fieldErrors.confirmPassword)}
             aria-describedby={fieldErrors.confirmPassword ? 'confirm-password-error' : undefined}
-            className={`auth-input w-full rounded-full py-4 px-6 text-sm text-on-surface placeholder:text-outline transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 ${fieldErrors.confirmPassword ? 'auth-input-error' : 'bg-surface-container-high/60'}`}
+            className={`auth-input w-full rounded-full py-4 pl-6 text-sm text-on-surface placeholder:text-outline transition-all focus:outline-none focus:ring-2 focus:ring-primary/30 ${fieldErrors.confirmPassword ? 'auth-input-error' : 'bg-surface-container-high/60'}`}
           />
           {fieldErrors.confirmPassword && (
             <p id="confirm-password-error" className="px-1 text-xs font-semibold text-error">
