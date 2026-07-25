@@ -30,11 +30,18 @@ if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
 
 var mailjetApiKey = Environment.GetEnvironmentVariable("MAILJET_API_KEY");
 var mailjetSecretKey = Environment.GetEnvironmentVariable("MAILJET_SECRET_KEY");
-if (!builder.Environment.IsDevelopment() &&
-    (string.IsNullOrWhiteSpace(mailjetApiKey) || string.IsNullOrWhiteSpace(mailjetSecretKey)))
+if (builder.Environment.IsDevelopment())
+{
+    mailjetApiKey ??= builder.Configuration["Mailjet:ApiKey"];
+    mailjetSecretKey ??= builder.Configuration["Mailjet:SecretKey"];
+}
+
+if (string.IsNullOrWhiteSpace(mailjetApiKey) || string.IsNullOrWhiteSpace(mailjetSecretKey))
 {
     throw new InvalidOperationException(
-        "Mailjet credentials are not configured. Set MAILJET_API_KEY and MAILJET_SECRET_KEY.");
+        builder.Environment.IsDevelopment()
+            ? "Mailjet credentials are not configured. Set Mailjet:ApiKey and Mailjet:SecretKey with dotnet user-secrets."
+            : "Mailjet credentials are not configured. Set MAILJET_API_KEY and MAILJET_SECRET_KEY.");
 }
 
 builder.Services.AddControllers()

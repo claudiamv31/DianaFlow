@@ -155,7 +155,10 @@ function Login() {
 
             {/* Password Field */}
             <div className="flex flex-col gap-2">
-              <div className="px-1">
+              <div
+                data-testid="password-label-row"
+                className="flex items-center justify-between px-1"
+              >
                 <label className="text-xs font-semibold text-primary uppercase tracking-wider">
                   {t('auth.password')}
                 </label>

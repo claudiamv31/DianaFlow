@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+    <UserSecretsId>DianaFlow-Backend-Local-Development</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

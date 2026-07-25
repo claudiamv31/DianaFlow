@@ -13,6 +13,15 @@ Do not put API keys or reset links in tracked configuration or production logs. 
 
 The sender identity is intentionally fixed in code as `DianaFlow <dianaflowapp@gmail.com>` so a deployment cannot accidentally send from an unvalidated address.
 
+For local development, store credentials once outside the repository with .NET User Secrets:
+
+```bash
+dotnet user-secrets set "Mailjet:ApiKey" "YOUR_API_KEY" --project backend/backend.csproj
+dotnet user-secrets set "Mailjet:SecretKey" "YOUR_SECRET_KEY" --project backend/backend.csproj
+```
+
+User Secrets are read only in the Development environment. Production continues to require the environment variables above.
+
 After deployment, request one reset for a test account and confirm that:
 
 1. Mailjet accepts and delivers the localized message.

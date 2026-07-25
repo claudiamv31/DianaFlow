@@ -56,9 +56,7 @@ public sealed class NormalizeUserEmailsAndProtectResetTokens : Migration
             oldType: "text",
             oldNullable: true);
 
-        migrationBuilder.DropIndex(
-            name: "IX_Users_Email",
-            table: "Users");
+        migrationBuilder.Sql("DROP INDEX IF EXISTS \"IX_Users_Email\";");
 
         migrationBuilder.CreateIndex(
             name: "IX_Users_NormalizedEmail",

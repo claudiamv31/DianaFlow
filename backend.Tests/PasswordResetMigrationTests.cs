@@ -27,5 +27,6 @@ public sealed class PasswordResetMigrationTests
         script.Should().Contain("SessionVersion");
         script.Should().Contain("IX_PasswordResetTokens_UserId");
         script.Should().Contain("WHERE \"UsedAt\" IS NULL");
+        script.Should().Contain("DROP INDEX IF EXISTS \"IX_Users_Email\"");
     }
 }

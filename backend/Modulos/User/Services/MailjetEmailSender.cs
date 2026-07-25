@@ -17,9 +17,7 @@ public sealed class MailjetEmailSender : IEmailSender
     private readonly IMailjetClient _mailjetClient;
     private readonly ILogger<MailjetEmailSender> _logger;
 
-    public MailjetEmailSender(
-        IMailjetClient mailjetClient,
-        ILogger<MailjetEmailSender> logger)
+    public MailjetEmailSender(IMailjetClient mailjetClient, ILogger<MailjetEmailSender> logger)
     {
         _mailjetClient = mailjetClient;
         _logger = logger;
