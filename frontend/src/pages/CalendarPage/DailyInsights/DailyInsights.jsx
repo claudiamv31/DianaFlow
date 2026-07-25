@@ -1,6 +1,7 @@
 import { FaEdit } from 'react-icons/fa';
 import { formatMonthDay, formatDateLocal } from '../../../utils/calendarUtils';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import Button from '../../../components/Button';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { translateGuidance } from '../../../i18n/guidance';
 import { calendarPhaseDayTranslationKey } from '../../../i18n/domainCodes';
@@ -103,15 +104,13 @@ const DailyInsigths = ({
         </div>
         <div className="flex flex-col gap-4">
           {isPeriod && (
-            <button
-              className="w-full py-3 rounded-full !bg-primary text-on-primary font-headline font-bold text-base shadow-lg !shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+            <Button
+              className="w-full"
               onClick={() => setIsDailyLogActive(true)}
             >
-              <span className="material-symbols-outlined text-xl">
-                <FaEdit />
-              </span>
+              <FaEdit className="text-xl" aria-hidden="true" />
               {t('home.logToday')}
-            </button>
+            </Button>
           )}
           <button
             className="w-full py-3 rounded-full border !border-primary/30 !text-primary/70 font-headline font-semibold text-xs hover:!bg-primary/5 transition-colors uppercase tracking-wider"
