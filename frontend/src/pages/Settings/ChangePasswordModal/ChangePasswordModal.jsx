@@ -4,6 +4,7 @@ import Button from '../../../components/Button';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { getErrorMessageKey } from '../../../api/AppError';
+import { isStrongPassword } from '../../../utils/passwordPolicy';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
   const { t } = useLocale();
@@ -52,8 +53,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
     }
     if (!passwordData.newPassword) {
       newErrors.newPassword = 'password.newRequired';
-    } else if (passwordData.newPassword.length < 8) {
-      newErrors.newPassword = 'password.tooShort';
+    } else if (!isStrongPassword(passwordData.newPassword)) {
+      newErrors.newPassword = 'password.weak';
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       newErrors.confirmPassword = 'password.noMatch';
@@ -186,7 +187,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                   </p>
                 )}
                 <span className="block text-[10px] text-on-surface-variant px-2">
-                  {t('password.minimum')}
+                  {t('password.weak')}
                 </span>
               </div>
 

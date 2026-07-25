@@ -62,6 +62,16 @@ describe('Login', () => {
     expect(screen.getAllByText('Obligatorio')).toHaveLength(2);
   });
 
+  test('aligns the forgot password link opposite the password label', () => {
+    renderLogin();
+
+    expect(screen.getByTestId('password-label-row')).toHaveClass(
+      'flex',
+      'items-center',
+      'justify-between'
+    );
+  });
+
   test('shows wrong password message on the password field', async () => {
     apiClient.login.mockRejectedValue({
       response: {

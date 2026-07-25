@@ -32,7 +32,11 @@ export const API_ERROR_TRANSLATION_KEYS = {
   PERIOD_UPDATE_FAILED: 'api.error.periodUpdateFailed',
   CALENDAR_UPDATE_FAILED: 'calendar.saveError',
   INTERNAL_ERROR: 'error.generic',
-  STATS_NOT_FOUND: 'stats.insightWelcome'
+  STATS_NOT_FOUND: 'stats.insightWelcome',
+  PASSWORD_RESET_TOKEN_INVALID: 'passwordReset.invalidLink',
+  PASSWORD_WEAK: 'password.weak',
+  PASSWORD_REUSED: 'password.reused',
+  PASSWORD_MISMATCH: 'password.noMatch'
 };
 
 export const getErrorMessageKey = (error, fallbackKey) => {

@@ -35,7 +35,12 @@ const storeAuthTokens = (tokens = {}) => {
 
 const shouldSkipRefresh = (config = {}) => {
   const url = config.url || '';
-  return url.includes('/users/login') || url.includes('/users/refresh');
+  return (
+    url.includes('/users/login') ||
+    url.includes('/users/refresh') ||
+    url.includes('/users/password-reset/request') ||
+    url.includes('/users/reset-password')
+  );
 };
 
 const sleep = (delayMs) =>
@@ -243,6 +248,30 @@ apiClient.login = async (email, password) => {
   return response.data;
 };
 
+apiClient.requestPasswordReset = async (email, locale) => {
+  const response = await apiClient.post('/users/password-reset/request', {
+    email,
+    locale
+  });
+  return response.data;
+};
+
+apiClient.validatePasswordResetToken = async (token) => {
+  const response = await apiClient.post('/users/reset-password/validate', {
+    token
+  });
+  return response.data;
+};
+
+apiClient.resetPassword = async ({ token, newPassword, confirmPassword }) => {
+  const response = await apiClient.post('/users/reset-password', {
+    token,
+    newPassword,
+    confirmPassword
+  });
+  return response.data;
+};
+
 apiClient.signUp = async (userData) => {
   const response = await apiClient.post('/users/sign-up', userData);
   if (!response.ok) {
@@ -272,7 +301,7 @@ apiClient.uploadAvatar = async (formData) => {
 
 apiClient.changePassword = async (passwordData) => {
   const response = await apiClient.post(
-    '/profile/change-password',
+    '/users/change-password',
     passwordData
   );
   return response.data;

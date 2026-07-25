@@ -30,4 +30,8 @@ public static class ApiErrorCodes
     public const string CalendarUpdateFailed = "CALENDAR_UPDATE_FAILED";
     public const string InternalError = "INTERNAL_ERROR";
     public const string StatsNotFound = "STATS_NOT_FOUND";
+    public const string PasswordResetTokenInvalid = "PASSWORD_RESET_TOKEN_INVALID";
+    public const string PasswordWeak = "PASSWORD_WEAK";
+    public const string PasswordReused = "PASSWORD_REUSED";
+    public const string PasswordMismatch = "PASSWORD_MISMATCH";
 }
