@@ -117,10 +117,17 @@ describe('SignUp', () => {
       screen.getByPlaceholderText('Enter your password'),
       'SecurePassword1'
     );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Show password' })
+    );
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
 
     expect(
       await screen.findByText('Error creating account')
     ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter your password')).toHaveAttribute(
+      'type',
+      'text'
+    );
   });
 });

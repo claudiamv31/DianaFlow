@@ -279,6 +279,8 @@ const esMX = {
   "password.changeError": "Ocurrió un error al cambiar la contraseña",
   "password.change": "Cambiar",
   "password.minimum": "Mínimo 8 caracteres",
+  "password.showPassword": "Mostrar contraseña",
+  "password.hidePassword": "Ocultar contraseña",
   "setup.noUser": "No hay una sesión activa",
   "setup.saved": "¡Ciclo guardado correctamente!",
   "setup.saveError": "Error al guardar el ciclo. Inténtalo de nuevo.",
