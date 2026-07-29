@@ -11,8 +11,6 @@ public sealed record PasswordResetEmailContent(
         DateTime expiresAt)
     {
         var safeLink = WebUtility.HtmlEncode(resetLink);
-        var safeIconUrl = WebUtility.HtmlEncode(
-            new Uri(new Uri(resetLink), "/icon.png").AbsoluteUri);
         var expiry = $"{expiresAt:yyyy-MM-dd HH:mm} UTC";
         var safeExpiry = WebUtility.HtmlEncode(expiry);
         var isSpanish = string.Equals(locale, "es-MX", StringComparison.OrdinalIgnoreCase);
@@ -39,7 +37,6 @@ public sealed record PasswordResetEmailContent(
             BuildHtmlBody(
                 isSpanish ? "es" : "en",
                 safeLink,
-                safeIconUrl,
                 greeting,
                 requestMessage,
                 buttonLabel,
@@ -51,7 +48,6 @@ public sealed record PasswordResetEmailContent(
     private static string BuildHtmlBody(
         string language,
         string safeLink,
-        string safeIconUrl,
         string greeting,
         string requestMessage,
         string buttonLabel,
@@ -91,9 +87,7 @@ public sealed record PasswordResetEmailContent(
                           <td style="padding:0 0 36px;">
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                               <tr>
-                                <td width="48" height="48" style="width:48px; height:48px;">
-                                  <img src="{{safeIconUrl}}" width="48" height="48" alt="DianaFlow" style="display:block; width:48px; height:48px; border:0; border-radius:14px;">
-                                </td>
+                                <td width="48" height="48" align="center" valign="middle" bgcolor="#904958" style="width:48px; height:48px; border-radius:14px; background-color:#904958; color:#FFF7F7; font-family:Arial,sans-serif; font-size:28px; line-height:48px; font-weight:700; text-align:center;">☾</td>
                                 <td style="padding-left:12px; color:#34322F; font-size:20px; line-height:26px; font-weight:750; letter-spacing:-0.3px;">DianaFlow</td>
                               </tr>
                             </table>
