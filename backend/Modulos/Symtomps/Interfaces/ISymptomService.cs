@@ -10,10 +10,11 @@ public interface ISymptomService
     Task AddUserSymptomAsync(
         Guid userId,
         DateOnly date,
+        int symptomId,
         SymtompSeverity severity,
         string? notes = null);
 
-    Task RemoveUserSymptomAsync(
+    Task<bool> RemoveUserSymptomAsync(
         Guid userId,
         DateOnly date,
         int symptomId);

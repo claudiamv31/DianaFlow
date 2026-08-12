@@ -15,6 +15,7 @@ import DailyInsigths from './DailyInsights/DailyInsights';
 import EditLog from '../../components/EditLog/EditLog';
 import { useLocale } from '../../i18n/LocaleContext';
 import { getErrorMessageKey } from '../../api/AppError';
+import LogTodayModal from '../../components/LogTodayModal/LogTodayModal';
 
 const findPeriodByDate = (periods, date) => {
   if (!date || !Array.isArray(periods)) return null;
@@ -54,6 +55,7 @@ const CalendarPage = () => {
   const [periodDays, setPeriodDays] = useState([]);
   const [currentPeriod, setCurrentPeriod] = useState(null);
   const [isDailyLogActive, setIsDailyLogActive] = useState(false);
+  const [isSymptomLogActive, setIsSymptomLogActive] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() + 1 };
@@ -200,6 +202,13 @@ const CalendarPage = () => {
               selectedDate={selectedDate}
               setIsDailyLogActive={setIsDailyLogActive}
               isPeriod={cycleInfo?.isPeriod}
+              symptoms={cycleInfo?.symptoms || []}
+              onEditSymptoms={() => setIsSymptomLogActive(true)}
+              onDeleteSymptom={async (symptom) => {
+                await apiClient.delete(`/symptoms/${symptom.id}?date=${formatDateLocal(selectedDate)}`);
+                await queryClient.invalidateQueries({ queryKey: ['calendar-day', user?.id, selectedDate] });
+                await queryClient.invalidateQueries({ queryKey: ['calendar', user?.id] });
+              }}
             />
             <LegendCard />
           </div>
@@ -212,6 +221,19 @@ const CalendarPage = () => {
           selectedDate={selectedDate}
           isPeriodActive={cycleInfo?.isPeriod}
           cycleInfo={cycleInfo}
+        />
+      )}
+
+      {isSymptomLogActive && (
+        <LogTodayModal
+          todayDate={formatDateLocal(selectedDate)}
+          existingSymptoms={cycleInfo?.symptoms || []}
+          onClose={() => setIsSymptomLogActive(false)}
+          onSaved={async () => {
+            setIsSymptomLogActive(false);
+            await queryClient.invalidateQueries({ queryKey: ['calendar-day', user?.id, selectedDate] });
+            await queryClient.invalidateQueries({ queryKey: ['calendar', user?.id] });
+          }}
         />
       )}
 

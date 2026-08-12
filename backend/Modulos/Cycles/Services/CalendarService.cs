@@ -6,6 +6,8 @@ using backend.Modulos.Periods.Services;
 using backend.Modulos.Cycles.DTOs;
 using backend.Modulos.Periods.Models;
 using backend.Modulos.Periods.DTOs;
+using backend.Modulos.Symptoms.DTOs;
+using backend.Modulos.Symptoms.Services;
 
 namespace backend.Modulos.Cycles.Services
 {
@@ -13,11 +15,18 @@ namespace backend.Modulos.Cycles.Services
     {
         private readonly CycleService _cycleService;
         private readonly PeriodService _periodService;
+        private readonly SymptomService? _symptomService;
         
         public CalendarService(CycleService cycleService, PeriodService periodService)
+            : this(cycleService, periodService, null)
+        {
+        }
+
+        public CalendarService(CycleService cycleService, PeriodService periodService, SymptomService? symptomService)
         {
             _cycleService = cycleService;
             _periodService = periodService;
+            _symptomService = symptomService;
         }
 
         public virtual async Task<List<CalendarDayDto>> GetCalendarAsync(Guid userId, int year, int month)
@@ -29,6 +38,9 @@ namespace backend.Modulos.Cycles.Services
             var endMonth = startMonth.AddMonths(1).AddDays(-1);
 
             var calendar = new List<CalendarDayDto>();
+            var symptoms = _symptomService == null
+                ? []
+                : await _symptomService.GetSymptomsForRangeAsync(userId, startMonth, endMonth);
 
             var averageCycleLength = _cycleService.CalculateAverageCycleLength(periods);
             var averagePeriodLength = CalculateAveragePeriodLength(periods);
@@ -49,6 +61,7 @@ namespace backend.Modulos.Cycles.Services
                         FertilityLevel = "low",
                         Flow = periodDay?.Flow,
                         PeriodDaysId = periodDay?.Id
+                        , Symptoms = ToSymptoms(symptoms, day)
                     });
                     continue;
                 }
@@ -74,6 +87,7 @@ namespace backend.Modulos.Cycles.Services
                     PhaseLength = phaseInfo.PhaseLength,
                     Flow = periodDay?.Flow,
                     PeriodDaysId = periodDay?.Id
+                    , Symptoms = ToSymptoms(symptoms, day)
                 });
             }
 
@@ -84,6 +98,9 @@ namespace backend.Modulos.Cycles.Services
         {
             var periods = await _periodService.GetLast6PeriodsByUser(userId);
             var periodsDays = await _periodService.GetPeriodsDaysByUserId(userId);
+            var symptoms = _symptomService == null
+                ? []
+                : await _symptomService.GetSymptomsForRangeAsync(userId, date, date);
 
             var latestPeriod = periods
                 .Where(p => p.StartDate <= date)
@@ -102,6 +119,7 @@ namespace backend.Modulos.Cycles.Services
                     FertilityLevel = "low",
                     Flow = periodDay?.Flow,
                     PeriodDaysId = periodDay?.Id
+                    , Symptoms = ToSymptoms(symptoms, date)
                 };
             }
 
@@ -131,6 +149,7 @@ namespace backend.Modulos.Cycles.Services
                 DailyInsightKey = insightKey,
                 Flow = periodDay?.Flow,
                 PeriodDaysId = periodDay?.Id
+                , Symptoms = ToSymptoms(symptoms, date)
             };
         }
 
@@ -207,5 +226,18 @@ namespace backend.Modulos.Cycles.Services
 
             return fallbackLength > 0 ? fallbackLength : 5;
         }
+
+        private static List<UserSymptomDto> ToSymptoms(IEnumerable<backend.Modulos.Symptoms.Models.UserSymptomEntry> entries, DateOnly date) =>
+            entries.Where(entry => entry.Date == date).Select(entry => new UserSymptomDto
+            {
+                Id = entry.Id,
+                Date = entry.Date,
+                SymptomId = entry.SymptomId,
+                Code = entry.Symptom.Code,
+                Category = entry.Symptom.Category,
+                Icon = entry.Symptom.Icon,
+                Severity = entry.Severity,
+                Notes = entry.Notes
+            }).ToList();
     }
 }

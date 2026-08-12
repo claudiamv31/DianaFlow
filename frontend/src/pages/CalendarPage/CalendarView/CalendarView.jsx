@@ -51,6 +51,8 @@ const CalendarView = ({
       dateString >= nextPeriod.startDate &&
       dateString <= nextPeriod.endDate;
 
+    const hasSymptoms = dayInfo?.symptoms?.length > 0;
+
     if (isSelected) {
       classes.push('calendar-day-selected');
     } else if (isToday) {
@@ -64,6 +66,7 @@ const CalendarView = ({
     } else if (isPredictedPeriodDay) {
       classes.push('calendar-day-predicted');
     }
+    if (hasSymptoms) classes.push('calendar-day-symptom');
 
     return classes.length ? classes.join(' ') : null;
   };
