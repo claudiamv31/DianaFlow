@@ -6,8 +6,9 @@ import { formatLongDate } from '../../utils/calendarUtils';
 import { useLocale } from '../../i18n/LocaleContext';
 
 const severityValues = ['Mild', 'Moderate', 'Severe'];
+const EMPTY_SYMPTOMS = Object.freeze([]);
 
-const LogTodayModal = ({ onClose, todayDate, existingSymptoms = [], onSaved, isSaving = false }) => {
+const LogTodayModal = ({ onClose, todayDate, existingSymptoms = EMPTY_SYMPTOMS, onSaved, isSaving = false }) => {
   const { t, locale } = useLocale();
   const [catalog, setCatalog] = useState([]);
   const [selected, setSelected] = useState({});
