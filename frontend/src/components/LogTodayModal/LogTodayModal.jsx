@@ -81,7 +81,7 @@ const LogTodayModal = ({ onClose, todayDate, existingSymptoms = EMPTY_SYMPTOMS, 
             </section>
           ))}
         </div>
-        <div className="px-8 pb-8 pt-4 grid grid-cols-2 gap-4"><button className="h-14 rounded-full text-on-surface-variant" onClick={onClose} disabled={isSaving}>{t('common.cancel')}</button><Button variant="primary" onClick={save} disabled={isSaving || loading || !Object.keys(selected).length}>{isSaving ? <LoadingSpinner size="sm" layout="inline" tone="current" label={t('symptoms.saving')} /> : t('symptoms.save')}</Button></div>
+        <div className="px-8 pb-8 pt-4 grid grid-cols-2 gap-4"><button className="h-14 rounded-full text-on-surface-variant" onClick={onClose} disabled={isSaving}>{t('common.cancel')}</button><Button className="dark:!bg-primary dark:!text-on-primary" variant="primary" onClick={save} disabled={isSaving || loading || !Object.keys(selected).length}>{isSaving ? <LoadingSpinner size="sm" layout="inline" tone="current" label={t('symptoms.saving')} /> : t('symptoms.save')}</Button></div>
       </div>
     </div>
   );
