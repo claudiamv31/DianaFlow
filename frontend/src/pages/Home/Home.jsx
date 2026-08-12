@@ -150,14 +150,23 @@ function Home() {
             </p>
           )}
 
-          {/* Action button */}
-          <Button
-            variant="primary"
-            className="w-48 mt-2"
-            onClick={() => setIsLoggingToday(true)}
-          >
-            {t('symptoms.logToday')}
-          </Button>
+          {/* Daily tracking actions */}
+          <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center mt-2">
+            <Button
+              variant="primary"
+              className="w-full sm:w-48"
+              onClick={() => setIsLoggingToday(true)}
+            >
+              {t('symptoms.logToday')}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full sm:w-48"
+              onClick={() => setIsLoggingNewPeriod(true)}
+            >
+              {t('home.logPeriod')}
+            </Button>
+          </div>
         </section>
 
         {/* ── Responsive Info Cards ── */}
