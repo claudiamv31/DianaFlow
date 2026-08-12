@@ -13,14 +13,14 @@ namespace backend.Data
         {
         }
 
-        public DbSet<Periods> Periods { get; set; }
-        public DbSet<PeriodDays> PeriodDays { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Profile> Profiles { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<Symptom> Symptoms { get; set; }
-        public DbSet<UserSymptomEntry> UserSymptomEntries { get; set; }
-        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+        public DbSet<Periods> Periods { get; set; } = null!;
+        public DbSet<PeriodDays> PeriodDays { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Profile> Profiles { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<Symptom> Symptoms { get; set; } = null!;
+        public DbSet<UserSymptomEntry> UserSymptomEntries { get; set; } = null!;
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
