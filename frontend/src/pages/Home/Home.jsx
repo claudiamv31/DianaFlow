@@ -151,24 +151,24 @@ function Home() {
           )}
 
           {/* Daily tracking actions */}
-          <div className="grid w-full max-w-lg grid-cols-1 gap-3 sm:grid-cols-2 mt-2">
+          <div className="grid w-full max-w-md grid-cols-1 gap-2 sm:grid-cols-2 mt-2">
             <Button
               variant="primary"
-              className="group min-h-16 w-full !rounded-3xl !px-4 shadow-lg shadow-primary/20"
+              className="group min-h-12 w-full !rounded-2xl !px-3 shadow-md shadow-primary/20"
               onClick={() => setIsLoggingToday(true)}
             >
-              <span className="flex flex-col items-center gap-1">
-                <span className="material-symbols-outlined text-2xl transition-transform group-hover:scale-110">self_improvement</span>
+              <span className="flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-xl transition-transform group-hover:scale-110">self_improvement</span>
                 <span>{t('symptoms.logToday')}</span>
               </span>
             </Button>
             <Button
               variant="secondary"
-              className="group min-h-16 w-full !rounded-3xl !px-4 border border-outline-variant/30 shadow-sm"
+              className="group min-h-12 w-full !rounded-2xl !px-3 border border-outline-variant/30 shadow-sm"
               onClick={() => setIsLoggingNewPeriod(true)}
             >
-              <span className="flex flex-col items-center gap-1">
-                <span className="material-symbols-outlined text-2xl text-primary transition-transform group-hover:scale-110">water_drop</span>
+              <span className="flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-xl text-primary transition-transform group-hover:scale-110">water_drop</span>
                 <span>{t('home.logPeriod')}</span>
               </span>
             </Button>
