@@ -151,20 +151,26 @@ function Home() {
           )}
 
           {/* Daily tracking actions */}
-          <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center mt-2">
+          <div className="grid w-full max-w-lg grid-cols-1 gap-3 sm:grid-cols-2 mt-2">
             <Button
               variant="primary"
-              className="w-full sm:w-48"
+              className="group min-h-16 w-full !rounded-3xl !px-4 shadow-lg shadow-primary/20"
               onClick={() => setIsLoggingToday(true)}
             >
-              {t('symptoms.logToday')}
+              <span className="flex flex-col items-center gap-1">
+                <span className="material-symbols-outlined text-2xl transition-transform group-hover:scale-110">self_improvement</span>
+                <span>{t('symptoms.logToday')}</span>
+              </span>
             </Button>
             <Button
-              variant="outline"
-              className="w-full sm:w-48"
+              variant="secondary"
+              className="group min-h-16 w-full !rounded-3xl !px-4 border border-outline-variant/30 shadow-sm"
               onClick={() => setIsLoggingNewPeriod(true)}
             >
-              {t('home.logPeriod')}
+              <span className="flex flex-col items-center gap-1">
+                <span className="material-symbols-outlined text-2xl text-primary transition-transform group-hover:scale-110">water_drop</span>
+                <span>{t('home.logPeriod')}</span>
+              </span>
             </Button>
           </div>
         </section>
