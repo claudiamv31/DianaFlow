@@ -125,13 +125,6 @@ function Home() {
   const suggestedPeriodDuration =
     safeStatus.durationDays || safeStatus.cycleStatus?.periodDuration || 5;
   const currentPhase = normalizePhaseCode(safeStatus.currentPhase);
-  const periodStatus = safeStatus.cycleStatus?.status;
-  const shouldHighlightPeriod = [
-    'next_period',
-    'period_should_start_today',
-    'delayed',
-    'active_period'
-  ].includes(periodStatus);
 
   return (
     <>
@@ -160,8 +153,8 @@ function Home() {
           {/* Daily tracking actions */}
           <div className="grid w-full max-w-md grid-cols-1 gap-2 sm:grid-cols-2 mt-2">
             <Button
-              variant={shouldHighlightPeriod ? 'secondary' : 'primary'}
-              className={`group min-h-12 w-full !rounded-2xl !px-3 ${shouldHighlightPeriod ? 'shadow-sm' : 'shadow-md shadow-primary/20'}`}
+              variant="secondary"
+              className="group min-h-12 w-full !rounded-2xl !px-3 shadow-sm border border-outline-variant/30"
               onClick={() => setIsLoggingToday(true)}
             >
               <span className="flex items-center justify-center gap-2">
@@ -170,8 +163,8 @@ function Home() {
               </span>
             </Button>
             <Button
-              variant={shouldHighlightPeriod ? 'primary' : 'secondary'}
-              className={`group min-h-12 w-full !rounded-2xl !px-3 border border-outline-variant/30 ${shouldHighlightPeriod ? 'shadow-md shadow-primary/20' : 'shadow-sm'}`}
+              variant="primary"
+              className="group min-h-12 w-full !rounded-2xl !px-3 shadow-md shadow-primary/20"
               onClick={() => setIsLoggingNewPeriod(true)}
             >
               <span className="flex items-center justify-center gap-2">
