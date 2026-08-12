@@ -33,8 +33,12 @@
           }
         },
         "warningProperties": {
+          "allWarningsAsErrors": true,
           "warnAsError": [
             "NU1605"
+          ],
+          "warnNotAsError": [
+            "NU1900"
           ]
         },
         "restoreAuditProperties": {
@@ -121,8 +125,12 @@
           }
         },
         "warningProperties": {
+          "allWarningsAsErrors": true,
           "warnAsError": [
             "NU1605"
+          ],
+          "warnNotAsError": [
+            "NU1900"
           ]
         },
         "restoreAuditProperties": {
