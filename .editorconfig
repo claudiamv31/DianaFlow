@@ -1,0 +1,37 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+
+# Keep using directives deterministic and easy to scan.
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+
+# Show style improvements in editors without turning legacy formatting into
+# build failures. Semantic analyzer warnings are enforced by MSBuild and CI.
+dotnet_diagnostic.IDE0005.severity = suggestion
+
+# Avoid culture-sensitive prefix/suffix checks in backend logic.
+dotnet_diagnostic.CA1310.severity = warning
+
+# Prefer modern, consistent C# syntax without forcing broad rewrites.
+csharp_style_namespace_declarations = file_scoped:suggestion
+csharp_style_prefer_primary_constructors = false:silent
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
+
+[*.{csproj,props,targets}]
+indent_style = space
+indent_size = 2
+
+[*.{yml,yaml,json}]
+indent_style = space
+indent_size = 2

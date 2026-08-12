@@ -7,6 +7,7 @@ using backend.Modulos.Periods.Services;
 using backend.Modulos.Cycles.Services;
 using backend.Modulos.Stats.Services;
 using backend.Modulos.Profile.Services;
+using backend.Modulos.Symptoms.Services;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using backend.Api;
@@ -151,6 +152,7 @@ builder.Services.AddHttpClient<IMailjetClient, MailjetClient>(client =>
 builder.Services.AddScoped<IEmailSender, MailjetEmailSender>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<TimeZoneService>();
+builder.Services.AddScoped<SymptomService>();
 
 var app = builder.Build();
 

@@ -48,31 +48,6 @@ function Home() {
     }
   });
 
-  const logTodayMutation = useMutation({
-    mutationFn: async (flowIntensity) => {
-      const todayStr = statusOfPeriod?.today || formatDateLocal(new Date());
-      if (!statusOfPeriod?.isActive) {
-        throw new Error(t('home.flowActiveOnly'));
-      }
-
-      return await apiClient.put(`/periods/day`, {
-        date: todayStr,
-        flow: flowIntensity
-      });
-    },
-    onSuccess: async () => {
-      await refreshCycleQueries(queryClient);
-      toast.success(t('home.logSaved'), {
-        icon: '🌸'
-      });
-    },
-    onError: (err) => {
-      toast.error(t('home.logError'), {
-        icon: '⚠️'
-      });
-    }
-  });
-
   const savePeriodMutation = useMutation({
     mutationFn: async (selectedDays) => {
       return await apiClient.post(`/periods`, {
@@ -131,17 +106,6 @@ function Home() {
     }
   };
 
-  const handleSaveToday = (flowIntensity) => {
-    if (statusOfPeriod?.isActive) {
-      logTodayMutation.mutate(flowIntensity, {
-        onSuccess: () => setIsLoggingToday(false)
-      });
-      return;
-    }
-    setIsLoggingToday(false);
-    setIsLoggingNewPeriod(true);
-  };
-
   if (isLoading || statusOfPeriod === undefined)
     return <LoadingSpinner label={t('common.loadingApp')} showLabel />;
   if (error)
@@ -158,9 +122,6 @@ function Home() {
   };
 
   const todayStr = safeStatus.today || formatDateLocal(new Date());
-  const todayRecord = safeStatus.selectedDays?.find((d) => d.date === todayStr);
-  const todayFlow = todayRecord ? todayRecord.flow : 0;
-  const isPeriodActive = safeStatus.isActive === true;
   const suggestedPeriodDuration =
     safeStatus.durationDays || safeStatus.cycleStatus?.periodDuration || 5;
   const currentPhase = normalizePhaseCode(safeStatus.currentPhase);
@@ -189,21 +150,29 @@ function Home() {
             </p>
           )}
 
-          {/* Action button */}
-          <Button
-            variant="primary"
-            className="w-48 mt-2"
-            onClick={() => {
-              if (isPeriodActive) {
-                setIsLoggingToday(true);
-                return;
-              }
-
-              setIsLoggingNewPeriod(true);
-            }}
-          >
-            {isPeriodActive ? t('home.logToday') : t('home.logPeriod')}
-          </Button>
+          {/* Daily tracking actions */}
+          <div className="grid w-full max-w-md grid-cols-1 gap-2 sm:grid-cols-2 mt-2">
+            <Button
+              variant="secondary"
+              className="group min-h-12 w-full !rounded-2xl !px-3 shadow-sm border border-outline-variant/30"
+              onClick={() => setIsLoggingToday(true)}
+            >
+              <span className="flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-2xl !text-on-surface transition-transform group-hover:scale-110">self_improvement</span>
+                <span>{t('symptoms.logToday')}</span>
+              </span>
+            </Button>
+            <Button
+              variant="primary"
+              className="group min-h-12 w-full !rounded-2xl !px-3 shadow-md shadow-primary/20"
+              onClick={() => setIsLoggingNewPeriod(true)}
+            >
+              <span className="flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-2xl !text-on-primary transition-transform group-hover:scale-110">water_drop</span>
+                <span>{t('home.logPeriod')}</span>
+              </span>
+            </Button>
+          </div>
         </section>
 
         {/* ── Responsive Info Cards ── */}
@@ -233,10 +202,8 @@ function Home() {
       {isLoggingToday && (
         <LogTodayModal
           onClose={() => setIsLoggingToday(false)}
-          onSave={handleSaveToday}
-          initialFlow={todayFlow}
           todayDate={todayStr}
-          isSaving={logTodayMutation.isPending}
+          onSaved={() => { setIsLoggingToday(false); queryClient.invalidateQueries({ queryKey: ['calendar-day'] }); toast.success(t('symptoms.saved')); }}
         />
       )}
 
