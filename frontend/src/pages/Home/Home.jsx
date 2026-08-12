@@ -158,7 +158,7 @@ function Home() {
               onClick={() => setIsLoggingToday(true)}
             >
               <span className="flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined text-xl transition-transform group-hover:scale-110">self_improvement</span>
+                <span className="material-symbols-outlined text-2xl !text-on-surface transition-transform group-hover:scale-110">self_improvement</span>
                 <span>{t('symptoms.logToday')}</span>
               </span>
             </Button>
@@ -168,7 +168,7 @@ function Home() {
               onClick={() => setIsLoggingNewPeriod(true)}
             >
               <span className="flex items-center justify-center gap-2">
-                <span className="material-symbols-outlined text-xl text-primary transition-transform group-hover:scale-110">water_drop</span>
+                <span className="material-symbols-outlined text-2xl !text-on-primary transition-transform group-hover:scale-110">water_drop</span>
                 <span>{t('home.logPeriod')}</span>
               </span>
             </Button>

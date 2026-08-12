@@ -179,7 +179,7 @@ const esMX = {
   "symptom.food_cravings": "Antojos",
   "symptom.insomnia": "Insomnio",
   "symptom.anxiety": "Ansiedad",
-  "home.logPeriod": "Registrar un periodo nuevo",
+  "home.logPeriod": "Registrar periodo",
   "home.flowActiveOnly": "Solo puedes registrar flujo durante un periodo activo.",
   "home.logSaved": "Registro guardado correctamente",
   "home.logError": "No se pudo guardar el registro. Inténtalo de nuevo.",
