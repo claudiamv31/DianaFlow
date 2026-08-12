@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using backend.Modulos.Profile.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using backend.Modulos.User.Services;
 
 namespace backend.Modulos.Profile.Services
 {
@@ -37,15 +38,17 @@ namespace backend.Modulos.Profile.Services
                 return false;
 
             // Using plural _context.Users
-            if (!string.Equals(profile.User.Email, email, StringComparison.OrdinalIgnoreCase)
-                && await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            var normalizedEmail = EmailAddressNormalizer.Normalize(email);
+            if (profile.User.NormalizedEmail != normalizedEmail
+                && await _context.Users.AnyAsync(u => u.NormalizedEmail == normalizedEmail))
             {
                 throw new InvalidOperationException("The email is already in use.");
             }
 
             profile.Name = name;
             profile.LastName = lastName;
-            profile.User.Email = email;
+            profile.User.Email = normalizedEmail;
+            profile.User.NormalizedEmail = normalizedEmail;
 
             if (!string.IsNullOrEmpty(avatarUrl))
             {

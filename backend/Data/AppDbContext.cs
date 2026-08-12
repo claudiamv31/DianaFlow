@@ -20,6 +20,7 @@ namespace backend.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Symptom> Symptoms { get; set; }
         public DbSet<UserSymptomEntry> UserSymptomEntries { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,9 +63,9 @@ namespace backend.Data
                 .WithOne(u => u.Profile)
                 .HasForeignKey<Profile>(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-                
+
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
+                .HasIndex(u => u.NormalizedEmail)
                 .IsUnique();
 
             modelBuilder.Entity<RefreshToken>()
@@ -130,6 +131,25 @@ namespace backend.Data
                     x.Date
                 });
             }); 
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasOne(prt => prt.User)
+                .WithMany(u => u.PasswordResetTokens)
+                .HasForeignKey(prt => prt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasIndex(prt => prt.TokenHash)
+                .IsUnique();
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasIndex(prt => prt.UserId)
+                .HasFilter("\"UsedAt\" IS NULL")
+                .IsUnique();
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .Property(prt => prt.UsedAt)
+                .IsConcurrencyToken();
         }
     }
 }

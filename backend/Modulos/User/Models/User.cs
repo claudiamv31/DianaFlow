@@ -6,10 +6,13 @@ public class User
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Email { get; set; } = string.Empty;
+    public string NormalizedEmail { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
+    public int SessionVersion { get; set; }
     
     // Explicitly tell the compiler to use the Model, not the namespace folder
     public backend.Modulos.Profile.Models.Profile Profile { get; set; } = null!;
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     public ICollection<UserSymptomEntry> SymptomEntries { get; set; } = new List<UserSymptomEntry>();
+    public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = [];
 }
