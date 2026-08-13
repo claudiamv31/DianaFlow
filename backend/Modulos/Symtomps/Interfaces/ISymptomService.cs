@@ -11,8 +11,7 @@ public interface ISymptomService
         Guid userId,
         DateOnly date,
         int symptomId,
-        SymtompSeverity severity,
-        string? notes = null);
+        SymtompSeverity? severity);
 
     Task<bool> RemoveUserSymptomAsync(
         Guid userId,

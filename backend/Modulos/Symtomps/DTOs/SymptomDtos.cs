@@ -6,6 +6,7 @@ public sealed class SymptomCatalogDto
     public string Code { get; init; } = string.Empty;
     public string Category { get; init; } = string.Empty;
     public string? Icon { get; init; }
+    public bool AllowsSeverity { get; init; }
 }
 
 public sealed class UserSymptomDto
@@ -16,16 +17,14 @@ public sealed class UserSymptomDto
     public string Code { get; init; } = string.Empty;
     public string Category { get; init; } = string.Empty;
     public string? Icon { get; init; }
-    public SymtompSeverity Severity { get; init; }
-    public string? Notes { get; init; }
+    public SymtompSeverity? Severity { get; init; }
 }
 
 public sealed class UpsertUserSymptomDto
 {
     public DateOnly Date { get; init; }
     public int SymptomId { get; init; }
-    public SymtompSeverity Severity { get; init; } = SymtompSeverity.Mild;
-    public string? Notes { get; init; }
+    public SymtompSeverity? Severity { get; init; }
 }
 
 public sealed class BulkUserSymptomsDto

@@ -236,8 +236,7 @@ namespace backend.Modulos.Cycles.Services
                 Code = entry.Symptom.Code,
                 Category = entry.Symptom.Category,
                 Icon = entry.Symptom.Icon,
-                Severity = entry.Severity,
-                Notes = entry.Notes
+                Severity = entry.Severity
             }).ToList();
     }
 }
