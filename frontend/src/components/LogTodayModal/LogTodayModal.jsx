@@ -84,7 +84,7 @@ const LogTodayModal = ({ onClose, todayDate, existingSymptoms = EMPTY_SYMPTOMS, 
       <div className="bg-surface-container-lowest w-full max-w-2xl shadow-soft overflow-hidden flex flex-col border border-outline-variant/20 rounded-[2.5rem]" style={{ maxHeight: '90vh' }}>
         <div className="px-8 pt-8 pb-4 flex items-center justify-between">
           <div><h2 className="font-headline font-bold text-2xl text-on-surface">{t('symptoms.title')}</h2><p className="text-sm font-semibold tracking-widest uppercase text-primary mt-1">{formatLongDate(todayDate, locale)}</p></div>
-          <button aria-label={t('common.close')} className="w-10 h-10 rounded-full bg-gray-100" onClick={onClose} disabled={isSaving}><span className="material-symbols-outlined">close</span></button>
+          <button aria-label={t('common.close')} className="w-10 h-10 rounded-full bg-surface-container-high text-on-surface hover:bg-surface-container-highest" onClick={onClose} disabled={isSaving}><span className="material-symbols-outlined">close</span></button>
         </div>
         <div className="px-8 pb-4 overflow-y-auto">
           <p className="text-on-surface-variant text-sm mb-6">{t('symptoms.choose')}</p>

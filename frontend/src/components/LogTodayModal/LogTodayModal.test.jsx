@@ -53,4 +53,14 @@ describe('LogTodayModal', () => {
     expect(screen.getByRole('group', { name: 'symptoms.severityLabel' })).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'severity.mild' })).toHaveLength(1);
   });
+
+  it('uses theme-aware colors for the close button', async () => {
+    render(<LogTodayModal todayDate="2026-08-11" onClose={jest.fn()} />);
+    await screen.findByRole('button', { name: 'symptom.headache' });
+
+    expect(screen.getByRole('button', { name: 'common.close' })).toHaveClass(
+      'bg-surface-container-high',
+      'text-on-surface'
+    );
+  });
 });
