@@ -32,7 +32,7 @@ public class SymptomsController : ControllerBase
         if (!TryGetUserId(out var userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
         if (dto.Date == default || dto.Symptoms.Count == 0) return BadRequest(new ApiError(ApiErrorCodes.InvalidRequest));
         foreach (var symptom in dto.Symptoms)
-            await _symptomService.AddUserSymptomAsync(userId, dto.Date, symptom.SymptomId, symptom.Severity, symptom.Notes);
+            await _symptomService.AddUserSymptomAsync(userId, dto.Date, symptom.SymptomId, symptom.Severity);
         return Ok((await _symptomService.GetSymptomsForRangeAsync(userId, dto.Date, dto.Date)).Select(ToUserDto));
     }
 
@@ -42,7 +42,7 @@ public class SymptomsController : ControllerBase
         if (!TryGetUserId(out var userId)) return Unauthorized(new ApiError(ApiErrorCodes.NotAuthorized));
         var entry = (await _symptomService.GetSymptomsForRangeAsync(userId, dto.Date, dto.Date)).FirstOrDefault(item => item.Id == id);
         if (entry == null) return NotFound(new ApiError(ApiErrorCodes.ResourceNotFound));
-        await _symptomService.AddUserSymptomAsync(userId, dto.Date, entry.SymptomId, dto.Severity, dto.Notes);
+        await _symptomService.AddUserSymptomAsync(userId, dto.Date, entry.SymptomId, dto.Severity);
         return Ok((await _symptomService.GetSymptomsForRangeAsync(userId, dto.Date, dto.Date)).Select(ToUserDto));
     }
 
@@ -57,6 +57,6 @@ public class SymptomsController : ControllerBase
     }
 
     private bool TryGetUserId(out Guid userId) => Guid.TryParse(User.FindFirst("sub")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out userId);
-    private static SymptomCatalogDto ToCatalogDto(Symptom symptom) => new() { Id = symptom.Id, Code = symptom.Code, Category = symptom.Category, Icon = symptom.Icon };
-    private static UserSymptomDto ToUserDto(UserSymptomEntry entry) => new() { Id = entry.Id, Date = entry.Date, SymptomId = entry.SymptomId, Code = entry.Symptom.Code, Category = entry.Symptom.Category, Icon = entry.Symptom.Icon, Severity = entry.Severity, Notes = entry.Notes };
+    private static SymptomCatalogDto ToCatalogDto(Symptom symptom) => new() { Id = symptom.Id, Code = symptom.Code, Category = symptom.Category, Icon = symptom.Icon, AllowsSeverity = symptom.AllowsSeverity };
+    private static UserSymptomDto ToUserDto(UserSymptomEntry entry) => new() { Id = entry.Id, Date = entry.Date, SymptomId = entry.SymptomId, Code = entry.Symptom.Code, Category = entry.Symptom.Category, Icon = entry.Symptom.Icon, Severity = entry.Severity };
 }

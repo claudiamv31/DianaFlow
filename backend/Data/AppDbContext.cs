@@ -105,9 +105,6 @@ namespace backend.Data
             {
                 entity.HasKey(x => x.Id);
 
-                entity.Property(x => x.Notes)
-                    .HasMaxLength(500);
-
                 entity.HasOne(x => x.User)
                     .WithMany(x => x.SymptomEntries)
                     .HasForeignKey(x => x.UserId)

@@ -15,8 +15,14 @@ public class SymptomService : ISymptomService
     public virtual Task<List<Symptom>> GetAllSymptomsAsync() => _context.Symptoms
         .AsNoTracking().Where(symptom => symptom.IsActive).OrderBy(symptom => symptom.SortOrder).ToListAsync();
 
-    public virtual async Task AddUserSymptomAsync(Guid userId, DateOnly date, int symptomId, SymtompSeverity severity, string? notes = null)
+    public virtual async Task AddUserSymptomAsync(Guid userId, DateOnly date, int symptomId, SymtompSeverity? severity)
     {
+        var symptom = await _context.Symptoms.SingleOrDefaultAsync(item => item.Id == symptomId && item.IsActive);
+        if (symptom == null) throw new ArgumentException("Unknown symptom.", nameof(symptomId));
+
+        var normalizedSeverity = symptom.AllowsSeverity
+            ? severity ?? (SymtompSeverity?)SymtompSeverity.Mild
+            : null;
         var existingEntry = await _context.UserSymptomEntries.FirstOrDefaultAsync(
             entry => entry.UserId == userId && entry.Date == date && entry.SymptomId == symptomId);
 
@@ -24,13 +30,12 @@ public class SymptomService : ISymptomService
         {
             _context.UserSymptomEntries.Add(new UserSymptomEntry
             {
-                UserId = userId, Date = date, SymptomId = symptomId, Severity = severity, Notes = notes
+                UserId = userId, Date = date, SymptomId = symptomId, Severity = normalizedSeverity
             });
         }
         else
         {
-            existingEntry.Severity = severity;
-            existingEntry.Notes = notes;
+            existingEntry.Severity = normalizedSeverity;
             existingEntry.UpdatedAt = DateTime.UtcNow;
         }
 

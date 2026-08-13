@@ -10,6 +10,8 @@ _Avoid_: Cycle phase, measured phase
 
 **Symptom Log**:
 A user-owned record of symptoms experienced on a specific calendar day in the cycle. It may exist for any cycle day, but should only capture symptom information the product intends to use.
+
+Symptom Logs do not contain user notes. Notes are not part of the product's symptom model.
 _Avoid_: Symptom entry, daily symptoms, period symptom
 
 **Symptom Catalog**:
@@ -19,7 +21,12 @@ The product-managed set of predefined, reusable symptoms that a user can record,
 The existing user-owned profile information associated with an account. Symptom Logs reference the authenticated User and do not create a second user-information record.
 
 **Symptom Severity**:
-The user's self-reported intensity for a Symptom Log: Mild, Moderate, or Severe. It describes the logged experience and is not a clinical assessment. A new log defaults to Mild unless the user selects another value.
+The user's self-reported intensity for a Pain-related Symptom Log: Mild, Moderate, or Severe. It describes the logged experience and is not a clinical assessment. A newly selected Pain-related Symptom defaults to Mild; a non-pain Symptom Log stores no severity (`null`).
+
+**Pain-related Symptom**:
+A Symptom Catalog item for which intensity is meaningful to the user: Headache, Cramps, or Back Pain in the initial catalog.
+
+The Symptom Catalog owns the `allowsSeverity` rule that determines whether a Symptom Log may have Symptom Severity.
 
 **Password Reset Link**:
 A single-use, time-limited link sent to a User's email address that proves possession of a Password Reset Token and permits choosing a new password.
