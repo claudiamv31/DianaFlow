@@ -96,6 +96,27 @@ describe('SignUp', () => {
     );
   });
 
+  test('keeps the create account action pending while the request is in flight', async () => {
+    apiClient.post.mockImplementation(() => new Promise(() => {}));
+    renderSignUp();
+
+    await userEvent.type(screen.getByPlaceholderText('Jane'), 'Jane');
+    await userEvent.type(screen.getByPlaceholderText('Doe'), 'Doe');
+    await userEvent.type(
+      screen.getByPlaceholderText(/name@example.com/i),
+      'jane@example.com'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Enter your password'),
+      'SecurePassword1'
+    );
+    await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
+
+    expect(screen.getByRole('status', { name: 'Creating account' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /creating account/i })).toBeDisabled();
+    expect(screen.queryByText('Error creating account')).not.toBeInTheDocument();
+  });
+
   test('shows a localized fallback when sign up fails', async () => {
     apiClient.post.mockRejectedValue({
       code: 'ERR_BAD_REQUEST',
