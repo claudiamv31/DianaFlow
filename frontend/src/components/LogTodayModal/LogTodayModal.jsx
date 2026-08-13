@@ -90,7 +90,7 @@ const LogTodayModal = ({ onClose, todayDate, existingSymptoms = EMPTY_SYMPTOMS, 
           <p className="text-on-surface-variant text-sm mb-6">{t('symptoms.choose')}</p>
           {loading ? <LoadingSpinner layout="center" size="md" /> : Object.entries(groupedCatalog).map(([category, symptoms]) => (
             <section key={category} className="mb-6"><h3 className="text-xs font-bold uppercase tracking-widest text-primary mb-3">{t(`symptomCategory.${category}`)}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">{symptoms.map((symptom) => {
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{symptoms.map((symptom) => {
                 const value = selected[symptom.id];
                 return <div key={symptom.id} className={`rounded-3xl border p-4 transition-all ${value ? 'border-primary bg-primary/10 shadow-sm' : 'border-outline-variant/30 bg-surface-container-lowest/40'}`}>
                   <button type="button" className="w-full text-left font-semibold text-sm text-on-surface" onClick={() => toggle(symptom)} disabled={isSaving} aria-pressed={Boolean(value)}>
