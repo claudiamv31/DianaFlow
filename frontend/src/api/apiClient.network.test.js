@@ -27,4 +27,26 @@ describe('API client network-state messages', () => {
     ).toBe('network.offline');
     expect(isColdStartError({ message: 'Network Error' })).toBe(false);
   });
+
+  test('treats an unclassified sign-up 400 as a cold-start response', () => {
+    expect(
+      isColdStartError(
+        {
+          response: { status: 400, data: {} }
+        },
+        { method: 'post', url: '/users/sign-up' }
+      )
+    ).toBe(true);
+  });
+
+  test('does not retry a classified sign-up validation 400', () => {
+    expect(
+      isColdStartError(
+        {
+          response: { status: 400, data: { code: 'EmailAlreadyInUse' } }
+        },
+        { method: 'post', url: '/users/sign-up' }
+      )
+    ).toBe(false);
+  });
 });
