@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using backend.Modulos.Symptoms.DTOs;
 
 namespace backend.Modulos.Cycles.DTOs
 {
@@ -18,5 +19,6 @@ namespace backend.Modulos.Cycles.DTOs
         public string? DailyInsightKey { get; set; }
         public int? Flow { get; set; }  
         public int? PeriodDaysId { get; set; }
+        public List<UserSymptomDto> Symptoms { get; set; } = [];
     }
 }

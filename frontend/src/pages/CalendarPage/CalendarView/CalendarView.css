@@ -27,6 +27,9 @@
 .calendar-view .react-calendar button:enabled:hover {
   cursor: pointer;
 }
+.calendar-day-symptom {
+  box-shadow: inset 0 -3px 0 var(--color-secondary);
+}
 
 .calendar-view .react-calendar__navigation {
   display: flex;

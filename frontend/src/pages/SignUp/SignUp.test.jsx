@@ -73,7 +73,7 @@ describe('SignUp', () => {
     );
     await userEvent.type(
       screen.getByPlaceholderText('Enter your password'),
-      'secure-password'
+      'SecurePassword1'
     );
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
 
@@ -87,12 +87,12 @@ describe('SignUp', () => {
       Name: 'Jane',
       LastName: 'Doe',
       Email: 'jane@example.com',
-      Password: 'secure-password',
+      Password: 'SecurePassword1',
       TimeZone: 'America/Mazatlan'
     });
     expect(apiClient.login).toHaveBeenCalledWith(
       'jane@example.com',
-      'secure-password'
+      'SecurePassword1'
     );
   });
 
@@ -136,12 +136,19 @@ describe('SignUp', () => {
     );
     await userEvent.type(
       screen.getByPlaceholderText('Enter your password'),
-      'secure-password'
+      'SecurePassword1'
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Show password' })
     );
     await userEvent.click(screen.getByRole('button', { name: /sign up/i }));
 
     expect(
       await screen.findByText('Error creating account')
     ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter your password')).toHaveAttribute(
+      'type',
+      'text'
+    );
   });
 });

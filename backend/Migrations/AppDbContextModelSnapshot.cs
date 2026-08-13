@@ -128,6 +128,86 @@ namespace backend.Migrations
                     b.ToTable("Profiles");
                 });
 
+            modelBuilder.Entity("backend.Modulos.Symptoms.Models.Symptom", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Icon")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Symptoms");
+                });
+
+            modelBuilder.Entity("backend.Modulos.Symptoms.Models.UserSymptomEntry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("Severity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SymptomId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SymptomId");
+
+                    b.HasIndex("UserId", "Date");
+
+                    b.HasIndex("UserId", "Date", "SymptomId")
+                        .IsUnique();
+
+                    b.ToTable("UserSymptomEntries");
+                });
+
             modelBuilder.Entity("backend.Modulos.User.Models.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -159,6 +239,43 @@ namespace backend.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
+            modelBuilder.Entity("backend.Modulos.User.Models.PasswordResetToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .IsConcurrencyToken()
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("\"UsedAt\" IS NULL");
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
             modelBuilder.Entity("backend.Modulos.User.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -169,13 +286,20 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("NormalizedEmail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("SessionVersion")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
+                    b.HasIndex("NormalizedEmail")
                         .IsUnique();
 
                     b.ToTable("Users");
@@ -214,6 +338,35 @@ namespace backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("backend.Modulos.Symptoms.Models.UserSymptomEntry", b =>
+                {
+                    b.HasOne("backend.Modulos.Symptoms.Models.Symptom", "Symptom")
+                        .WithMany("Entries")
+                        .HasForeignKey("SymptomId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("backend.Modulos.User.Models.User", "User")
+                        .WithMany("SymptomEntries")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Symptom");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("backend.Modulos.User.Models.PasswordResetToken", b =>
+                {
+                    b.HasOne("backend.Modulos.User.Models.User", "User")
+                        .WithMany("PasswordResetTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("backend.Modulos.User.Models.RefreshToken", b =>
                 {
                     b.HasOne("backend.Modulos.User.Models.User", "User")
@@ -225,12 +378,21 @@ namespace backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("backend.Modulos.Symptoms.Models.Symptom", b =>
+                {
+                    b.Navigation("Entries");
+                });
+
             modelBuilder.Entity("backend.Modulos.User.Models.User", b =>
                 {
                     b.Navigation("Profile")
                         .IsRequired();
 
+                    b.Navigation("PasswordResetTokens");
+
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("SymptomEntries");
                 });
 #pragma warning restore 612, 618
         }

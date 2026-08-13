@@ -4,6 +4,8 @@ import Button from '../../../components/Button';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import { useLocale } from '../../../i18n/LocaleContext';
 import { getErrorMessageKey } from '../../../api/AppError';
+import { isStrongPassword } from '../../../utils/passwordPolicy';
+import PasswordInput from '../../../components/PasswordInput';
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
   const { t } = useLocale();
@@ -52,8 +54,8 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
     }
     if (!passwordData.newPassword) {
       newErrors.newPassword = 'password.newRequired';
-    } else if (passwordData.newPassword.length < 8) {
-      newErrors.newPassword = 'password.tooShort';
+    } else if (!isStrongPassword(passwordData.newPassword)) {
+      newErrors.newPassword = 'password.weak';
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       newErrors.confirmPassword = 'password.noMatch';
@@ -143,10 +145,9 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 >
                   {t('password.current')}
                 </label>
-                <input
-                  className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                <PasswordInput
+                  className="w-full h-14 pl-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
                   id="modal-password-current"
-                  type="password"
                   name="currentPassword"
                   value={passwordData.currentPassword}
                   onChange={handlePasswordChange}
@@ -169,10 +170,9 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 >
                   {t('password.new')}
                 </label>
-                <input
-                  className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                <PasswordInput
+                  className="w-full h-14 pl-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
                   id="modal-password-new"
-                  type="password"
                   name="newPassword"
                   value={passwordData.newPassword}
                   onChange={handlePasswordChange}
@@ -186,7 +186,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                   </p>
                 )}
                 <span className="block text-[10px] text-on-surface-variant px-2">
-                  {t('password.minimum')}
+                  {t('password.weak')}
                 </span>
               </div>
 
@@ -198,10 +198,9 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 >
                   {t('password.confirm')}
                 </label>
-                <input
-                  className="w-full h-14 px-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
+                <PasswordInput
+                  className="w-full h-14 pl-6 bg-surface-container-low border-none rounded-full text-on-surface font-medium focus:ring-2 focus:ring-primary/20 transition-all appearance-none"
                   id="modal-password-confirm"
-                  type="password"
                   name="confirmPassword"
                   value={passwordData.confirmPassword}
                   onChange={handlePasswordChange}

@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using backend.Modulos.User.Models; 
 using backend.Modulos.Profile.Models;
 using backend.Modulos.Periods.Models;
+using backend.Modulos.Symptoms.Models;
+
 
 namespace backend.Data
 {
@@ -11,11 +13,14 @@ namespace backend.Data
         {
         }
 
-        public DbSet<Periods> Periods { get; set; }
-        public DbSet<PeriodDays> PeriodDays { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Profile> Profiles { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Periods> Periods { get; set; } = null!;
+        public DbSet<PeriodDays> PeriodDays { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Profile> Profiles { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<Symptom> Symptoms { get; set; } = null!;
+        public DbSet<UserSymptomEntry> UserSymptomEntries { get; set; } = null!;
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,9 +63,9 @@ namespace backend.Data
                 .WithOne(u => u.Profile)
                 .HasForeignKey<Profile>(p => p.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-                
+
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.Email)
+                .HasIndex(u => u.NormalizedEmail)
                 .IsUnique();
 
             modelBuilder.Entity<RefreshToken>()
@@ -75,6 +80,76 @@ namespace backend.Data
 
             modelBuilder.Entity<RefreshToken>()
                 .HasIndex(rt => new { rt.UserId, rt.IsRevoked });
+
+            modelBuilder.Entity<Symptom>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Code)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(x => x.Name)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(x => x.Category)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.HasIndex(x => x.Code)
+                    .IsUnique();
+            });
+        
+            modelBuilder.Entity<UserSymptomEntry>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Notes)
+                    .HasMaxLength(500);
+
+                entity.HasOne(x => x.User)
+                    .WithMany(x => x.SymptomEntries)
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.Symptom)
+                    .WithMany(x => x.Entries)
+                    .HasForeignKey(x => x.SymptomId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => new
+                {
+                    x.UserId,
+                    x.Date,
+                    x.SymptomId
+                }).IsUnique();
+
+                entity.HasIndex(x => new
+                {
+                    x.UserId,
+                    x.Date
+                });
+            }); 
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasOne(prt => prt.User)
+                .WithMany(u => u.PasswordResetTokens)
+                .HasForeignKey(prt => prt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasIndex(prt => prt.TokenHash)
+                .IsUnique();
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasIndex(prt => prt.UserId)
+                .HasFilter("\"UsedAt\" IS NULL")
+                .IsUnique();
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .Property(prt => prt.UsedAt)
+                .IsConcurrencyToken();
         }
     }
 }

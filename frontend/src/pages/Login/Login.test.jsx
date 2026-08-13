@@ -62,6 +62,16 @@ describe('Login', () => {
     expect(screen.getAllByText('Obligatorio')).toHaveLength(2);
   });
 
+  test('aligns the forgot password link opposite the password label', () => {
+    renderLogin();
+
+    expect(screen.getByTestId('password-label-row')).toHaveClass(
+      'flex',
+      'items-center',
+      'justify-between'
+    );
+  });
+
   test('shows wrong password message on the password field', async () => {
     apiClient.login.mockRejectedValue({
       response: {
@@ -88,6 +98,35 @@ describe('Login', () => {
       'aria-invalid',
       'true'
     );
+  });
+
+  test('keeps the password visible when login returns an error', async () => {
+    apiClient.login.mockRejectedValue({
+      response: {
+        status: 401,
+        data: { field: 'password', code: 'INVALID_CREDENTIALS' }
+      }
+    });
+    renderLogin();
+
+    await userEvent.type(
+      screen.getByPlaceholderText(/name@example.com/i),
+      'jane@example.com'
+    );
+    const passwordInput = screen.getByPlaceholderText('Enter your password');
+    await userEvent.type(passwordInput, 'wrong-password');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Show password' })
+    );
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+    expect(
+      await screen.findByText('The password does not match this account.')
+    ).toBeInTheDocument();
+    expect(passwordInput).toHaveAttribute('type', 'text');
+    expect(
+      screen.getByRole('button', { name: 'Hide password' })
+    ).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('navigates home after a successful login and user check', async () => {

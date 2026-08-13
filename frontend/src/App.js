@@ -3,6 +3,8 @@ import { PublicRoute, PrivateRoute } from './routes/guards/routesGuards.jsx';
 import { Toaster } from 'react-hot-toast';
 import Login from './pages//Login/Login.jsx';
 import SignUp from './pages//SignUp/SignUp.jsx';
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword.jsx';
+import ResetPassword from './pages/ResetPassword/ResetPassword.jsx';
 import Home from './pages//Home/Home.jsx';
 import PeriodDataForm from './pages/PeriodDataForm/PeriodDataForm.jsx';
 import PeriodSetup from './pages/PeriodSetup/PeriodSetup.jsx';
@@ -38,6 +40,8 @@ function App() {
               </>
             }
           />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Period Setup Wizard Route */}
           <Route

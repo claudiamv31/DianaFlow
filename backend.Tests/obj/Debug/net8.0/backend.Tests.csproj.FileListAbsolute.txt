@@ -133,3 +133,5 @@
 /Users/claudiavega/Documents/docker/DianaFlow/backend.Tests/obj/Debug/net8.0/backend.Tests.pdb
 /Users/claudiavega/Documents/docker/DianaFlow/backend.Tests/obj/Debug/net8.0/backend.Tests.genruntimeconfig.cache
 /Users/claudiavega/Documents/docker/DianaFlow/backend.Tests/obj/Debug/net8.0/ref/backend.Tests.dll
+/Users/claudiavega/Documents/docker/DianaFlow/backend.Tests/bin/Debug/net8.0/Mailjet.Client.dll
+/Users/claudiavega/Documents/docker/DianaFlow/backend.Tests/bin/Debug/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll
