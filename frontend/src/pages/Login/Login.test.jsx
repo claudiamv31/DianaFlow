@@ -153,4 +153,25 @@ describe('Login', () => {
       ).toBeInTheDocument();
     });
   });
+
+  test('keeps the sign-in action pending while the request is in flight', async () => {
+    apiClient.login.mockImplementation(() => new Promise(() => {}));
+    renderLogin();
+
+    await userEvent.type(
+      screen.getByPlaceholderText(/name@example.com/i),
+      'jane@example.com'
+    );
+    await userEvent.type(
+      screen.getByPlaceholderText('Enter your password'),
+      'correct-password'
+    );
+    await userEvent.click(screen.getByRole('button', { name: /sign in/i }));
+
+    expect(screen.getByRole('status', { name: 'Signing in' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /signing in/i })).toBeDisabled();
+    expect(
+      screen.queryByText('Error logging in. Please verify your credentials.')
+    ).not.toBeInTheDocument();
+  });
 });

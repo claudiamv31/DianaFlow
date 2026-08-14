@@ -49,4 +49,26 @@ describe('API client network-state messages', () => {
       )
     ).toBe(false);
   });
+
+  test('treats an unclassified login 400 as a cold-start response', () => {
+    expect(
+      isColdStartError(
+        {
+          response: { status: 400, data: {} }
+        },
+        { method: 'post', url: '/users/login' }
+      )
+    ).toBe(true);
+  });
+
+  test('does not retry a classified login validation 400', () => {
+    expect(
+      isColdStartError(
+        {
+          response: { status: 400, data: { code: 'INVALID_CREDENTIALS' } }
+        },
+        { method: 'post', url: '/users/login' }
+      )
+    ).toBe(false);
+  });
 });
