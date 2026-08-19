@@ -21,6 +21,29 @@ const apiClient = axios.create({
 
 const getAccessToken = () => localStorage.getItem(ACCESS_TOKEN_KEY);
 
+export const isAccessTokenExpired = (token) => {
+  if (!token) {
+    return true;
+  }
+
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) {
+      return true;
+    }
+
+    const normalizedPayload = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const decodedPayload = atob(
+      normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, '=')
+    );
+    const { exp } = JSON.parse(decodedPayload);
+
+    return !exp || exp * 1000 <= Date.now();
+  } catch {
+    return true;
+  }
+};
+
 const clearAuthTokens = () => {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
 };
@@ -210,7 +233,7 @@ apiClient.interceptors.request.use((config) => {
 apiClient.checkUser = async () => {
   let token = getAccessToken();
 
-  if (!token) {
+  if (isAccessTokenExpired(token)) {
     try {
       token = await refreshAccessToken();
     } catch (error) {
