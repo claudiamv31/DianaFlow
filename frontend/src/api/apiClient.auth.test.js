@@ -1,4 +1,8 @@
-import { isAccessTokenExpired } from './apiClient';
+import {
+  isAccessTokenExpired,
+  normalizeApiRootUrl,
+  refreshAccessToken
+} from './apiClient';
 
 jest.mock('axios', () => {
   const client = {
@@ -42,5 +46,35 @@ describe('access-token startup checks', () => {
     const validToken = createToken({ exp: Math.floor(Date.now() / 1000) + 60 });
 
     expect(isAccessTokenExpired(validToken)).toBe(false);
+  });
+});
+
+describe('refresh-token requests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('normalizes an API URL before appending the refresh endpoint', () => {
+    expect(normalizeApiRootUrl('https://example.test/api/')).toBe(
+      'https://example.test'
+    );
+  });
+
+  test('sends refresh requests with credentials', async () => {
+    const axios = require('axios').default;
+    axios.request.mockResolvedValueOnce({
+      data: { accessToken: 'new-access-token' }
+    });
+
+    await expect(refreshAccessToken()).resolves.toBe('new-access-token');
+
+    expect(axios.request).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'post',
+        url: expect.stringMatching(/\/api\/users\/refresh$/),
+        withCredentials: true,
+        data: {}
+      })
+    );
   });
 });

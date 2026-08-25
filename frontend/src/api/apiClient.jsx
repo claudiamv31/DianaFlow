@@ -13,8 +13,13 @@ const COLD_START_RETRY_DELAYS_MS = [1500, 3500];
 let refreshRequest = null;
 let activeColdStartRetries = 0;
 
+export const normalizeApiRootUrl = (url = '') =>
+  url.replace(/\/+$/, '').replace(/\/api$/, '');
+
+const API_ROOT_URL = normalizeApiRootUrl(API_URL);
+
 const apiClient = axios.create({
-  baseURL: API_URL,
+  baseURL: API_ROOT_URL,
   timeout: REQUEST_TIMEOUT_MS,
   withCredentials: true
 });
@@ -129,11 +134,11 @@ const requestWithColdStartRetry = async (requestConfig) => {
   }
 };
 
-const refreshAccessToken = async () => {
+export const refreshAccessToken = async () => {
   if (!refreshRequest) {
     refreshRequest = requestWithColdStartRetry({
       method: 'post',
-      url: `${API_URL}/api/users/refresh`,
+      url: `${API_ROOT_URL}/api/users/refresh`,
       data: {},
       timeout: REQUEST_TIMEOUT_MS,
       withCredentials: true
