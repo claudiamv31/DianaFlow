@@ -58,4 +58,37 @@ describe('DailyInsights actions', () => {
     expect(registerButton).toHaveClass('text-on-primary');
     expect(registerButton).not.toHaveClass('text-white');
   });
+
+  test('shows the update action when the selected date belongs to a period on its last day', () => {
+    render(
+      <LocaleProvider>
+        <DailyInsights
+          cycleInfo={{
+            date: '2026-07-25',
+            cycleDay: 8,
+            phase: 'follicular',
+            phaseDay: 3,
+            phaseLength: 4,
+            fertilityLevel: 'low',
+            isPeriod: false
+          }}
+          isPeriod={false}
+          currentPeriod={{
+            id: '7',
+            startDate: '2026-07-21',
+            endDate: '2026-07-25'
+          }}
+          setIsEditingPeriod={jest.fn()}
+          setIsDailyLogActive={jest.fn()}
+        />
+      </LocaleProvider>
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Edit Period Dates' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Log Period' })
+    ).not.toBeInTheDocument();
+  });
 });

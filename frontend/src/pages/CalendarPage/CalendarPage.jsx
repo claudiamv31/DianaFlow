@@ -202,6 +202,7 @@ const CalendarPage = () => {
               selectedDate={selectedDate}
               setIsDailyLogActive={setIsDailyLogActive}
               isPeriod={cycleInfo?.isPeriod}
+              currentPeriod={currentPeriod}
               symptoms={cycleInfo?.symptoms || []}
               onEditSymptoms={() => setIsSymptomLogActive(true)}
               onDeleteSymptom={async (symptom) => {

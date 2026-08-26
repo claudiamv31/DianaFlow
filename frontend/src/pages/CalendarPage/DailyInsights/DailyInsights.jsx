@@ -26,10 +26,14 @@ const DailyInsigths = ({
   isLoading = false,
   setIsEditingPeriod,
   setIsDailyLogActive,
-  isPeriod
-  , symptoms = [], onEditSymptoms, onDeleteSymptom
+  isPeriod,
+  currentPeriod,
+  symptoms = [],
+  onEditSymptoms,
+  onDeleteSymptom
 }) => {
   const { t, locale } = useLocale();
+  const hasPeriodOnSelectedDate = isPeriod || Boolean(currentPeriod);
   const isToday = cycleInfo?.date === formatDateLocal(new Date());
   const hasCycleDay = cycleInfo?.cycleDay && cycleInfo.cycleDay > 0;
   const phaseDayLabel = t(calendarPhaseDayTranslationKey(cycleInfo?.phase));
@@ -107,7 +111,7 @@ const DailyInsigths = ({
           {symptoms.length ? <div className="flex flex-col gap-2">{symptoms.map((symptom) => <div key={symptom.id} className="flex items-center justify-between gap-2 text-sm"><span className="text-on-surface">{t(`symptom.${symptom.code}`)} {symptom.severity && <span className="text-xs text-on-surface-variant">{t(`severity.${String(symptom.severity).toLowerCase()}`)}</span>}</span><button aria-label={t('common.remove')} className="text-xs text-error" onClick={() => onDeleteSymptom(symptom)}><span className="material-symbols-outlined text-base">close</span></button></div>)}</div> : <p className="text-sm text-on-surface-variant">{t('symptoms.none')}</p>}
         </div>
         <div className="flex flex-col gap-4">
-          {isPeriod && (
+          {hasPeriodOnSelectedDate && (
             <button
               className="w-full py-3 rounded-full !bg-primary text-on-primary font-headline font-bold text-base shadow-lg !shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
               onClick={() => setIsDailyLogActive(true)}
@@ -122,7 +126,9 @@ const DailyInsigths = ({
             className="w-full py-3 rounded-full border border-outline-variant/40 bg-surface-container-lowest/40 text-on-surface-variant font-headline font-semibold text-xs hover:bg-surface-container-high transition-colors uppercase tracking-wider"
             onClick={() => setIsEditingPeriod(true)}
           >
-            {isPeriod ? t('calendar.editPeriodDates') : t('home.logPeriod')}
+            {hasPeriodOnSelectedDate
+              ? t('calendar.editPeriodDates')
+              : t('home.logPeriod')}
           </button>
         </div>
       </div>
