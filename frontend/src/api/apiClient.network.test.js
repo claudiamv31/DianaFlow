@@ -71,4 +71,22 @@ describe('API client network-state messages', () => {
       )
     ).toBe(false);
   });
+
+  test('treats a refresh 500 as a database cold-start response', () => {
+    expect(
+      isColdStartError(
+        { response: { status: 500 } },
+        { method: 'post', url: '/api/users/refresh' }
+      )
+    ).toBe(true);
+  });
+
+  test('does not classify an unrelated 500 as a cold-start response', () => {
+    expect(
+      isColdStartError(
+        { response: { status: 500 } },
+        { method: 'get', url: '/api/users/me' }
+      )
+    ).toBe(false);
+  });
 });

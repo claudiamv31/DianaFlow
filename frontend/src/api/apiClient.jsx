@@ -9,7 +9,9 @@ import {
 
 const ACCESS_TOKEN_KEY = 'jwtToken';
 const REQUEST_TIMEOUT_MS = 45000;
-const COLD_START_RETRY_DELAYS_MS = [1500, 3500];
+// Railway may need several seconds to wake the API and its database. Keep the
+// app in its loading state long enough for that startup to finish.
+const COLD_START_RETRY_DELAYS_MS = [1500, 3500, 7000, 12000];
 let refreshRequest = null;
 let activeColdStartRetries = 0;
 

@@ -18,11 +18,23 @@ const isUnclassifiedAuthBadRequest = (error, config = error?.config) => {
   );
 };
 
+const isRefreshDatabaseStartupError = (error, config = error?.config) => {
+  const method = (config?.method || '').toLowerCase();
+  const url = config?.url || '';
+
+  return (
+    method === 'post' &&
+    url.includes('/users/refresh') &&
+    error?.response?.status === 500
+  );
+};
+
 export const isColdStartError = (error, config = error?.config) =>
   error?.code === 'ECONNABORTED' ||
   isColdStartStatus(error?.response?.status) ||
   (isBrowserNetworkError(error) && !isNavigatorOffline()) ||
-  isUnclassifiedAuthBadRequest(error, config);
+  isUnclassifiedAuthBadRequest(error, config) ||
+  isRefreshDatabaseStartupError(error, config);
 
 export const getNetworkErrorMessageKey = (error) => {
   if (error?.code === 'ECONNABORTED') return 'network.waking';
